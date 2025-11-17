@@ -1,0 +1,72 @@
+/* =========================
+   TOKENS GLOBALES
+   ========================= */
+:root {
+  /* === PALETA PRINCIPAL (ApiEscuela moderno) === */
+  --primary-50: #e8f1ff;
+  --primary-100: #c5daff;
+  --primary-200: #9fc3ff;
+  --primary-300: #79acff;
+  --primary-400: #5294ff;
+  --primary-500: #2c7dff;
+  --primary-600: #1463e6;
+  --primary-700: #0f4db4;
+  --primary-800: #093782;
+  --primary-900: #042151;
+
+  /* === TEXTOS === */
+  --text-main: #1b2b3b;
+  --text-muted: #7a8899;
+  --text-light: #cbd5ff;
+
+  /* === FONDOS === */
+  --bg-1: #020617;
+  --bg-2: #0f172a;
+  --bg-3: #1d4ed8;
+
+  --card-bg: #ffffff;
+
+  /* === BORDES & INPUTS === */
+  --input-border: #d0d7e2;
+  --input-placeholder: #a2a9b8;
+  --input-focus-ring: rgba(1, 65, 136, 0.15);
+
+  /* === SOMBRAS === */
+  --shadow-card: 0 18px 40px rgba(0, 0, 0, 0.25);
+  --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-hover: 0 12px 30px rgba(1, 53, 106, 0.45);
+
+  /* === RADIOS === */
+  --radius: 10px;
+  --radius-md: 20px;
+  --radius-lg: 28px;
+
+  /* === TRANSICIONES === */
+  --speed: 0.15s ease;
+}
+
+/* =========================
+   RESET GLOBAL / FULL SCREEN
+   ========================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden; /* 👈 el body no scrollea, solo el contenido de la app */
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  background-color: #e5edf7;
+  color: var(--text-main);
+}

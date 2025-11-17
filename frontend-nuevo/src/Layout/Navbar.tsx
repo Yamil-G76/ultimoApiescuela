@@ -1,13 +1,33 @@
 // src/components/layout/Navbar.tsx
-import React from "react";
+import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+import {
+  FiHome,
+  FiBookOpen,
+  FiCreditCard,
+  FiBell,
+  FiUsers,
+  FiUser,
+  FiLogOut,
+  FiMenu,
+  FiPlusCircle,
+} from "react-icons/fi";
 
 type UserType = "admin" | "alumno";
 
+type MenuItem = {
+  to: string;
+  label: string;
+  icon: React.ReactNode;
+  exact?: boolean;
+  isSub?: boolean;
+};
+
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
+  const [collapsed, setCollapsed] = useState(false);
 
-  // Detectar rol desde localStorage
+  // ====== LÓGICA DE ROL (TUYA) =======================================
   let userType: UserType = "alumno";
 
   const storedType = localStorage.getItem("user_type");
@@ -30,6 +50,31 @@ const Navbar: React.FC = () => {
   const isAdmin = userType === "admin";
   const basePath = isAdmin ? "/admin" : "/alumno";
 
+  const rawUser = localStorage.getItem("user");
+  let userName = "Usuario";
+  if (rawUser) {
+    try {
+      const parsed = JSON.parse(rawUser) as {
+        username?: string;
+        first_name?: string;
+        last_name?: string;
+      };
+      const nombre =
+        [parsed.first_name, parsed.last_name].filter(Boolean).join(" ") ||
+        parsed.username;
+      if (nombre) userName = nombre;
+    } catch {
+      // ignore
+    }
+  }
+
+  const userInitials = userName
+    .split(" ")
+    .map((p) => p[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -38,130 +83,140 @@ const Navbar: React.FC = () => {
     navigate("/login");
   };
 
+  // ====== MENÚS ======================================================
+  const adminMenu: MenuItem[] = [
+    {
+      to: basePath,
+      label: "Inicio",
+      icon: <FiHome />,
+      exact: true,
+    },
+    {
+      to: "/admin/careers",
+      label: "Carreras",
+      icon: <FiBookOpen />,
+    },
+    {
+      to: "/admin/payments",
+      label: "Pagos",
+      icon: <FiCreditCard />,
+    },
+    {
+      to: "/admin/news",
+      label: "Noticias",
+      icon: <FiBell />,
+    },
+    {
+      to: "/admin/users",
+      label: "Usuarios",
+      icon: <FiUsers />,
+    },
+    {
+      to: "/admin/news/create",
+      label: "Crear noticia",
+      icon: <FiPlusCircle />,
+      isSub: true,
+    },
+  ];
+
+  const alumnoMenu: MenuItem[] = [
+    {
+      to: basePath,
+      label: "Inicio",
+      icon: <FiHome />,
+      exact: true,
+    },
+    {
+      to: "/alumno/profile",
+      label: "Mi perfil",
+      icon: <FiUser />,
+    },
+    {
+      to: "/alumno/careers",
+      label: "Mis carreras",
+      icon: <FiBookOpen />,
+    },
+    {
+      to: "/alumno/payments",
+      label: "Mis pagos",
+      icon: <FiCreditCard />,
+    },
+    {
+      to: "/alumno/news",
+      label: "Noticias",
+      icon: <FiBell />,
+    },
+  ];
+
+  const menuItems = isAdmin ? adminMenu : alumnoMenu;
+
+  // ====== RENDER =====================================================
   return (
-    <aside
-      className="d-flex flex-column justify-content-between"
-      style={{
-        width: "260px",
-        background: "linear-gradient(180deg, #0d6efd 0%, #0dcaf0 100%)",
-        color: "#fff",
-      }}
-    >
-      <div>
-        <div className="p-3 border-bottom border-light">
-          <h5 className="mb-0">ApiEscuela</h5>
-          <small>{isAdmin ? "Panel administrador" : "Panel alumno"}</small>
-        </div>
+    <aside className={`sidebar ${collapsed ? "sidebar--collapsed" : ""}`}>
+      {/* TOP: solo hamburguesa + menú */}
+      <div className="sidebar-top">
+        <button
+          type="button"
+          className="sidebar-toggle"
+          onClick={() => setCollapsed((prev) => !prev)}
+          aria-label="Alternar menú"
+        >
+          <FiMenu />
+        </button>
 
-        <nav className="nav flex-column p-2">
-          {/* DASHBOARD / HOME */}
-          <NavLink
-            to={basePath}
-            className={({ isActive }) =>
-              `nav-link text-white ${isActive ? "fw-bold" : ""}`
-            }
-            end
-          >
-            {isAdmin ? "Dashboard" : "Inicio"}
-          </NavLink>
-
-          {isAdmin ? (
-            <>
-              {/* MENU ADMIN */}
-              <NavLink
-                to="/admin/users"
-                className={({ isActive }) =>
-                  `nav-link text-white ${isActive ? "fw-bold" : ""}`
-                }
-              >
-                Alumnos / Usuarios
-              </NavLink>
-
-              <NavLink
-                to="/admin/careers"
-                className={({ isActive }) =>
-                  `nav-link text-white ${isActive ? "fw-bold" : ""}`
-                }
-              >
-                Carreras
-              </NavLink>
-
-              <NavLink
-                to="/admin/payments"
-                className={({ isActive }) =>
-                  `nav-link text-white ${isActive ? "fw-bold" : ""}`
-                }
-              >
-                Pagos
-              </NavLink>
-
-              {/* Noticias */}
-              <NavLink
-                to="/admin/news"
-                className={({ isActive }) =>
-                  `nav-link text-white ${isActive ? "fw-bold" : ""}`
-                }
-              >
-                Noticias
-              </NavLink>
-              <NavLink
-                to="/admin/news/create"
-                className={({ isActive }) =>
-                  `nav-link text-white ps-4 ${isActive ? "fw-bold" : ""}`
-                }
-              >
-                + Crear noticia
-              </NavLink>
-            </>
-          ) : (
-            <>
-              {/* MENU ALUMNO */}
-              <NavLink
-                to="/alumno/profile"
-                className={({ isActive }) =>
-                  `nav-link text-white ${isActive ? "fw-bold" : ""}`
-                }
-              >
-                Mi perfil
-              </NavLink>
-
-              <NavLink
-                to="/alumno/careers"
-                className={({ isActive }) =>
-                  `nav-link text-white ${isActive ? "fw-bold" : ""}`
-                }
-              >
-                Mis carreras
-              </NavLink>
-
-              <NavLink
-                to="/alumno/payments"
-                className={({ isActive }) =>
-                  `nav-link text-white ${isActive ? "fw-bold" : ""}`
-                }
-              >
-                Mis pagos
-              </NavLink>
-
-              <NavLink
-                to="/alumno/news"
-                className={({ isActive }) =>
-                  `nav-link text-white ${isActive ? "fw-bold" : ""}`
-                }
-              >
-                Noticias
-              </NavLink>
-            </>
-          )}
+        <nav className="sidebar-nav">
+          {menuItems.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.exact}
+              className={({ isActive }) =>
+                `sidebar-item ${item.isSub ? "sidebar-item--sub" : ""} ${
+                  isActive ? "sidebar-item--active" : ""
+                }`
+              }
+              data-label={item.label}
+            >
+              <div className="sidebar-item-icon">{item.icon}</div>
+              {!collapsed && (
+                <span className="sidebar-item-label">{item.label}</span>
+              )}
+            </NavLink>
+          ))}
         </nav>
       </div>
 
-      <div className="p-3 border-top border-light">
-        <button
-          className="btn btn-outline-light btn-sm w-100"
-          onClick={handleLogout}
+      {/* FOOTER: perfil + cerrar sesión, estilo de menú */}
+      <div className="sidebar-footer">
+        <div
+          className="sidebar-item sidebar-item--profile"
+          data-label={userName}
         >
-          Cerrar sesión
+          <div className="sidebar-item-icon sidebar-item-icon--avatar">
+            <span>{userInitials}</span>
+          </div>
+          {!collapsed && (
+            <div className="sidebar-profile-text">
+              <div className="sidebar-profile-name">{userName}</div>
+              <div className="sidebar-profile-role">
+                {isAdmin ? "Administrador" : "Alumno"}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <button
+          type="button"
+          className="sidebar-item sidebar-item--logout"
+          onClick={handleLogout}
+          data-label="Cerrar sesión"
+        >
+          <div className="sidebar-item-icon">
+            <FiLogOut />
+          </div>
+          {!collapsed && (
+            <span className="sidebar-item-label">Cerrar sesión</span>
+          )}
         </button>
       </div>
     </aside>

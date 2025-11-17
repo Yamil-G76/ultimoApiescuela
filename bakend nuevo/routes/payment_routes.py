@@ -1,7 +1,6 @@
 # routes/payment_routes.py
 
 from typing import Optional
-
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -361,14 +360,35 @@ def get_payments_paginated(
 
     items = []
     for p, uxc, user, ud, career in rows:
+        alumno = {
+            "id": user.id,
+            "username": user.username,
+            "first_name": ud.first_name,
+            "last_name": ud.last_name,
+            "dni": ud.dni,
+            "email": ud.email,
+        }
+
+        career_obj = {
+            "id": career.id,
+            "name": career.name,
+        }
+
         items.append(
             {
+                # --- datos del pago ---
                 "id": p.id,
                 "numero_cuota": p.numero_cuota,
                 "fecha_pago": p.fecha_pago,
                 "monto": p.monto,
                 "adelantado": p.adelantado,
                 "anulado": p.anulado,
+
+                # --- objetos anidados para el FRONT ---
+                "alumno": alumno,
+                "career": career_obj,
+
+                # --- campos planos (compatibilidad) ---
                 "id_usuarioxcarrera": uxc.id,
                 "user_id": user.id,
                 "username": user.username,

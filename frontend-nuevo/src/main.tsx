@@ -3,9 +3,14 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import AppRouter from "./routes/AppRouter";
-import "bootstrap/dist/css/bootstrap.min.css";
 
-
+// 🔹 Estilos globales de ApiEscuela (sin Bootstrap)
+import "./styles/variables.css";
+import "./styles/layout.css";
+import "./styles/sidevar.css";
+import "./styles/login.css";
+import "./styles/dashboard.css";
+import "./styles/careers.css"
 const rootElement = document.getElementById("root") as HTMLElement;
 
 ReactDOM.createRoot(rootElement).render(

@@ -1,0 +1,191 @@
+/* SIDEBAR BASE */
+.sidebar {
+  height: 100vh;
+  width: 260px;
+  background: linear-gradient(180deg, #053a7b, #0450a8);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 14px;
+  box-sizing: border-box;
+  transition: width 0.18s ease;
+  position: relative;
+  z-index: 10;
+}
+
+/* Colapsado */
+.sidebar.sidebar--collapsed {
+  width: 80px;
+  align-items: center;
+}
+
+/* TOP */
+.sidebar-top {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Botón hamburguesa */
+.sidebar-toggle {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #e5edff;
+  transition: background 0.15s ease, transform 0.08s ease;
+}
+
+.sidebar-toggle:hover {
+  background: rgba(15, 23, 42, 0.25);
+  transform: translateY(-1px);
+}
+
+/* NAV */
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  margin-top: 8px;
+  gap: 8px;
+}
+
+.sidebar-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  color: #e5edff;
+  text-decoration: none;
+  font-size: 0.9rem;
+  opacity: 0.85;
+  transition:
+    background 0.15s ease,
+    opacity 0.15s ease,
+    transform 0.08s ease,
+    box-shadow 0.15s ease;
+}
+
+.sidebar-item-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-item-label {
+  white-space: nowrap;
+}
+
+/* Hover / activo */
+.sidebar-item:hover {
+  background: rgba(255, 255, 255, 0.12);
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+.sidebar-item--active {
+  background: #ffffff;
+  color: #014188;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Item secundario (crear noticia) */
+.sidebar-item--sub {
+  opacity: 0.8;
+}
+
+/* === COLAPSADO + TOOLTIP ======================================= */
+.sidebar.sidebar--collapsed .sidebar-item-label,
+.sidebar.sidebar--collapsed .sidebar-profile-text {
+  display: none;
+}
+
+.sidebar.sidebar--collapsed .sidebar-item {
+  justify-content: center;
+  padding-inline: 0;
+}
+
+/* Tooltip para todos los items (menu + footer) en modo colapsado */
+.sidebar.sidebar--collapsed .sidebar-item::after {
+  content: attr(data-label);
+  position: absolute;
+  left: 80px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #111827;
+  color: #e5e7eb;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease, transform 0.12s ease;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+}
+
+.sidebar.sidebar--collapsed .sidebar-item:hover::after {
+  opacity: 1;
+  transform: translateY(-50%) translateX(2px);
+}
+
+/* FOOTER (perfil + logout) */
+.sidebar-footer {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+/* Perfil como item especial */
+.sidebar-item--profile {
+  cursor: default;
+}
+
+.sidebar-item--profile:hover {
+  /* un poquito menos hover que los demás, para que no parezca botón de acción */
+  background: rgba(255, 255, 255, 0.1);
+  transform: none;
+}
+
+/* Avatar dentro del icono */
+.sidebar-item-icon--avatar {
+  background: #ffffff;
+  color: #014188;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.sidebar-profile-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-profile-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.sidebar-profile-role {
+  font-size: 0.75rem;
+  opacity: 0.9;
+}
+
+/* Logout como item normal de menú */
+.sidebar-item--logout {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}

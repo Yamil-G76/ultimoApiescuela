@@ -1,0 +1,273 @@
+/* ===========================================
+   PÁGINA GENERAL CARRERAS
+   =========================================== */
+
+.career-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  color: var(--text-main);
+}
+
+/* Encabezados genéricos de página */
+.page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.page-header-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.page-header-subtitle {
+  margin: 4px 0 0 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* ===========================================
+   ALERTAS / MENSAJES
+   =========================================== */
+
+.alert-box {
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+}
+
+.alert-error {
+  background-color: #ffe5e5;
+  color: #a32020;
+}
+
+.alert-list {
+  margin: 0;
+  padding-left: 18px;
+}
+
+/* Mensajes de lista (centrados) */
+.list-message {
+  padding: 10px 8px;
+  font-size: 0.9rem;
+}
+
+.list-message--muted {
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* ===========================================
+   BOTONES GENERALES
+   =========================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 16px;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.08s ease;
+}
+
+.btn:disabled {
+  opacity: 0.7;
+  cursor: default;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Principal */
+.btn-primary {
+  background-color: var(--primary-600);
+  color: #ffffff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--primary-700);
+  box-shadow: 0 10px 22px rgba(15, 77, 180, 0.45);
+  transform: translateY(-1px);
+}
+
+/* Secundario gris claro */
+.btn-secondary {
+  background-color: #e5e7eb;
+  color: #111827;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: #d1d5db;
+  box-shadow: 0 6px 16px rgba(17, 24, 39, 0.18);
+  transform: translateY(-1px);
+}
+
+/* Bordeado */
+.btn-outline {
+  background-color: #ffffff;
+  color: var(--primary-700);
+  border: 1px solid var(--primary-200);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background-color: var(--primary-50);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.16);
+  transform: translateY(-1px);
+}
+
+/* Peligro */
+.btn-danger {
+  background-color: #dc2626;
+  color: #ffffff;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background-color: #b91c1c;
+  box-shadow: 0 6px 16px rgba(185, 28, 28, 0.4);
+  transform: translateY(-1px);
+}
+
+/* Tamaño reducido para acciones en tabla */
+.btn-small {
+  padding: 6px 10px;
+  font-size: 0.78rem;
+}
+
+/* ===========================================
+   FORMULARIOS
+   =========================================== */
+
+.career-form-card {
+  background-color: #ffffff;
+  border-radius: 24px;
+  box-shadow: var(--shadow-soft);
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px 32px;
+}
+
+.form-column {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.form-label-optional {
+  font-weight: 400;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.form-input {
+  border-radius: 10px;
+  border: 1px solid var(--input-border);
+  padding: 9px 12px;
+  font-size: 0.9rem;
+  outline: none;
+  background-color: #ffffff;
+}
+
+.form-input::placeholder {
+  color: var(--input-placeholder);
+}
+
+.form-input:focus {
+  border-color: var(--primary-600);
+  box-shadow: 0 0 0 2px var(--input-focus-ring);
+}
+
+/* Acciones del formulario */
+.form-actions {
+  margin-top: 6px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ===========================================
+   BUSCADOR LISTA CARRERAS
+   =========================================== */
+
+.career-search {
+  margin-top: 4px;
+}
+
+.career-search-input-wrapper {
+  display: flex;
+  gap: 8px;
+  max-width: 520px;
+}
+
+.career-search-input {
+  flex: 1;
+}
+
+/* ===========================================
+   LISTA CARRERAS (TABLA)
+   =========================================== */
+
+.career-list-container {
+  margin-top: 4px;
+  height: 70vh;
+  overflow-y: auto;
+  border-radius: 18px;
+  background-color: #ffffff;
+  box-shadow: var(--shadow-soft);
+  padding: 10px 12px;
+}
+
+/* Tabla ya usa .table-modern del dashboard */
+.career-table {
+  width: 100%;
+}
+
+/* Alinear botones dentro de la celda de acciones */
+.career-table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .career-list-container {
+    height: 60vh;
+  }
+
+  .career-table-actions {
+    flex-direction: row;
+  }
+}

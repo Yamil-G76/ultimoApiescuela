@@ -1,0 +1,266 @@
+/* =========================
+   DASHBOARD ADMIN
+   ========================= */
+
+.dashboard-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  color: var(--text-main);
+}
+
+/* Encabezado */
+.dashboard-header h2 {
+  margin: 0 0 4px 0;
+  font-size: 1.6rem;
+}
+
+.dashboard-header p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+/* Mensajes de estado */
+.dashboard-error {
+  margin-bottom: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background-color: #ffe5e5;
+  color: #a32020;
+  font-size: 0.9rem;
+}
+
+.dashboard-loading {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+/* =========================
+   FILA SUPERIOR
+   ========================= */
+
+.dashboard-top {
+  display: flex;
+  gap: 20px;
+  align-items: stretch;
+}
+
+/* Columna izquierda: tarjetas apiladas, más angostas */
+.dashboard-column-left {
+  flex: 0 0 30%;
+  max-width: 320px;
+  min-width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Tarjeta de últimos pagos: ocupa ~70% restante */
+.dashboard-card--top-pagos {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ======================================
+   TARJETAS
+   ====================================== */
+
+.dashboard-card {
+  position: relative;
+  background: linear-gradient(135deg, #ffffff, #f4f7ff);
+  padding: 18px 18px 16px;
+  border-radius: 22px;
+  box-shadow: 0 16px 35px rgba(15, 23, 42, 0.12);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Barra superior de color */
+.dashboard-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 22px;
+  border-top: 4px solid var(--primary-400);
+  opacity: 0.95;
+  pointer-events: none;
+}
+
+/* Hover */
+.dashboard-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.2);
+}
+
+/* Título */
+.dashboard-card-title {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+/* Valor grande */
+.dashboard-card-value {
+  font-size: 2.1rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--primary-800);
+}
+
+/* Botón */
+.dashboard-card-btn {
+  margin-top: 8px;
+  align-self: flex-start;
+  padding: 7px 16px;
+  border-radius: 999px;
+  border: none;
+  background-color: var(--primary-600);
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: background 0.15s ease, box-shadow 0.15s ease,
+    transform 0.08s ease;
+}
+
+.dashboard-card-btn:hover {
+  background-color: var(--primary-700);
+  box-shadow: 0 10px 22px rgba(15, 77, 180, 0.45);
+  transform: translateY(-1px);
+}
+
+/* Variantes por tipo */
+.dashboard-card--alumnos::before {
+  border-top-color: #22c55e;
+}
+.dashboard-card--alumnos .dashboard-card-value {
+  color: #15803d;
+}
+
+.dashboard-card--carreras::before {
+  border-top-color: #0ea5e9;
+}
+.dashboard-card--carreras .dashboard-card-value {
+  color: #0369a1;
+}
+
+/* Tarjeta de últimos pagos arriba */
+.dashboard-card--top-pagos::before {
+  border-top-color: #f97316;
+}
+
+/* Contenido vacío */
+.dashboard-top-pagos-empty {
+  margin-top: 6px;
+}
+
+/* Mini tabla dentro de la tarjeta de últimos pagos */
+.dashboard-top-pagos-mini {
+  margin-top: 10px;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: var(--shadow-soft);
+  padding: 6px 8px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+/* ======================================
+   SECCIÓN: ÚLTIMAS NOTICIAS
+   ====================================== */
+
+.dashboard-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dashboard-news-section {
+  margin-top: 8px;
+}
+
+.dashboard-section-header h3 {
+  margin: 0 0 2px 0;
+  font-size: 1.1rem;
+}
+
+.dashboard-section-header p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.dashboard-empty-text {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* Panel noticias grande */
+.dashboard-news-panel {
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: var(--shadow-soft);
+  padding: 12px 16px;
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+/* Celda de detalle de noticias */
+.dashboard-news-detail-cell {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+/* ======================================
+   TABLAS
+   ====================================== */
+
+.table-modern {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.table-modern th {
+  text-align: left;
+  padding: 10px;
+  background: var(--primary-50);
+  font-size: 0.85rem;
+}
+
+.table-modern td {
+  padding: 10px;
+  background: #ffffff;
+  border-bottom: 1px solid #eeeeee;
+}
+
+.table-modern tr:hover td {
+  background: #f4f7ff;
+}
+
+/* Tabla compacta para la tarjeta de pagos */
+.table-modern--compact th,
+.table-modern--compact td {
+  padding: 6px 8px;
+  font-size: 0.8rem;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .dashboard-top {
+    flex-direction: column;
+  }
+
+  .dashboard-column-left {
+    flex: 1;
+    max-width: 100%;
+  }
+
+  .dashboard-card--top-pagos {
+    flex: 1;
+  }
+}

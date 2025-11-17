@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../../../config/backend";
+import "../../../styles/careers.css";
 
 interface CareerItem {
   id: number;
@@ -177,49 +178,48 @@ const CareerListView: React.FC = () => {
   // Render
   // ---------------------------------
   return (
-    <div className="container mt-4">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2>Carreras</h2>
-        <button className="btn btn-primary" onClick={handleCreate}>
+    <div className="career-page">
+      <header className="page-header">
+        <div>
+          <h2 className="page-header-title">Carreras</h2>
+          <p className="page-header-subtitle">
+            Administrá las carreras activas y su información básica.
+          </p>
+        </div>
+
+        <button className="btn btn-primary" onClick={handleCreate} type="button">
           + Nueva carrera
         </button>
-      </div>
+      </header>
 
-      <form className="mb-3" onSubmit={handleSearchSubmit}>
-        <div className="input-group">
+      <form className="career-search" onSubmit={handleSearchSubmit}>
+        <div className="career-search-input-wrapper">
           <input
-            className="form-control"
+            className="form-input career-search-input"
             placeholder="Buscar por nombre de carrera..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <button className="btn btn-outline-secondary" type="submit">
+          <button className="btn btn-outline" type="submit">
             Buscar
           </button>
         </div>
       </form>
 
-      {error && <div className="alert alert-danger py-2">{error}</div>}
+      {error && <div className="alert-box alert-error">{error}</div>}
 
       <div
         ref={scrollContainerRef}
         onScroll={handleScroll}
-        style={{
-          height: "70vh",
-          overflowY: "auto",
-          border: "1px solid #dee2e6",
-          borderRadius: "0.5rem",
-          backgroundColor: "#ffffff",
-          padding: "0.75rem",
-        }}
+        className="career-list-container"
       >
         {initialLoading ? (
-          <div className="text-center text-muted py-3">
+          <div className="list-message list-message--muted">
             Cargando carreras...
           </div>
         ) : (
           <>
-            <table className="table table-striped table-hover mb-0">
+            <table className="table-modern career-table">
               <thead>
                 <tr>
                   <th>ID</th>
@@ -227,7 +227,7 @@ const CareerListView: React.FC = () => {
                   <th>Costo mensual</th>
                   <th>Duración (meses)</th>
                   <th>Inicio cursado</th>
-                  <th style={{ width: "250px" }}>Acciones</th>
+                  <th style={{ width: "260px" }}>Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -238,21 +238,24 @@ const CareerListView: React.FC = () => {
                     <td>${c.costo_mensual}</td>
                     <td>{c.duracion_meses}</td>
                     <td>{formatFecha(c.inicio_cursado || null)}</td>
-                    <td>
+                    <td className="career-table-actions">
                       <button
-                        className="btn btn-sm btn-outline-primary me-2"
+                        className="btn btn-small btn-outline"
+                        type="button"
                         onClick={() => handleEdit(c.id)}
                       >
                         Editar
                       </button>
                       <button
-                        className="btn btn-sm btn-outline-secondary me-2"
+                        className="btn btn-small btn-outline"
+                        type="button"
                         onClick={() => handleViewPrices(c.id)}
                       >
                         Historial precios
                       </button>
                       <button
-                        className="btn btn-sm btn-outline-danger"
+                        className="btn btn-small btn-danger"
+                        type="button"
                         onClick={() => handleDelete(c.id)}
                       >
                         Eliminar
@@ -263,8 +266,10 @@ const CareerListView: React.FC = () => {
 
                 {items.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="text-center">
-                      No se encontraron carreras.
+                    <td colSpan={6}>
+                      <div className="list-message list-message--muted">
+                        No se encontraron carreras.
+                      </div>
                     </td>
                   </tr>
                 )}
@@ -272,13 +277,13 @@ const CareerListView: React.FC = () => {
             </table>
 
             {loadingMore && (
-              <div className="text-center text-muted py-2">
+              <div className="list-message list-message--muted">
                 Cargando más carreras...
               </div>
             )}
 
             {!hasMore && items.length > 0 && (
-              <div className="text-center text-muted py-2">
+              <div className="list-message list-message--muted">
                 No hay más carreras para cargar.
               </div>
             )}

@@ -212,12 +212,12 @@ const CareerPricesView: React.FC = () => {
               >
                 <table className="table table-striped table-hover mb-0">
                   <thead>
-                    <tr>
+                    <a>
                       <th>ID</th>
                       <th>Monto</th>
                       <th>Vigente desde</th>
                       <th>Registrado el</th>
-                    </tr>
+                    </a>
                   </thead>
                   <tbody>
                     {prices.map((p) => (

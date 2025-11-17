@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+// src/views/auth/admin/CareerEditView.tsx
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { BASE_URL } from "../../../config/backend";
+import "../../../styles/careers.css";
 
 interface CareerData {
   id: number;
@@ -17,7 +19,7 @@ interface CareerUpdatePayload {
   inicio_cursado?: string;
 }
 
-const CareerEditView = () => {
+const CareerEditView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
@@ -145,31 +147,53 @@ const CareerEditView = () => {
     }
   };
 
-  if (loading) {
-    return <div className="container mt-4">Cargando carrera...</div>;
-  }
-
-  if (!career) {
-    return <div className="container mt-4">Carrera no encontrada</div>;
-  }
-
   const handleViewHistory = () => {
     if (!id) return;
     navigate(`/admin/careers/${id}/prices`);
   };
 
+  if (loading) {
+    return (
+      <div className="career-page">
+        <div className="list-message list-message--muted">
+          Cargando carrera...
+        </div>
+      </div>
+    );
+  }
+
+  if (!career) {
+    return (
+      <div className="career-page">
+        <div className="list-message list-message--muted">
+          Carrera no encontrada.
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="container mt-4">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2 className="mb-0">Editar carrera</h2>
-        <button className="btn btn-outline-secondary" onClick={handleViewHistory}>
+    <div className="career-page">
+      <header className="page-header">
+        <div>
+          <h2 className="page-header-title">Editar carrera</h2>
+          <p className="page-header-subtitle">
+            Actualizá los datos de la carrera seleccionada.
+          </p>
+        </div>
+
+        <button
+          className="btn btn-outline"
+          type="button"
+          onClick={handleViewHistory}
+        >
           Ver historial de precios
         </button>
-      </div>
+      </header>
 
       {errors.length > 0 && (
-        <div className="alert alert-danger py-2">
-          <ul className="mb-0">
+        <div className="alert-box alert-error">
+          <ul className="alert-list">
             {errors.map((e, idx) => (
               <li key={idx}>{e}</li>
             ))}
@@ -177,69 +201,77 @@ const CareerEditView = () => {
         </div>
       )}
 
-      <div className="row">
-        <div className="col-md-6">
-          {/* Nombre */}
-          <div className="mb-3">
-            <label className="form-label">Nombre de la carrera</label>
-            <input
-              className="form-control"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
+      <div className="career-form-card">
+        <div className="form-grid">
+          <div className="form-column">
+            {/* Nombre */}
+            <div className="form-field">
+              <label className="form-label">Nombre de la carrera</label>
+              <input
+                className="form-input"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
+
+            {/* Costo mensual */}
+            <div className="form-field">
+              <label className="form-label">Costo mensual</label>
+              <input
+                type="number"
+                className="form-input"
+                value={costoMensual}
+                onChange={(e) => setCostoMensual(e.target.value)}
+              />
+            </div>
           </div>
 
-          {/* Costo mensual */}
-          <div className="mb-3">
-            <label className="form-label">Costo mensual</label>
-            <input
-              type="number"
-              className="form-control"
-              value={costoMensual}
-              onChange={(e) => setCostoMensual(e.target.value)}
-            />
+          <div className="form-column">
+            {/* Duración */}
+            <div className="form-field">
+              <label className="form-label">Duración (meses)</label>
+              <input
+                type="number"
+                className="form-input"
+                value={duracionMeses}
+                onChange={(e) => setDuracionMeses(e.target.value)}
+              />
+            </div>
+
+            {/* Inicio cursado */}
+            <div className="form-field">
+              <label className="form-label">
+                Inicio de cursado <span className="form-label-optional">(opcional)</span>
+              </label>
+              <input
+                type="date"
+                className="form-input"
+                value={inicioCursado}
+                onChange={(e) => setInicioCursado(e.target.value)}
+              />
+            </div>
           </div>
         </div>
 
-        <div className="col-md-6">
-          {/* Duración */}
-          <div className="mb-3">
-            <label className="form-label">Duración (meses)</label>
-            <input
-              type="number"
-              className="form-control"
-              value={duracionMeses}
-              onChange={(e) => setDuracionMeses(e.target.value)}
-            />
-          </div>
+        <div className="form-actions">
+          <button
+            className="btn btn-primary"
+            type="button"
+            onClick={handleSubmit}
+            disabled={saving}
+          >
+            {saving ? "Guardando..." : "Guardar cambios"}
+          </button>
 
-          {/* Inicio cursado */}
-          <div className="mb-3">
-            <label className="form-label">Inicio de cursado (opcional)</label>
-            <input
-              type="date"
-              className="form-control"
-              value={inicioCursado}
-              onChange={(e) => setInicioCursado(e.target.value)}
-            />
-          </div>
+          <button
+            className="btn btn-secondary"
+            type="button"
+            onClick={() => navigate("/admin/careers")}
+          >
+            Cancelar
+          </button>
         </div>
       </div>
-
-      <button
-        className="btn btn-primary me-2"
-        onClick={handleSubmit}
-        disabled={saving}
-      >
-        {saving ? "Guardando..." : "Guardar cambios"}
-      </button>
-
-      <button
-        className="btn btn-secondary"
-        onClick={() => navigate("/admin/careers")}
-      >
-        Cancelar
-      </button>
     </div>
   );
 };

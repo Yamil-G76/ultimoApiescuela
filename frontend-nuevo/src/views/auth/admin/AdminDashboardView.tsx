@@ -45,6 +45,9 @@ interface NewsItem {
   id: number;
   title: string;
   created_at?: string | null;
+  // Campos opcionales para el detalle, por si en tu backend se llama distinto
+  content?: string | null;
+  body?: string | null;
 }
 
 // Estadísticas agregadas
@@ -89,6 +92,13 @@ const AdminDashboardView: React.FC = () => {
     return p.career?.name ?? "-";
   };
 
+  const getNewsSnippet = (n: NewsItem, maxLength = 90) => {
+    const raw = (n.content || n.body || "").trim();
+    if (!raw) return "Sin detalle cargado";
+    if (raw.length <= maxLength) return raw;
+    return raw.slice(0, maxLength).trimEnd() + "…";
+  };
+
   useEffect(() => {
     const loadDashboard = async () => {
       setLoading(true);
@@ -103,13 +113,12 @@ const AdminDashboardView: React.FC = () => {
           headers.Authorization = `Bearer ${token}`;
         }
 
-        // 1) Total alumnos (users/paginated)
+        // 1) Total alumnos
         const usersBody = {
           page: 1,
           page_size: 1,
           search: null as string | null,
         };
-
         const usersRes = await fetch(`${BASE_URL}/users/paginated`, {
           method: "POST",
           headers,
@@ -118,7 +127,8 @@ const AdminDashboardView: React.FC = () => {
         if (!usersRes.ok) {
           throw new Error(`Error users/paginated: ${usersRes.status}`);
         }
-        const usersData = (await usersRes.json()) as SimplePaginatedResponse<unknown>;
+        const usersData =
+          (await usersRes.json()) as SimplePaginatedResponse<unknown>;
 
         // 2) Total carreras
         const careersBody = {
@@ -134,12 +144,13 @@ const AdminDashboardView: React.FC = () => {
         if (!careersRes.ok) {
           throw new Error(`Error careers/paginated: ${careersRes.status}`);
         }
-        const careersData = (await careersRes.json()) as SimplePaginatedResponse<unknown>;
+        const careersData =
+          (await careersRes.json()) as SimplePaginatedResponse<unknown>;
 
         // 3) Total pagos + últimos pagos
         const paymentsBody = {
           page: 1,
-          page_size: 5, // últimos 5
+          page_size: 5,
           include_anulados: false,
         };
         const paymentsRes = await fetch(`${BASE_URL}/payments/paginated`, {
@@ -150,7 +161,8 @@ const AdminDashboardView: React.FC = () => {
         if (!paymentsRes.ok) {
           throw new Error(`Error payments/paginated: ${paymentsRes.status}`);
         }
-        const paymentsData = (await paymentsRes.json()) as SimplePaginatedResponse<PaymentListItem>;
+        const paymentsData =
+          (await paymentsRes.json()) as SimplePaginatedResponse<PaymentListItem>;
 
         // 4) Total noticias + últimas noticias
         const newsBody = {
@@ -165,7 +177,8 @@ const AdminDashboardView: React.FC = () => {
         if (!newsRes.ok) {
           throw new Error(`Error news/paginated: ${newsRes.status}`);
         }
-        const newsData = (await newsRes.json()) as SimplePaginatedResponse<NewsItem>;
+        const newsData =
+          (await newsRes.json()) as SimplePaginatedResponse<NewsItem>;
 
         setStats({
           totalAlumnos: usersData.data?.total_items ?? 0,
@@ -192,167 +205,122 @@ const AdminDashboardView: React.FC = () => {
   }, []);
 
   return (
-    <div className="container mt-4">
-      <h2>Dashboard administrador</h2>
-      <p className="text-muted">
-        Resumen general de alumnos, carreras, pagos y noticias.
-      </p>
+    <div className="dashboard-page">
+      {/* Encabezado */}
+      <header className="dashboard-header">
+        <h2>Dashboard administrador</h2>
+        <p>Resumen general de alumnos, carreras, pagos y noticias.</p>
+      </header>
 
-      {error && (
-        <div className="alert alert-danger py-2">
-          {error}
-        </div>
-      )}
+      {error && <div className="dashboard-error">{error}</div>}
 
       {loading ? (
-        <div>Cargando datos del dashboard...</div>
+        <div className="dashboard-loading">Cargando datos del dashboard...</div>
       ) : (
         <>
-          {/* Tarjetas resumen */}
-          <div className="row g-3 mb-4">
-            <div className="col-md-3">
-              <div className="card shadow-sm">
-                <div className="card-body">
-                  <h6 className="card-subtitle mb-1 text-muted">Alumnos</h6>
-                  <h3 className="card-title">{stats.totalAlumnos}</h3>
-                  <button
-                    className="btn btn-sm btn-outline-primary mt-2"
-                    onClick={() => navigate("/admin/users")}
-                  >
-                    Ver alumnos
-                  </button>
-                </div>
-              </div>
+          {/* Fila superior:
+              - Izquierda: tarjetas apiladas (Alumnos / Carreras), más angostas
+              - Derecha: tarjeta ancha "Últimos pagos realizados" (~70%) */}
+          <section className="dashboard-top">
+            {/* Columna izquierda: tarjetas */}
+            <div className="dashboard-column-left">
+              <article className="dashboard-card dashboard-card--alumnos">
+                <h3 className="dashboard-card-title">Alumnos</h3>
+                <p className="dashboard-card-value">{stats.totalAlumnos}</p>
+                <button
+                  className="dashboard-card-btn"
+                  onClick={() => navigate("/admin/users")}
+                >
+                  Ver alumnos
+                </button>
+              </article>
+
+              <article className="dashboard-card dashboard-card--carreras">
+                <h3 className="dashboard-card-title">Carreras</h3>
+                <p className="dashboard-card-value">{stats.totalCarreras}</p>
+                <button
+                  className="dashboard-card-btn"
+                  onClick={() => navigate("/admin/careers")}
+                >
+                  Ver carreras
+                </button>
+              </article>
             </div>
 
-            <div className="col-md-3">
-              <div className="card shadow-sm">
-                <div className="card-body">
-                  <h6 className="card-subtitle mb-1 text-muted">Carreras</h6>
-                  <h3 className="card-title">{stats.totalCarreras}</h3>
-                  <button
-                    className="btn btn-sm btn-outline-primary mt-2"
-                    onClick={() => navigate("/admin/careers")}
-                  >
-                    Ver carreras
-                  </button>
-                </div>
-              </div>
-            </div>
+            {/* Columna derecha: tarjeta ancha con mini tabla de pagos */}
+            <article className="dashboard-card dashboard-card--top-pagos">
+              <h3 className="dashboard-card-title">Últimos pagos realizados</h3>
 
-            <div className="col-md-3">
-              <div className="card shadow-sm">
-                <div className="card-body">
-                  <h6 className="card-subtitle mb-1 text-muted">Pagos</h6>
-                  <h3 className="card-title">{stats.totalPagos}</h3>
-                  <button
-                    className="btn btn-sm btn-outline-primary mt-2"
-                    onClick={() => navigate("/admin/payments")}
-                  >
-                    Ver pagos
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="col-md-3">
-              <div className="card shadow-sm">
-                <div className="card-body">
-                  <h6 className="card-subtitle mb-1 text-muted">Noticias</h6>
-                  <h3 className="card-title">{stats.totalNoticias}</h3>
-                  <button
-                    className="btn btn-sm btn-outline-primary mt-2"
-                    onClick={() => navigate("/admin/news")}
-                  >
-                    Ver noticias
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Últimos pagos + últimas noticias */}
-          <div className="row g-3">
-            {/* Últimos pagos */}
-            <div className="col-lg-7">
-              <div className="card shadow-sm h-100">
-                <div className="card-body">
-                  <h5 className="card-title">Últimos pagos registrados</h5>
-                  <small className="text-muted d-block mb-2">
-                    Ordenados del más reciente al más antiguo.
-                  </small>
-
-                  {lastPayments.length === 0 ? (
-                    <p className="text-muted mb-0">
-                      Todavía no hay pagos registrados.
-                    </p>
-                  ) : (
-                    <div
-                      style={{
-                        maxHeight: "320px",
-                        overflowY: "auto",
-                      }}
-                    >
-                      <table className="table table-sm table-hover mb-0">
-                        <thead>
-                          <tr>
-                            <th>Alumno</th>
-                            <th>Carrera</th>
-                            <th>Cuota</th>
-                            <th>Monto</th>
-                            <th>Fecha</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {lastPayments.map((p) => (
-                            <tr key={p.id}>
-                              <td>{getNombreAlumno(p)}</td>
-                              <td>{getNombreCarrera(p)}</td>
-                              <td>{p.numero_cuota}</td>
-                              <td>${p.monto}</td>
-                              <td>{formatFecha(p.fecha_pago || null)}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Últimas noticias */}
-            <div className="col-lg-5">
-              <div className="card shadow-sm h-100">
-                <div className="card-body">
-                  <h5 className="card-title">Últimas noticias</h5>
-                  <small className="text-muted d-block mb-2">
-                    Lo más reciente publicado para los alumnos.
-                  </small>
-
-                  {lastNews.length === 0 ? (
-                    <p className="text-muted mb-0">
-                      Todavía no hay noticias publicadas.
-                    </p>
-                  ) : (
-                    <ul className="list-group list-group-flush">
-                      {lastNews.map((n) => (
-                        <li
-                          key={n.id}
-                          className="list-group-item d-flex flex-column"
-                        >
-                          <strong>{n.title}</strong>
-                          <small className="text-muted">
-                            {formatFecha(n.created_at || null)}
-                          </small>
-                        </li>
+              {lastPayments.length === 0 ? (
+                <p className="dashboard-empty-text dashboard-top-pagos-empty">
+                  Todavía no hay pagos registrados.
+                </p>
+              ) : (
+                <div className="dashboard-top-pagos-mini">
+                  <table className="table-modern table-modern--compact">
+                    <thead>
+                      <tr>
+                        <th>Alumno</th>
+                        <th>Carrera</th>
+                        <th>Cuota</th>
+                        <th>Monto</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {lastPayments.slice(0, 6).map((pago) => (
+                        <tr key={pago.id}>
+                          <td>{getNombreAlumno(pago)}</td>
+                          <td>{getNombreCarrera(pago)}</td>
+                          <td>{pago.numero_cuota}</td>
+                          <td>${pago.monto.toFixed(2)}</td>
+                        </tr>
                       ))}
-                    </ul>
-                  )}
+                    </tbody>
+                  </table>
                 </div>
-              </div>
+              )}
+            </article>
+          </section>
+
+          {/* Sección amplia: Últimas noticias con detalle recortado */}
+          <section className="dashboard-section dashboard-news-section">
+            <div className="dashboard-section-header">
+              <h3>Últimas noticias y novedades</h3>
+              <p>
+                Listado de las noticias más recientes publicadas en el sistema (
+                total: {stats.totalNoticias}).
+              </p>
             </div>
-          </div>
+
+            {lastNews.length === 0 ? (
+              <p className="dashboard-empty-text">
+                Todavía no hay noticias publicadas.
+              </p>
+            ) : (
+              <div className="dashboard-panel dashboard-news-panel">
+                <table className="table-modern">
+                  <thead>
+                    <tr>
+                      <th>Título</th>
+                      <th>Detalle</th>
+                      <th>Fecha</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {lastNews.map((n) => (
+                      <tr key={n.id}>
+                        <td>{n.title}</td>
+                        <td className="dashboard-news-detail-cell">
+                          {getNewsSnippet(n)}
+                        </td>
+                        <td>{formatFecha(n.created_at)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
         </>
       )}
     </div>
