@@ -1,40 +1,44 @@
+# main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+
 from config.db import Base, engine
-from routes import user_routes, career_routes, payment_routes
+from routes import user_routes
+from routes.upload_routes import router as upload_router
+from routes import news_routes  # 👈 importar tu router de noticias
 
 app = FastAPI()
 
-# -----------------------------
-# 🔹 Configuración de CORS
-# -----------------------------
+# 👇 ORÍGENES PERMITIDOS (tu front)
 origins = [
-
-    "*",   # <-- si querés permitir todo
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,      # or ["*"]
+    allow_origins=origins,          # mientras desarrollás, podés usar ["*"]
     allow_credentials=True,
-    allow_methods=["*"],        # GET, POST, PUT, DELETE...
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# -----------------------------
-# 🔹 Routers
-# -----------------------------
-app.include_router(user_routes.router)
-app.include_router(career_routes.router)
-app.include_router(payment_routes.router)
+# 👉 Montar carpeta estática para servir imágenes
+app.mount(
+    "/static/news_images",
+    StaticFiles(directory="static/news_images"),
+    name="news_images"
+)
 
-# -----------------------------
-# 🔹 Crear tablas al iniciar
-# -----------------------------
-@app.on_event("startup")
-def init_db():
-    try:
-        Base.metadata.create_all(bind=engine)
-        print(" Base de datos inicializada correctamente.")
-    except Exception as e:
-        print("Error al inicializar la base de datos:", e)
+# 👉 Crear tablas
+Base.metadata.create_all(bind=engine)
+
+# 👉 Incluir routers
+app.include_router(user_routes.router)
+app.include_router(upload_router)
+app.include_router(news_routes.router)  # 👈 aquí se engancha /news
+
+@app.get("/")
+def root():
+    return {"message": "API Escuela OK"}

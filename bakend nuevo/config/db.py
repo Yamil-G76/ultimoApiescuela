@@ -23,6 +23,7 @@ engine = create_engine(DATABASE_URL, echo=True)
 # Crear clase base de SQLAlchemy
 Base = declarative_base()
 
+from models import user, career, payment, usuarioxcarrera
 # Configurar la sesión
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

@@ -104,9 +104,11 @@ const LoginView: React.FC = () => {
         return;
       }
 
-      // Guardar token y usuario
+      // 👉 Guardar token y usuario + id y type por separado
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(usuario));
+      localStorage.setItem("user_id", String(usuario.id));
+      localStorage.setItem("user_type", usuario.type);
 
       // Redirigir según el rol
       if (usuario.type === "admin") {
@@ -128,9 +130,14 @@ const LoginView: React.FC = () => {
       className="d-flex align-items-center justify-content-center"
       style={{ minHeight: "100vh", backgroundColor: "#e9f2ff" }}
     >
-      <div className="card shadow-sm" style={{ width: "100%", maxWidth: "380px" }}>
+      <div
+        className="card shadow-sm"
+        style={{ width: "100%", maxWidth: "380px" }}
+      >
         <div className="card-body">
-          <h4 className="card-title mb-3 text-center">Ingreso a ApiEscuela</h4>
+          <h4 className="card-title mb-3 text-center">
+            Ingreso a ApiEscuela
+          </h4>
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
               <label className="form-label">Usuario</label>
@@ -156,7 +163,11 @@ const LoginView: React.FC = () => {
 
             {error && <div className="alert alert-danger py-2">{error}</div>}
 
-            <button type="submit" className="btn btn-primary w-100" disabled={loading}>
+            <button
+              type="submit"
+              className="btn btn-primary w-100"
+              disabled={loading}
+            >
               {loading ? "Ingresando..." : "Entrar"}
             </button>
           </form>

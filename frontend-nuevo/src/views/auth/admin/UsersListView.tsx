@@ -1,45 +1,42 @@
 import React, { useEffect, useRef, useState } from "react";
 import UsersDataView from "../../../components/data/UsersDataView";
-
+import type { User } from "../../../components/data/UsersDataView";
 // 1) Tipos
-type User = {
-  id: number;
-  username: string;
-  first_name?: string | null;
-  last_name?: string | null;
-  type: string;
-};
-
 type PaginatedUsersResponse = {
-  success: boolean;
-  message: string;
-  data: {
+  success?: boolean;
+  message?: string;
+  data?: {
     items: User[];
-    nextCursor: string | null; // o page, según cómo lo tengas en el backend
+    page: number;
+    page_size: number;
+    total_items: number;
+    total_pages: number;
+    has_next: boolean;
   };
 };
 
 // 2) Constantes backend
 const BACKEND_IP = "127.0.0.1";
 const BACKEND_PORT = "8000";
-const ENDPOINT = "/users/paginated"; // ajustá al path real de tu backend
+const ENDPOINT = "/users/paginated";
 const URL = `http://${BACKEND_IP}:${BACKEND_PORT}${ENDPOINT}`;
 
 // 3) Hooks (useState, useRef, useEffect)
 const UsersListView: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
-  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [initialLoading, setInitialLoading] = useState(true);
 
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const loadingRef = useRef<boolean>(false);
 
   // 4) Funciones internas
 
-  const getUsersPag = async () => {
+  const getUsersPag = async (page: number) => {
     if (loadingRef.current) return;
-    if (!hasMore) return;
+    if (!hasMore && page !== 1) return;
 
     loadingRef.current = true;
     setError(null);
@@ -48,8 +45,8 @@ const UsersListView: React.FC = () => {
       const token = localStorage.getItem("token");
 
       const body = {
-        cursor: nextCursor, // o pageNumber, etc.
-        limit: 20,
+        page,
+        page_size: 20,
       };
 
       const res = await fetch(URL, {
@@ -67,18 +64,20 @@ const UsersListView: React.FC = () => {
 
       const data = (await res.json()) as PaginatedUsersResponse;
 
-      if (!data.success) {
+      if (!data.success || !data.data) {
         throw new Error(data.message || "Error al obtener usuarios");
       }
 
-      const newItems = data.data.items || [];
+      const { items, has_next, page: returnedPage } = data.data;
 
-      setUsers((prev) => [...prev, ...newItems]);
-      setNextCursor(data.data.nextCursor);
-
-      if (!data.data.nextCursor || newItems.length === 0) {
-        setHasMore(false);
+      if (page === 1) {
+        setUsers(items);
+      } else {
+        setUsers((prev) => [...prev, ...items]);
       }
+
+      setCurrentPage(returnedPage);
+      setHasMore(has_next);
     } catch (error: unknown) {
       if (error instanceof Error) {
         setError(error.message);
@@ -87,6 +86,7 @@ const UsersListView: React.FC = () => {
       }
     } finally {
       loadingRef.current = false;
+      setInitialLoading(false);
     }
   };
 
@@ -96,16 +96,16 @@ const UsersListView: React.FC = () => {
 
     const { scrollTop, scrollHeight, clientHeight } = container;
 
-    const nearBottom = scrollTop + clientHeight >= scrollHeight - 100; // margen de 100px
+    const nearBottom = scrollTop + clientHeight >= scrollHeight - 100;
 
-    if (nearBottom) {
-      void getUsersPag();
+    if (nearBottom && hasMore && !loadingRef.current) {
+      void getUsersPag(currentPage + 1);
     }
   };
 
   // 5) useEffect para cargar datos al montar
   useEffect(() => {
-    void getUsersPag();
+    void getUsersPag(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -128,7 +128,15 @@ const UsersListView: React.FC = () => {
           padding: "0.75rem",
         }}
       >
-        <UsersDataView users={users} hasMore={hasMore && !error} />
+        {initialLoading ? (
+          <div className="text-center text-muted py-3">Cargando usuarios...</div>
+        ) : (
+          <UsersDataView
+            users={users}
+            loadingMore={loadingRef.current}
+            hasMore={hasMore}
+          />
+        )}
       </div>
     </div>
   );
