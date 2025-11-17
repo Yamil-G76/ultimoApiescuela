@@ -1,249 +1,359 @@
 # routes/career_routes.py
-from fastapi import APIRouter, Request, Depends, Query
-from fastapi.responses import JSONResponse
-from sqlalchemy.orm import Session
+
 from typing import Optional, List
 
+from datetime import datetime
+
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel, validator
+from sqlalchemy.orm import Session
+
 from config.db import get_db
-from auth.security import Security
 from models.career import Career
-from models.usuarioxcarrera import UsuarioXcarrera
-from models.payment import Payment
+from models.career_price import CareerPriceHistory  # 👈 historial de precios
 
-router = APIRouter()
-
-
-# ---------------------------
-# Helpers locales
-# ---------------------------
-def standard_response(success: bool, message: str, data=None):
-    return {"success": success, "message": message, "data": data}
+router = APIRouter(
+    prefix="/careers",
+    tags=["careers"],
+)
 
 
-async def require_admin(request: Request):
-    """
-    Verifica token y que el rol sea admin.
-    Retorna payload si OK o JSONResponse (error) si no.
-    """
-    try:
-        user_data = await Security.get_current_user(request)
-    except Exception as e:
-        return JSONResponse(status_code=401, content=standard_response(False, str(e), None))
+# -------------------------------------------------------------------
+# SCHEMAS BASE
+# -------------------------------------------------------------------
 
-    if user_data.get("rol") != "admin":
-        return JSONResponse(status_code=403, content=standard_response(False, "Acceso denegado. Solo administradores.", None))
+class CareerBase(BaseModel):
+    name: str
+    costo_mensual: int
+    duracion_meses: int
+    inicio_cursado: Optional[datetime] = None
 
-    return user_data
+    @validator("name")
+    def name_not_empty(cls, v: str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("El nombre de la carrera es obligatorio")
+        if len(v) > 50:
+            raise ValueError("El nombre no puede superar los 50 caracteres")
+        return v
+
+    @validator("costo_mensual")
+    def costo_positive_and_reasonable(cls, v: int) -> int:
+        if v <= 0:
+            raise ValueError("El costo mensual debe ser mayor a 0")
+        if v > 1_000_000:
+            raise ValueError("El costo mensual es demasiado alto")
+        return v
+
+    @validator("duracion_meses")
+    def duracion_positive_and_reasonable(cls, v: int) -> int:
+        if v <= 0:
+            raise ValueError("La duración en meses debe ser mayor a 0")
+        if v > 60:
+            raise ValueError("La duración no puede superar los 60 meses")
+        return v
+
+    @validator("inicio_cursado")
+    def inicio_cursado_valid(cls, v: Optional[datetime]) -> Optional[datetime]:
+        # Podés meter más reglas (no muy viejo, no en 1900, etc.)
+        return v
 
 
-# ---------------------------
-# Schemas simples (local)
-# ---------------------------
-from pydantic import BaseModel, Field
+class CareerCreate(CareerBase):
+    """Crear carrera."""
+    pass
 
 
-class InputCareer(BaseModel):
-    name: str = Field(..., min_length=2)
-    costo_mensual: int = Field(..., gt=0)
-    duracion_meses: int = Field(..., gt=0)
-    inicio_cursado: Optional[str] = None  # ISO date string opcional
+class CareerUpdate(CareerBase):
+    """Editar carrera."""
+    pass
 
 
-class UpdateCareer(BaseModel):
-    name: Optional[str]
-    costo_mensual: Optional[int]
-    duracion_meses: Optional[int]
-    inicio_cursado: Optional[str]
+class CareersPaginatedRequest(BaseModel):
+    page: int = 1
+    page_size: int = 20
+    search: Optional[str] = None
+
+    @validator("page", "page_size")
+    def page_min(cls, v: int) -> int:
+        if v <= 0:
+            raise ValueError("page y page_size deben ser mayores a 0")
+        return v
 
 
-# ---------------------------
-# Endpoints
-# ---------------------------
+class CareerPricesPaginatedRequest(BaseModel):
+    id_carrera: int
+    page: int = 1
+    page_size: int = 20
 
-@router.get("/")
-def list_carreras(
-    q: Optional[str] = Query(None, description="Texto a buscar en el nombre"),
-    limit: int = Query(50, gt=0, le=200),
-    last_seen_id: Optional[int] = Query(None),
+    @validator("id_carrera")
+    def id_carrera_positive(cls, v: int) -> int:
+        if v <= 0:
+            raise ValueError("id_carrera debe ser mayor a 0")
+        return v
+
+    @validator("page", "page_size")
+    def page_min(cls, v: int) -> int:
+        if v <= 0:
+            raise ValueError("page y page_size deben ser mayores a 0")
+        return v
+
+
+# -------------------------------------------------------------------
+# CREAR CARRERA
+# -------------------------------------------------------------------
+
+@router.post("")
+def create_career(payload: CareerCreate, db: Session = Depends(get_db)):
+    # Validar nombre único
+    existing = db.query(Career).filter(Career.name == payload.name).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Ya existe una carrera con ese nombre")
+
+    inicio = payload.inicio_cursado or datetime.utcnow()
+
+    nueva = Career(
+        name=payload.name,
+        costo_mensual=payload.costo_mensual,
+        duracion_meses=payload.duracion_meses,
+        inicio_cursado=inicio,
+    )
+
+    db.add(nueva)
+    db.flush()  # para obtener nueva.id antes del commit
+
+    # 💡 Crear registro inicial de precio
+    precio_inicial = CareerPriceHistory(
+        id_carrera=nueva.id,
+        monto=payload.costo_mensual,
+        fecha_desde=datetime.utcnow(),
+    )
+    db.add(precio_inicial)
+
+    db.commit()
+    db.refresh(nueva)
+
+    return {
+      "success": True,
+      "message": "Carrera creada correctamente",
+      "data": {
+          "id": nueva.id,
+          "name": nueva.name,
+          "costo_mensual": nueva.costo_mensual,
+          "duracion_meses": nueva.duracion_meses,
+          "inicio_cursado": nueva.inicio_cursado,
+      },
+    }
+
+
+# -------------------------------------------------------------------
+# OBTENER UNA CARRERA POR ID
+# -------------------------------------------------------------------
+
+@router.get("/{career_id}")
+def get_career(career_id: int, db: Session = Depends(get_db)):
+    c: Optional[Career] = db.query(Career).filter(Career.id == career_id).first()
+    if not c:
+        raise HTTPException(status_code=404, detail="Carrera no encontrada")
+
+    return {
+        "success": True,
+        "data": {
+            "id": c.id,
+            "name": c.name,
+            "costo_mensual": c.costo_mensual,
+            "duracion_meses": c.duracion_meses,
+            "inicio_cursado": c.inicio_cursado,
+        },
+    }
+
+
+# -------------------------------------------------------------------
+# EDITAR CARRERA (con historial de precios)
+# -------------------------------------------------------------------
+
+@router.put("/{career_id}")
+def update_career(career_id: int, payload: CareerUpdate, db: Session = Depends(get_db)):
+    c: Optional[Career] = db.query(Career).filter(Career.id == career_id).first()
+    if not c:
+        raise HTTPException(status_code=404, detail="Carrera no encontrada")
+
+    # Validar nombre único si cambia
+    existing = (
+        db.query(Career)
+        .filter(Career.name == payload.name, Career.id != career_id)
+        .first()
+    )
+    if existing:
+        raise HTTPException(status_code=400, detail="Ya existe otra carrera con ese nombre")
+
+    # Detectar cambio de costo
+    costo_anterior = c.costo_mensual
+    costo_nuevo = payload.costo_mensual
+
+    c.name = payload.name
+    c.costo_mensual = costo_nuevo
+    c.duracion_meses = payload.duracion_meses
+    c.inicio_cursado = payload.inicio_cursado or c.inicio_cursado
+
+    # 💡 Si el costo cambió, registramos un nuevo precio a partir de AHORA
+    if costo_nuevo != costo_anterior:
+        nuevo_precio = CareerPriceHistory(
+            id_carrera=c.id,
+            monto=costo_nuevo,
+            fecha_desde=datetime.utcnow(),  # 👉 a partir de este momento
+        )
+        db.add(nuevo_precio)
+
+    db.commit()
+    db.refresh(c)
+
+    return {
+        "success": True,
+        "message": "Carrera actualizada correctamente",
+        "data": {
+            "id": c.id,
+            "name": c.name,
+            "costo_mensual": c.costo_mensual,
+            "duracion_meses": c.duracion_meses,
+            "inicio_cursado": c.inicio_cursado,
+        },
+    }
+
+
+# -------------------------------------------------------------------
+# ELIMINAR CARRERA
+# -------------------------------------------------------------------
+
+@router.delete("/{career_id}")
+def delete_career(career_id: int, db: Session = Depends(get_db)):
+    c: Optional[Career] = db.query(Career).filter(Career.id == career_id).first()
+    if not c:
+        raise HTTPException(status_code=404, detail="Carrera no encontrada")
+
+    db.delete(c)
+    db.commit()
+
+    return {
+        "success": True,
+        "message": "Carrera eliminada correctamente",
+    }
+
+
+# -------------------------------------------------------------------
+# LISTADO PAGINADO + BÚSQUEDA
+# -------------------------------------------------------------------
+
+@router.post("/paginated")
+def get_careers_paginated(
+    payload: CareersPaginatedRequest,
+    db: Session = Depends(get_db),
+):
+    page = payload.page
+    page_size = payload.page_size
+
+    query = db.query(Career).order_by(Career.id)
+
+    if payload.search:
+        search = f"%{payload.search}%"
+        query = query.filter(Career.name.ilike(search))
+
+    total_items = query.count()
+    total_pages = (total_items + page_size - 1) // page_size if total_items > 0 else 1
+
+    careers_db: List[Career] = (
+        query
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+        .all()
+    )
+
+    items = [
+        {
+            "id": c.id,
+            "name": c.name,
+            "costo_mensual": c.costo_mensual,
+            "duracion_meses": c.duracion_meses,
+            "inicio_cursado": c.inicio_cursado,
+        }
+        for c in careers_db
+    ]
+
+    return {
+        "success": True,
+        "message": "Carreras obtenidas correctamente",
+        "data": {
+            "items": items,
+            "page": page,
+            "page_size": page_size,
+            "total_items": total_items,
+            "total_pages": total_pages,
+            "has_next": page < total_pages,
+        },
+    }
+
+
+# -------------------------------------------------------------------
+# HISTORIAL DE PRECIOS DE UNA CARRERA (POST + paginado)
+# -------------------------------------------------------------------
+
+@router.post("/prices/paginated")
+def get_career_prices_paginated(
+    payload: CareerPricesPaginatedRequest,
     db: Session = Depends(get_db),
 ):
     """
-    Listado público (paginable y con búsqueda por nombre).
+    Devuelve el historial de precios de una carrera en orden descendente por fecha_desde.
+    Path final: POST /careers/prices/paginated
     """
-    try:
-        query = db.query(Career).order_by(Career.id)
 
-        if last_seen_id:
-            query = query.filter(Career.id > last_seen_id)
+    # Verificar que la carrera exista
+    carrera: Optional[Career] = (
+        db.query(Career).filter(Career.id == payload.id_carrera).first()
+    )
+    if not carrera:
+        raise HTTPException(status_code=404, detail="Carrera no encontrada")
 
-        if q:
-            pattern = f"%{q}%"
-            query = query.filter(Career.name.ilike(pattern))
+    page = payload.page
+    page_size = payload.page_size
 
-        items = query.limit(limit).all()
+    query = (
+        db.query(CareerPriceHistory)
+        .filter(CareerPriceHistory.id_carrera == payload.id_carrera)
+        .order_by(CareerPriceHistory.fecha_desde.desc())
+    )
 
-        out = []
-        for c in items:
-            out.append({
-                "id": c.id,
-                "name": c.name,
-                "costo_mensual": c.costo_mensual,
-                "duracion_meses": c.duracion_meses,
-                "inicio_cursado": c.inicio_cursado.isoformat() if c.inicio_cursado else None
-            })
+    total_items = query.count()
+    total_pages = (total_items + page_size - 1) // page_size if total_items > 0 else 1
 
-        next_cursor = out[-1]["id"] if len(out) == limit else None
+    precios_db = (
+        query
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+        .all()
+    )
 
-        return JSONResponse(status_code=200, content=standard_response(True, "Listado de carreras", {"carreras": out, "next_cursor": next_cursor}))
-    except Exception as ex:
-        print("Error list_carreras:", ex)
-        return JSONResponse(status_code=500, content=standard_response(False, "Error interno al listar carreras", None))
-
-
-@router.post("/")
-async def create_carrera(request: Request, body: InputCareer, db: Session = Depends(get_db)):
-    """
-    Crear carrera (solo admin).
-    """
-    admin_check = await require_admin(request)
-    if isinstance(admin_check, JSONResponse):
-        return admin_check
-
-    try:
-        # Unicidad por nombre
-        exists = db.query(Career).filter(Career.name == body.name).first()
-        if exists:
-            return JSONResponse(status_code=400, content=standard_response(False, "Ya existe una carrera con ese nombre", None))
-
-        carrera = Career(body.name, body.costo_mensual, body.duracion_meses, body.inicio_cursado)
-        db.add(carrera)
-        db.commit()
-        db.refresh(carrera)
-
-        data = {
-            "id": carrera.id,
-            "name": carrera.name,
-            "costo_mensual": carrera.costo_mensual,
-            "duracion_meses": carrera.duracion_meses,
-            "inicio_cursado": carrera.inicio_cursado.isoformat() if carrera.inicio_cursado else None
+    items = [
+        {
+            "id": p.id,
+            "monto": p.monto,
+            "fecha_desde": p.fecha_desde,
+            "created_at": p.created_at,
         }
+        for p in precios_db
+    ]
 
-        return JSONResponse(status_code=201, content=standard_response(True, "Carrera creada", data))
-    except Exception as ex:
-        db.rollback()
-        print("Error create_carrera:", ex)
-        return JSONResponse(status_code=500, content=standard_response(False, "Error interno al crear carrera", None))
-
-
-@router.get("/{carrera_id}")
-def get_carrera(carrera_id: int, db: Session = Depends(get_db)):
-    """
-    Obtener detalle de una carrera por id.
-    """
-    try:
-        carrera = db.query(Career).filter(Career.id == carrera_id).first()
-        if not carrera:
-            return JSONResponse(status_code=404, content=standard_response(False, "Carrera no encontrada", None))
-
-        data = {
-            "id": carrera.id,
-            "name": carrera.name,
-            "costo_mensual": carrera.costo_mensual,
-            "duracion_meses": carrera.duracion_meses,
-            "inicio_cursado": carrera.inicio_cursado.isoformat() if carrera.inicio_cursado else None
-        }
-        return JSONResponse(status_code=200, content=standard_response(True, "Detalle de carrera", data))
-    except Exception as ex:
-        print("Error get_carrera:", ex)
-        return JSONResponse(status_code=500, content=standard_response(False, "Error interno al obtener carrera", None))
-
-
-@router.put("/{carrera_id}")
-async def update_carrera(carrera_id: int, request: Request, body: UpdateCareer, db: Session = Depends(get_db)):
-    """
-    Actualizar carrera (solo admin).
-    """
-    admin_check = await require_admin(request)
-    if isinstance(admin_check, JSONResponse):
-        return admin_check
-
-    try:
-        carrera = db.query(Career).filter(Career.id == carrera_id).first()
-        if not carrera:
-            return JSONResponse(status_code=404, content=standard_response(False, "Carrera no encontrada", None))
-
-        # Aplicar cambios permitidos
-        if body.name is not None:
-            # verificar unicidad si cambia el nombre
-            exists = db.query(Career).filter(Career.name == body.name, Career.id != carrera_id).first()
-            if exists:
-                return JSONResponse(status_code=400, content=standard_response(False, "El nombre ya está en uso por otra carrera", None))
-            carrera.name = body.name
-        if body.costo_mensual is not None:
-            carrera.costo_mensual = body.costo_mensual
-        if body.duracion_meses is not None:
-            carrera.duracion_meses = body.duracion_meses
-        if body.inicio_cursado is not None:
-            carrera.inicio_cursado = body.inicio_cursado
-
-        db.add(carrera)
-        db.commit()
-        db.refresh(carrera)
-
-        data = {
-            "id": carrera.id,
-            "name": carrera.name,
-            "costo_mensual": carrera.costo_mensual,
-            "duracion_meses": carrera.duracion_meses,
-            "inicio_cursado": carrera.inicio_cursado.isoformat() if carrera.inicio_cursado else None
-        }
-        return JSONResponse(status_code=200, content=standard_response(True, "Carrera actualizada", data))
-    except Exception as ex:
-        db.rollback()
-        print("Error update_carrera:", ex)
-        return JSONResponse(status_code=500, content=standard_response(False, "Error interno al actualizar carrera", None))
-
-
-@router.delete("/{carrera_id}")
-async def delete_carrera(carrera_id: int, request: Request, force: Optional[bool] = Query(False), db: Session = Depends(get_db)):
-    """
-    Eliminar carrera (solo admin).
-    Si tiene inscripciones, por defecto bloquea la eliminación.
-    Si se pasa ?force=true el admin confirma y se borran inscripciones y pagos asociados.
-    """
-    admin_check = await require_admin(request)
-    if isinstance(admin_check, JSONResponse):
-        return admin_check
-
-    try:
-        carrera = db.query(Career).filter(Career.id == carrera_id).first()
-        if not carrera:
-            return JSONResponse(status_code=404, content=standard_response(False, "Carrera no encontrada", None))
-
-        # Contar inscripciones
-        inscripciones = db.query(UsuarioXcarrera).filter(UsuarioXcarrera.id_carrera == carrera_id).all()
-        if inscripciones and not force:
-            return JSONResponse(
-                status_code=400,
-                content=standard_response(False, "La carrera tiene alumnos inscriptos. Use force=true para forzar borrado", {"inscripciones_count": len(inscripciones)})
-            )
-
-        if inscripciones and force:
-            # borrar pagos asociados primero
-            ids_ins = [ins.id for ins in inscripciones]
-            if ids_ins:
-                db.query(Payment).filter(Payment.id_usuarioxcarrera.in_(ids_ins)).delete(synchronize_session=False)
-            # borrar inscripciones
-            db.query(UsuarioXcarrera).filter(UsuarioXcarrera.id_carrera == carrera_id).delete(synchronize_session=False)
-            db.commit()
-
-        # borrar la carrera
-        db.delete(carrera)
-        db.commit()
-
-        return JSONResponse(status_code=200, content=standard_response(True, "Carrera eliminada correctamente", None))
-
-    except Exception as ex:
-        db.rollback()
-        print("Error delete_carrera:", ex)
-        return JSONResponse(status_code=500, content=standard_response(False, "Error interno al eliminar carrera", None))
+    return {
+        "success": True,
+        "message": "Historial de precios obtenido correctamente",
+        "data": {
+            "id_carrera": payload.id_carrera,
+            "career_name": carrera.name,
+            "items": items,
+            "page": page,
+            "page_size": page_size,
+            "total_items": total_items,
+            "total_pages": total_pages,
+            "has_next": page < total_pages,
+        },
+    }

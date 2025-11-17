@@ -1,8 +1,34 @@
+// src/components/layout/Navbar.tsx
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 
+type UserType = "admin" | "alumno";
+
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
+
+  // Detectar rol desde localStorage
+  let userType: UserType = "alumno";
+
+  const storedType = localStorage.getItem("user_type");
+  if (storedType === "admin" || storedType === "alumno") {
+    userType = storedType;
+  } else {
+    const rawUser = localStorage.getItem("user");
+    if (rawUser) {
+      try {
+        const parsed = JSON.parse(rawUser) as { type?: string };
+        if (parsed.type === "admin" || parsed.type === "alumno") {
+          userType = parsed.type;
+        }
+      } catch (e) {
+        console.error("Error parseando user desde localStorage:", e);
+      }
+    }
+  }
+
+  const isAdmin = userType === "admin";
+  const basePath = isAdmin ? "/admin" : "/alumno";
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -11,21 +37,6 @@ const Navbar: React.FC = () => {
     localStorage.removeItem("user_type");
     navigate("/login");
   };
-
-  // Detectar rol
-  const rawUser = localStorage.getItem("user");
-  let role: "admin" | "alumno" = "admin";
-
-  if (rawUser) {
-    try {
-      const parsed = JSON.parse(rawUser);
-      if (parsed.type === "alumno") {
-        role = "alumno";
-      }
-    } catch (e) {
-      console.error("[Navbar] Error parseando user:", e);
-    }
-  }
 
   return (
     <aside
@@ -40,21 +51,25 @@ const Navbar: React.FC = () => {
         <div className="p-3 border-bottom border-light">
           <h5 className="mb-0">ApiEscuela</h5>
           <small>
-            {role === "admin" ? "Panel administrador" : "Panel alumno"}
+            {isAdmin ? "Panel administrador" : "Panel alumno"}
           </small>
         </div>
 
         <nav className="nav flex-column p-2">
-          {role === "admin" ? (
+          {/* DASHBOARD / HOME */}
+          <NavLink
+            to={basePath}
+            className={({ isActive }) =>
+              `nav-link text-white ${isActive ? "fw-bold" : ""}`
+            }
+            end
+          >
+            {isAdmin ? "Dashboard" : "Inicio"}
+          </NavLink>
+
+          {isAdmin ? (
             <>
-              <NavLink
-                to="/admin"
-                className={({ isActive }) =>
-                  `nav-link text-white ${isActive ? "fw-bold" : ""}`
-                }
-              >
-                Dashboard
-              </NavLink>
+              {/* MENU ADMIN */}
               <NavLink
                 to="/admin/users"
                 className={({ isActive }) =>
@@ -63,6 +78,7 @@ const Navbar: React.FC = () => {
               >
                 Alumnos / Usuarios
               </NavLink>
+
               <NavLink
                 to="/admin/careers"
                 className={({ isActive }) =>
@@ -71,6 +87,7 @@ const Navbar: React.FC = () => {
               >
                 Carreras
               </NavLink>
+
               <NavLink
                 to="/admin/payments"
                 className={({ isActive }) =>
@@ -80,7 +97,6 @@ const Navbar: React.FC = () => {
                 Pagos
               </NavLink>
 
-              {/* Noticias Admin */}
               <NavLink
                 to="/admin/news"
                 className={({ isActive }) =>
@@ -89,24 +105,35 @@ const Navbar: React.FC = () => {
               >
                 Noticias
               </NavLink>
-              <NavLink
-                to="/admin/news/create"
-                className={({ isActive }) =>
-                  `nav-link text-white ${isActive ? "fw-bold" : ""}`
-                }
-              >
-                Crear noticia
-              </NavLink>
             </>
           ) : (
             <>
+              {/* MENU ALUMNO */}
               <NavLink
-                to="/alumno"
+                to="/alumno/profile"
                 className={({ isActive }) =>
                   `nav-link text-white ${isActive ? "fw-bold" : ""}`
                 }
               >
-                Inicio
+                Mi perfil
+              </NavLink>
+
+              <NavLink
+                to="/alumno/careers"
+                className={({ isActive }) =>
+                  `nav-link text-white ${isActive ? "fw-bold" : ""}`
+                }
+              >
+                Mis carreras
+              </NavLink>
+
+              <NavLink
+                to="/alumno/payments"
+                className={({ isActive }) =>
+                  `nav-link text-white ${isActive ? "fw-bold" : ""}`
+                }
+              >
+                Mis pagos
               </NavLink>
 
               <NavLink
@@ -117,8 +144,6 @@ const Navbar: React.FC = () => {
               >
                 Noticias
               </NavLink>
-
-              {/* A futuro: Pagos del alumno, Mis carreras, etc. */}
             </>
           )}
         </nav>

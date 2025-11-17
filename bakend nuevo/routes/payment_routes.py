@@ -1,237 +1,395 @@
 # routes/payment_routes.py
-from fastapi import APIRouter, Request, Depends, Query
-from fastapi.responses import JSONResponse
+
+from typing import Optional
+
+from datetime import datetime
+
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel, validator
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
-from typing import Optional, List
 
 from config.db import get_db
-from auth.security import Security
-from models.payment import Payment
+from models.payment import Payment as PaymentModel
 from models.usuarioxcarrera import UsuarioXcarrera
-from models.user import UserDetail, User
+from models.career import Career
+from models.career_price import CareerPriceHistory
+from models.user import User, UserDetail
 
-router = APIRouter()
-
-
-# ---------------------------
-# Helpers locales
-# ---------------------------
-def standard_response(success: bool, message: str, data=None):
-    return {"success": success, "message": message, "data": data}
+router = APIRouter(
+    prefix="/payments",
+    tags=["payments"],
+)
 
 
-async def require_token(request: Request):
+# -------------------------------------------------------------------
+# HELPER: Obtener precio vigente según fecha de pago
+# -------------------------------------------------------------------
+
+def get_price_for_date(db: Session, id_carrera: int, fecha_pago: datetime) -> int:
     """
-    Verifica token y devuelve payload o JSONResponse de error.
+    Devuelve el precio de la carrera que estaba vigente en 'fecha_pago',
+    usando CareerPriceHistory. Si no encuentra historial, usa costo_mensual actual.
     """
-    try:
-        user_data = await Security.get_current_user(request)
-    except Exception as e:
-        return JSONResponse(status_code=401, content=standard_response(False, str(e), None))
-    return user_data
 
-
-# ---------------------------
-# Schemas locales (Pydantic simples)
-# ---------------------------
-from pydantic import BaseModel, Field
-
-
-class InputPayment(BaseModel):
-    id_usuarioxcarrera: int = Field(..., gt=0)
-    numero_cuota: int = Field(..., gt=0)
-    monto: int = Field(..., gt=0)
-    adelantado: Optional[bool] = False
-    observacion: Optional[str] = None
-
-
-# ---------------------------
-# Endpoints
-# ---------------------------
-
-@router.post("/")
-async def crear_pago(request: Request, body: InputPayment, db: Session = Depends(get_db)):
-    """
-    Crear un pago (solo admin).
-    Valida duplicados: no puede existir otro pago con el mismo id_usuarioxcarrera y numero_cuota
-    a menos que el pago esté anulado.
-    """
-    token_check = await require_token(request)
-    if isinstance(token_check, JSONResponse):
-        return token_check
-
-    # sólo admin puede crear pagos
-    if token_check.get("rol") != "admin":
-        return JSONResponse(status_code=403, content=standard_response(False, "Acceso denegado. Solo administradores.", None))
-
-    try:
-        # verificar existencia de la inscripción
-        ins = db.query(UsuarioXcarrera).filter(UsuarioXcarrera.id == body.id_usuarioxcarrera).first()
-        if not ins:
-            return JSONResponse(status_code=404, content=standard_response(False, "Inscripción (usuarioxcarrera) no encontrada", None))
-
-        # validar duplicado (mismo numero_cuota y no anulado)
-        exists = db.query(Payment).filter(
-            Payment.id_usuarioxcarrera == body.id_usuarioxcarrera,
-            Payment.numero_cuota == body.numero_cuota,
-            Payment.anulado == False
-        ).first()
-        if exists:
-            return JSONResponse(status_code=400, content=standard_response(False, "Ya existe un pago registrado para esa cuota", None))
-
-        pago = Payment(
-            id_usuarioxcarrera=body.id_usuarioxcarrera,
-            numero_cuota=body.numero_cuota,
-            monto=body.monto,
-            adelantado=body.adelantado
+    # 1) Último precio cuya fecha_desde sea <= fecha_pago
+    precio_hist = (
+        db.query(CareerPriceHistory)
+        .filter(
+            CareerPriceHistory.id_carrera == id_carrera,
+            CareerPriceHistory.fecha_desde <= fecha_pago,
         )
-        # si el modelo tiene observacion
-        if hasattr(pago, "observacion") and body.observacion:
-            pago.observacion = body.observacion
+        .order_by(CareerPriceHistory.fecha_desde.desc())
+        .first()
+    )
 
-        db.add(pago)
-        db.commit()
-        db.refresh(pago)
+    if precio_hist:
+        return precio_hist.monto
 
-        data = {
-            "id": pago.id,
-            "id_usuarioxcarrera": pago.id_usuarioxcarrera,
-            "numero_cuota": pago.numero_cuota,
-            "monto": pago.monto,
-            "adelantado": pago.adelantado,
-            "fecha_pago": pago.fecha_pago.isoformat() if pago.fecha_pago else None
-        }
-        return JSONResponse(status_code=201, content=standard_response(True, "Pago registrado", data))
+    # 2) Si no hay historial, usar costo_mensual actual de la carrera
+    career: Optional[Career] = db.query(Career).filter(Career.id == id_carrera).first()
+    if not career:
+        raise HTTPException(status_code=404, detail="Carrera no encontrada al calcular precio")
 
-    except Exception as ex:
-        db.rollback()
-        print("Error crear_pago:", ex)
-        return JSONResponse(status_code=500, content=standard_response(False, "Error interno al crear pago", None))
+    return career.costo_mensual
 
 
-@router.get("/")
-async def listar_pagos(
-    request: Request,
-    usuario_x_carrera_id: Optional[int] = Query(None),
-    detalle_id: Optional[int] = Query(None),
-    carrera_id: Optional[int] = Query(None),
-    numero_cuota: Optional[int] = Query(None),
-    limit: int = Query(100, gt=0, le=500),
-    db: Session = Depends(get_db)
+# -------------------------------------------------------------------
+# SCHEMAS
+# -------------------------------------------------------------------
+
+class PaymentCreate(BaseModel):
+    id_usuarioxcarrera: int
+    numero_cuota: int
+    fecha_pago: Optional[datetime] = None
+    adelantado: bool = False
+
+    @validator("id_usuarioxcarrera", "numero_cuota")
+    def ids_positive(cls, v: int) -> int:
+        if v <= 0:
+            raise ValueError("Los IDs y número de cuota deben ser mayores a 0")
+        return v
+
+
+class PaymentsByEnrollmentRequest(BaseModel):
+    id_usuarioxcarrera: int
+    page: int = 1
+    page_size: int = 20
+    include_anulados: bool = True
+
+    @validator("id_usuarioxcarrera")
+    def enrollment_positive(cls, v: int) -> int:
+        if v <= 0:
+            raise ValueError("id_usuarioxcarrera debe ser mayor a 0")
+        return v
+
+    @validator("page", "page_size")
+    def page_min(cls, v: int) -> int:
+        if v <= 0:
+            raise ValueError("page y page_size deben ser mayores a 0")
+        return v
+
+
+class PaymentCancelRequest(BaseModel):
+    motivo: Optional[str] = None  # por si después querés guardar motivo en la BD
+
+
+class PaymentsPaginatedRequest(BaseModel):
+    page: int = 1
+    page_size: int = 20
+    search: Optional[str] = None  # username, nombre, dni, carrera
+
+    @validator("page", "page_size")
+    def page_min(cls, v: int) -> int:
+        if v <= 0:
+            raise ValueError("page y page_size deben ser mayores a 0")
+        return v
+
+
+# -------------------------------------------------------------------
+# CREAR PAGO
+# -------------------------------------------------------------------
+
+@router.post("")
+def create_payment(payload: PaymentCreate, db: Session = Depends(get_db)):
+    """
+    Crea un pago para una inscripción (UsuarioXcarrera).
+    - Calcula el monto según el historial de precios de la carrera
+      usando la fecha de pago (default ahora).
+    - Evita duplicar la misma cuota si ya está pagada (no anulada).
+
+    Path final: POST /payments
+    """
+
+    # 1) Verificar que la inscripción exista
+    uxc = (
+        db.query(UsuarioXcarrera)
+        .filter(UsuarioXcarrera.id == payload.id_usuarioxcarrera)
+        .first()
+    )
+    if not uxc:
+        raise HTTPException(status_code=404, detail="Inscripción (usuarioxcarrera) no encontrada")
+
+    # 2) Evitar duplicar cuota (no anulada)
+    existing = (
+        db.query(PaymentModel)
+        .filter(
+            PaymentModel.id_usuarioxcarrera == payload.id_usuarioxcarrera,
+            PaymentModel.numero_cuota == payload.numero_cuota,
+            PaymentModel.anulado == False,  # noqa: E712
+        )
+        .first()
+    )
+    if existing:
+        raise HTTPException(
+            status_code=400,
+            detail=f"La cuota {payload.numero_cuota} ya fue pagada para esta inscripción",
+        )
+
+    # 3) Determinar fecha de pago
+    fecha_pago = payload.fecha_pago or datetime.utcnow()
+
+    # 4) Calcular monto según precio vigente en esa fecha
+    monto = get_price_for_date(db, uxc.id_carrera, fecha_pago)
+
+    # 5) Crear Payment
+    nuevo_pago = PaymentModel(
+        id_usuarioxcarrera=payload.id_usuarioxcarrera,
+        numero_cuota=payload.numero_cuota,
+        monto=monto,
+        adelantado=payload.adelantado,
+    )
+    nuevo_pago.fecha_pago = fecha_pago
+
+    db.add(nuevo_pago)
+    db.commit()
+    db.refresh(nuevo_pago)
+
+    return {
+        "success": True,
+        "message": "Pago registrado correctamente",
+        "data": {
+            "id": nuevo_pago.id,
+            "id_usuarioxcarrera": nuevo_pago.id_usuarioxcarrera,
+            "numero_cuota": nuevo_pago.numero_cuota,
+            "fecha_pago": nuevo_pago.fecha_pago,
+            "monto": nuevo_pago.monto,
+            "adelantado": nuevo_pago.adelantado,
+            "anulado": nuevo_pago.anulado,
+        },
+    }
+
+
+# -------------------------------------------------------------------
+# LISTAR PAGOS POR INSCRIPCIÓN (POST + paginado)
+# -------------------------------------------------------------------
+
+@router.post("/by-enrollment")
+def get_payments_by_enrollment(
+    payload: PaymentsByEnrollmentRequest,
+    db: Session = Depends(get_db),
 ):
     """
-    Listar pagos. Por seguridad, por defecto requiere admin.
-    Filtros útiles: usuario_x_carrera_id, detalle_id (alumno), carrera_id, numero_cuota.
+    Devuelve los pagos de una inscripción (UsuarioXcarrera) con paginado.
+
+    Path final: POST /payments/by-enrollment
     """
-    token_check = await require_token(request)
-    if isinstance(token_check, JSONResponse):
-        return token_check
 
-    # si no es admin, rechazamos (para listados generales)
-    if token_check.get("rol") != "admin":
-        return JSONResponse(status_code=403, content=standard_response(False, "Acceso denegado. Solo administradores.", None))
+    # Verificar que la inscripción exista
+    uxc = (
+        db.query(UsuarioXcarrera)
+        .filter(UsuarioXcarrera.id == payload.id_usuarioxcarrera)
+        .first()
+    )
+    if not uxc:
+        raise HTTPException(status_code=404, detail="Inscripción no encontrada")
 
-    try:
-        query = db.query(Payment).order_by(Payment.id)
+    page = payload.page
+    page_size = payload.page_size
 
-        if usuario_x_carrera_id:
-            query = query.filter(Payment.id_usuarioxcarrera == usuario_x_carrera_id)
+    query = db.query(PaymentModel).filter(
+        PaymentModel.id_usuarioxcarrera == payload.id_usuarioxcarrera
+    )
 
-        if numero_cuota:
-            query = query.filter(Payment.numero_cuota == numero_cuota)
+    # si include_anulados = False, filtramos solo los NO anulados
+    if not payload.include_anulados:
+        query = query.filter(PaymentModel.anulado == False)  # noqa: E712
 
-        # filtro por alumno (detalle_id) o por carrera requiere join con UsuarioXcarrera
-        if detalle_id or carrera_id:
-            query = query.join(UsuarioXcarrera)
-            if detalle_id:
-                query = query.filter(UsuarioXcarrera.id_userdetail == detalle_id)
-            if carrera_id:
-                query = query.filter(UsuarioXcarrera.id_carrera == carrera_id)
+    # Últimos pagos primero (cuotas más altas primero)
+    query = query.order_by(PaymentModel.numero_cuota.desc())
 
-        pagos = query.limit(limit).all()
+    total_items = query.count()
+    total_pages = (total_items + page_size - 1) // page_size if total_items > 0 else 1
 
-        out = []
-        for p in pagos:
-            out.append({
+    pagos_db = (
+        query
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+        .all()
+    )
+
+    items = [
+        {
+            "id": p.id,
+            "numero_cuota": p.numero_cuota,
+            "fecha_pago": p.fecha_pago,
+            "monto": p.monto,
+            "adelantado": p.adelantado,
+            "anulado": p.anulado,
+        }
+        for p in pagos_db
+    ]
+
+    return {
+        "success": True,
+        "message": "Pagos obtenidos correctamente",
+        "data": {
+            "id_usuarioxcarrera": payload.id_usuarioxcarrera,
+            "items": items,
+            "page": page,
+            "page_size": page_size,
+            "total_items": total_items,
+            "total_pages": total_pages,
+            "has_next": page < total_pages,
+        },
+    }
+
+
+# -------------------------------------------------------------------
+# ANULAR PAGO
+# -------------------------------------------------------------------
+
+@router.put("/{payment_id}/cancel")
+def cancel_payment(
+    payment_id: int,
+    payload: PaymentCancelRequest,
+    db: Session = Depends(get_db),
+):
+    """
+    Marca un pago como anulado.
+
+    Path final: PUT /payments/{payment_id}/cancel
+    """
+    p = db.query(PaymentModel).filter(PaymentModel.id == payment_id).first()
+    if not p:
+        raise HTTPException(status_code=404, detail="Pago no encontrado")
+
+    if p.anulado:
+        raise HTTPException(status_code=400, detail="El pago ya está anulado")
+
+    p.anulado = True
+    db.commit()
+    db.refresh(p)
+
+    return {
+        "success": True,
+        "message": "Pago anulado correctamente",
+        "data": {
+            "id": p.id,
+            "id_usuarioxcarrera": p.id_usuarioxcarrera,
+            "numero_cuota": p.numero_cuota,
+            "fecha_pago": p.fecha_pago,
+            "monto": p.monto,
+            "adelantado": p.adelantado,
+            "anulado": p.anulado,
+        },
+    }
+
+
+# -------------------------------------------------------------------
+# LISTA GLOBAL DE PAGOS (para /admin/payments)
+# -------------------------------------------------------------------
+
+@router.post("/paginated")
+def get_payments_paginated(
+    payload: PaymentsPaginatedRequest,
+    db: Session = Depends(get_db),
+):
+    """
+    Lista global de pagos con joins a alumno y carrera.
+
+    Path final: POST /payments/paginated
+
+    Permite 'search' por:
+    - username
+    - nombre / apellido
+    - dni
+    - nombre de carrera
+    """
+
+    page = payload.page
+    page_size = payload.page_size
+
+    query = (
+        db.query(
+            PaymentModel,
+            UsuarioXcarrera,
+            User,
+            UserDetail,
+            Career,
+        )
+        .join(UsuarioXcarrera, PaymentModel.id_usuarioxcarrera == UsuarioXcarrera.id)
+        .join(UserDetail, UsuarioXcarrera.id_userdetail == UserDetail.id)
+        .join(User, UserDetail.id_user == User.id)
+        .join(Career, UsuarioXcarrera.id_carrera == Career.id)
+    )
+
+    if payload.search:
+        search = f"%{payload.search}%"
+        query = query.filter(
+            or_(
+                User.username.ilike(search),
+                UserDetail.first_name.ilike(search),
+                UserDetail.last_name.ilike(search),
+                UserDetail.dni.ilike(search),
+                Career.name.ilike(search),
+            )
+        )
+
+    # Últimos pagos primero: por fecha de pago y luego id
+    query = query.order_by(PaymentModel.fecha_pago.desc(), PaymentModel.id.desc())
+
+    total_items = query.count()
+    total_pages = (total_items + page_size - 1) // page_size if total_items > 0 else 1
+
+    rows = (
+        query
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+        .all()
+    )
+
+    items = []
+    for p, uxc, user, ud, career in rows:
+        items.append(
+            {
                 "id": p.id,
-                "id_usuarioxcarrera": p.id_usuarioxcarrera,
                 "numero_cuota": p.numero_cuota,
+                "fecha_pago": p.fecha_pago,
                 "monto": p.monto,
                 "adelantado": p.adelantado,
-                "anulado": getattr(p, "anulado", False),
-                "fecha_pago": p.fecha_pago.isoformat() if p.fecha_pago else None
-            })
+                "anulado": p.anulado,
+                "id_usuarioxcarrera": uxc.id,
+                "user_id": user.id,
+                "username": user.username,
+                "first_name": ud.first_name,
+                "last_name": ud.last_name,
+                "dni": ud.dni,
+                "email": ud.email,
+                "career_id": career.id,
+                "career_name": career.name,
+            }
+        )
 
-        return JSONResponse(status_code=200, content=standard_response(True, "Pagos listados", {"pagos": out}))
-    except Exception as ex:
-        print("Error listar_pagos:", ex)
-        return JSONResponse(status_code=500, content=standard_response(False, "Error interno al listar pagos", None))
-
-
-@router.get("/by_inscripcion/{inscripcion_id}")
-async def listar_pagos_por_inscripcion(inscripcion_id: int, request: Request, db: Session = Depends(get_db)):
-    """
-    Listar pagos de una inscripción específica.
-    Admin puede ver cualquiera; alumno solo puede ver si la inscripción le pertenece.
-    """
-    token_check = await require_token(request)
-    if isinstance(token_check, JSONResponse):
-        return token_check
-
-    try:
-        ins = db.query(UsuarioXcarrera).filter(UsuarioXcarrera.id == inscripcion_id).first()
-        if not ins:
-            return JSONResponse(status_code=404, content=standard_response(False, "Inscripción no encontrada", None))
-
-        # Si no es admin, validar que el token pertenezca al usuario dueño de la inscripción
-        if token_check.get("rol") != "admin":
-            # token contiene id del usuario (user id), pero la inscripción referencia userdetail id
-            # buscamos el userdetail del token: el token tiene 'id' (user id). Necesitamos mapear.
-            token_user_id = token_check.get("id")
-            # obtener detalle del usuario logeado
-            detalle = db.query(UserDetail).filter(UserDetail.id_user == token_user_id).first()
-            if not detalle or detalle.id != ins.id_userdetail:
-                return JSONResponse(status_code=403, content=standard_response(False, "Acceso denegado. No es la inscripción del alumno.", None))
-
-        pagos = db.query(Payment).filter(Payment.id_usuarioxcarrera == inscripcion_id).order_by(Payment.numero_cuota).all()
-        out = []
-        for p in pagos:
-            out.append({
-                "id": p.id,
-                "numero_cuota": p.numero_cuota,
-                "monto": p.monto,
-                "adelantado": p.adelantado,
-                "anulado": getattr(p, "anulado", False),
-                "fecha_pago": p.fecha_pago.isoformat() if p.fecha_pago else None
-            })
-
-        return JSONResponse(status_code=200, content=standard_response(True, "Pagos de la inscripción", {"pagos": out}))
-    except Exception as ex:
-        print("Error listar_pagos_por_inscripcion:", ex)
-        return JSONResponse(status_code=500, content=standard_response(False, "Error interno al listar pagos", None))
-
-
-@router.delete("/{pago_id}")
-async def delete_pago(pago_id: int, request: Request, db: Session = Depends(get_db)):
-    """
-    Eliminar pago (solo admin). Borrado físico.
-    """
-    token_check = await require_token(request)
-    if isinstance(token_check, JSONResponse):
-        return token_check
-
-    if token_check.get("rol") != "admin":
-        return JSONResponse(status_code=403, content=standard_response(False, "Acceso denegado. Solo administradores.", None))
-
-    try:
-        pago = db.query(Payment).filter(Payment.id == pago_id).first()
-        if not pago:
-            return JSONResponse(status_code=404, content=standard_response(False, "Pago no encontrado", None))
-
-        db.delete(pago)
-        db.commit()
-        return JSONResponse(status_code=200, content=standard_response(True, "Pago eliminado", None))
-    except Exception as ex:
-        db.rollback()
-        print("Error delete_pago:", ex)
-        return JSONResponse(status_code=500, content=standard_response(False, "Error interno al eliminar pago", None))
+    return {
+        "success": True,
+        "message": "Pagos listados correctamente",
+        "data": {
+            "items": items,
+            "page": page,
+            "page_size": page_size,
+            "total_items": total_items,
+            "total_pages": total_pages,
+            "has_next": page < total_pages,
+        },
+    }

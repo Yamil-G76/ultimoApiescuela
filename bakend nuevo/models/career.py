@@ -19,6 +19,13 @@ class Career(Base):
     # Relación con la tabla pivote (usuarios inscritos)
     usuariosxcarrera = relationship("UsuarioXcarrera", back_populates="carrera")
 
+    # 💡 NUEVO: historial de precios
+    precios = relationship(
+        "CareerPriceHistory",
+        back_populates="carrera",
+        cascade="all, delete-orphan"
+    )
+
     def __init__(self, name, costo_mensual, duracion_meses, inicio_cursado=None):
         self.name = name
         self.costo_mensual = costo_mensual

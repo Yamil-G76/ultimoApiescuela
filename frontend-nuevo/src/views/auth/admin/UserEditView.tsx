@@ -19,7 +19,6 @@ const UserEditView = () => {
   const [user, setUser] = useState<UserData | null>(null);
 
   const [username, setUsername] = useState("");
-  const [password, setPassword] = useState(""); // opcional
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [dni, setDni] = useState("");
@@ -28,6 +27,36 @@ const UserEditView = () => {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState<string[]>([]);
+
+  const validate = (): boolean => {
+    const newErrors: string[] = [];
+
+    if (!username.trim()) newErrors.push("El usuario es obligatorio");
+    if (!firstName.trim()) newErrors.push("El nombre es obligatorio");
+    if (!lastName.trim()) newErrors.push("El apellido es obligatorio");
+
+    if (!dni.trim()) {
+      newErrors.push("El DNI es obligatorio");
+    } else if (!/^\d+$/.test(dni.trim())) {
+      newErrors.push("El DNI debe ser numérico");
+    } else if (dni.trim().length < 7 || dni.trim().length > 9) {
+      newErrors.push("El DNI debe tener entre 7 y 9 dígitos");
+    }
+
+    if (!email.trim()) {
+      newErrors.push("El email es obligatorio");
+    } else if (!/^\S+@\S+\.\S+$/.test(email)) {
+      newErrors.push("El email no tiene un formato válido");
+    }
+
+    if (!["admin", "alumno"].includes(type)) {
+      newErrors.push("El rol debe ser 'admin' o 'alumno'");
+    }
+
+    setErrors(newErrors);
+    return newErrors.length === 0;
+  };
 
   useEffect(() => {
     const loadUser = async () => {
@@ -57,12 +86,13 @@ const UserEditView = () => {
     };
 
     if (id) {
-      loadUser();
+      void loadUser();
     }
   }, [id]);
 
   const handleSubmit = async () => {
     if (!id) return;
+    if (!validate()) return;
 
     setSaving(true);
     try {
@@ -73,8 +103,6 @@ const UserEditView = () => {
         },
         body: JSON.stringify({
           username,
-          // si mandamos string vacío, en el back podés tratarlo como "no cambiar"
-          password: password || null,
           first_name: firstName,
           last_name: lastName,
           dni,
@@ -86,7 +114,11 @@ const UserEditView = () => {
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
         console.error("Error actualizando usuario:", errData);
-        alert(errData.detail || "No se pudo actualizar el usuario");
+        if (errData.detail) {
+          setErrors([String(errData.detail)]);
+        } else {
+          setErrors(["No se pudo actualizar el usuario"]);
+        }
         return;
       }
 
@@ -94,7 +126,7 @@ const UserEditView = () => {
       navigate("/admin/users");
     } catch (err) {
       console.error(err);
-      alert("Error actualizando el usuario");
+      setErrors(["Error actualizando el usuario"]);
     } finally {
       setSaving(false);
     }
@@ -112,8 +144,19 @@ const UserEditView = () => {
     <div className="container mt-4">
       <h2>Editar usuario</h2>
 
+      {errors.length > 0 && (
+        <div className="alert alert-danger py-2">
+          <ul className="mb-0">
+            {errors.map((e, idx) => (
+              <li key={idx}>{e}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <div className="row">
         <div className="col-md-6">
+          {/* Usuario */}
           <div className="mb-3">
             <label className="form-label">Usuario</label>
             <input
@@ -123,18 +166,7 @@ const UserEditView = () => {
             />
           </div>
 
-          <div className="mb-3">
-            <label className="form-label">
-              Contraseña (dejar vacío para no cambiar)
-            </label>
-            <input
-              type="password"
-              className="form-control"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-
+          {/* Rol */}
           <div className="mb-3">
             <label className="form-label">Rol</label>
             <select
@@ -149,6 +181,7 @@ const UserEditView = () => {
         </div>
 
         <div className="col-md-6">
+          {/* Nombre */}
           <div className="mb-3">
             <label className="form-label">Nombre</label>
             <input
@@ -158,6 +191,7 @@ const UserEditView = () => {
             />
           </div>
 
+          {/* Apellido */}
           <div className="mb-3">
             <label className="form-label">Apellido</label>
             <input
@@ -167,6 +201,7 @@ const UserEditView = () => {
             />
           </div>
 
+          {/* DNI */}
           <div className="mb-3">
             <label className="form-label">DNI</label>
             <input
@@ -176,6 +211,7 @@ const UserEditView = () => {
             />
           </div>
 
+          {/* Email */}
           <div className="mb-3">
             <label className="form-label">Email</label>
             <input

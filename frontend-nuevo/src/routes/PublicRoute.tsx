@@ -1,28 +1,34 @@
+// src/router/PublicRoute.tsx
 import { Navigate, Outlet } from "react-router-dom";
+
+type UserType = "admin" | "alumno";
 
 const PublicRoute: React.FC = () => {
   const token = localStorage.getItem("token");
 
   if (token) {
-    // Si ya está logueado, lo mandamos según su rol
-    const rawUser = localStorage.getItem("user");
-    let type: "admin" | "alumno" | undefined;
+    // Detectar tipo de usuario
+    let userType: UserType = "alumno";
 
-    if (rawUser) {
-      try {
-        const parsed = JSON.parse(rawUser);
-        type = parsed.type;
-      } catch (e) {
-        console.error("[PublicRoute] Error parseando user:", e);
+    const storedType = localStorage.getItem("user_type");
+    if (storedType === "admin" || storedType === "alumno") {
+      userType = storedType;
+    } else {
+      const rawUser = localStorage.getItem("user");
+      if (rawUser) {
+        try {
+          const parsed = JSON.parse(rawUser) as { type?: string };
+          if (parsed.type === "admin" || parsed.type === "alumno") {
+            userType = parsed.type;
+          }
+        } catch (e) {
+          console.error("Error parseando user desde localStorage:", e);
+        }
       }
     }
 
-    if (type === "alumno") {
-      return <Navigate to="/alumno" replace />;
-    }
-
-    // Por defecto, admin
-    return <Navigate to="/admin" replace />;
+    const target = userType === "admin" ? "/admin" : "/alumno";
+    return <Navigate to={target} replace />;
   }
 
   return <Outlet />;

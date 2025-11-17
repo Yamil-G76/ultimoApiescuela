@@ -4,17 +4,55 @@ import { BASE_URL } from "../../../config/backend";
 
 const UserCreateView = () => {
   const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [dni, setDni] = useState("");
   const [email, setEmail] = useState("");
   const [type, setType] = useState<"admin" | "alumno">("alumno");
+  const [password, setPassword] = useState("");
   const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState<string[]>([]);
 
   const navigate = useNavigate();
 
+  const validate = (): boolean => {
+    const newErrors: string[] = [];
+
+    if (!username.trim()) newErrors.push("El usuario es obligatorio");
+    if (!firstName.trim()) newErrors.push("El nombre es obligatorio");
+    if (!lastName.trim()) newErrors.push("El apellido es obligatorio");
+
+    if (!dni.trim()) {
+      newErrors.push("El DNI es obligatorio");
+    } else if (!/^\d+$/.test(dni.trim())) {
+      newErrors.push("El DNI debe ser numérico");
+    } else if (dni.trim().length < 7 || dni.trim().length > 9) {
+      newErrors.push("El DNI debe tener entre 7 y 9 dígitos");
+    }
+
+    if (!email.trim()) {
+      newErrors.push("El email es obligatorio");
+    } else if (!/^\S+@\S+\.\S+$/.test(email)) {
+      newErrors.push("El email no tiene un formato válido");
+    }
+
+    if (!password.trim()) {
+      newErrors.push("La contraseña es obligatoria");
+    } else if (password.length < 6) {
+      newErrors.push("La contraseña debe tener al menos 6 caracteres");
+    }
+
+    if (!["admin", "alumno"].includes(type)) {
+      newErrors.push("El rol debe ser 'admin' o 'alumno'");
+    }
+
+    setErrors(newErrors);
+    return newErrors.length === 0;
+  };
+
   const handleSubmit = async () => {
+    if (!validate()) return;
+
     setSaving(true);
     try {
       const res = await fetch(`${BASE_URL}/users`, {
@@ -36,7 +74,11 @@ const UserCreateView = () => {
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
         console.error("Error creando usuario:", errData);
-        alert(errData.detail || "No se pudo crear el usuario");
+        if (errData.detail) {
+          setErrors([String(errData.detail)]);
+        } else {
+          setErrors(["No se pudo crear el usuario"]);
+        }
         return;
       }
 
@@ -44,7 +86,7 @@ const UserCreateView = () => {
       navigate("/admin/users");
     } catch (err) {
       console.error(err);
-      alert("Error creando usuario");
+      setErrors(["Error creando usuario"]);
     } finally {
       setSaving(false);
     }
@@ -54,8 +96,19 @@ const UserCreateView = () => {
     <div className="container mt-4">
       <h2>Nuevo usuario</h2>
 
+      {errors.length > 0 && (
+        <div className="alert alert-danger py-2">
+          <ul className="mb-0">
+            {errors.map((e, idx) => (
+              <li key={idx}>{e}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <div className="row">
         <div className="col-md-6">
+          {/* Usuario */}
           <div className="mb-3">
             <label className="form-label">Usuario</label>
             <input
@@ -65,6 +118,7 @@ const UserCreateView = () => {
             />
           </div>
 
+          {/* Contraseña */}
           <div className="mb-3">
             <label className="form-label">Contraseña</label>
             <input
@@ -73,8 +127,12 @@ const UserCreateView = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
+            <small className="text-muted">
+              Mínimo 6 caracteres.
+            </small>
           </div>
 
+          {/* Rol */}
           <div className="mb-3">
             <label className="form-label">Rol</label>
             <select
@@ -89,6 +147,7 @@ const UserCreateView = () => {
         </div>
 
         <div className="col-md-6">
+          {/* Nombre */}
           <div className="mb-3">
             <label className="form-label">Nombre</label>
             <input
@@ -98,6 +157,7 @@ const UserCreateView = () => {
             />
           </div>
 
+          {/* Apellido */}
           <div className="mb-3">
             <label className="form-label">Apellido</label>
             <input
@@ -107,6 +167,7 @@ const UserCreateView = () => {
             />
           </div>
 
+          {/* DNI */}
           <div className="mb-3">
             <label className="form-label">DNI</label>
             <input
@@ -116,6 +177,7 @@ const UserCreateView = () => {
             />
           </div>
 
+          {/* Email */}
           <div className="mb-3">
             <label className="form-label">Email</label>
             <input

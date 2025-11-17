@@ -1,33 +1,41 @@
-// src/views/auth/admin/UsersListView.tsx
+// src/views/auth/admin/PaymentsListView.tsx
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../../../config/backend";
 
-interface UserItem {
+interface PaymentRow {
   id: number;
+  numero_cuota: number;
+  fecha_pago?: string | null;
+  monto: number;
+  adelantado: boolean;
+  anulado: boolean;
+  id_usuarioxcarrera: number;
+  user_id: number;
   username: string;
   first_name?: string;
   last_name?: string;
   dni?: string;
   email?: string;
-  type: string; // "admin" | "alumno"
+  career_id: number;
+  career_name: string;
 }
 
-type PaginatedUsersResponse = {
+interface PaginatedPaymentsResponse {
   success?: boolean;
   message?: string;
   data?: {
-    items: UserItem[];
+    items: PaymentRow[];
     page: number;
     page_size: number;
     total_items: number;
     total_pages: number;
     has_next: boolean;
   };
-};
+}
 
-const UsersListView: React.FC = () => {
-  const [items, setItems] = useState<UserItem[]>([]);
+const PaymentsListView: React.FC = () => {
+  const [items, setItems] = useState<PaymentRow[]>([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -41,10 +49,27 @@ const UsersListView: React.FC = () => {
 
   const navigate = useNavigate();
 
-  // -------------------------------------------------
-  // Cargar usuarios con paginado (scroll infinito)
-  // -------------------------------------------------
-  const loadUsers = async (pageToLoad: number, reset = false) => {
+  const formatFecha = (value?: string | null) => {
+    if (!value) return "-";
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return value;
+    return d.toLocaleString();
+  };
+
+  const formatAlumno = (p: PaymentRow) => {
+    const nombre = [p.first_name, p.last_name].filter(Boolean).join(" ");
+    if (nombre) {
+      return `${nombre} (${p.username})`;
+    }
+    return p.username;
+  };
+
+  const formatEstado = (p: PaymentRow) => (p.anulado ? "Anulado" : "Activo");
+
+  // ---------------------------------
+  // Cargar pagos (paginado + scroll infinito)
+  // ---------------------------------
+  const loadPayments = async (pageToLoad: number, reset = false) => {
     if (loadingRef.current) return;
     if (!hasMore && !reset && pageToLoad !== 1) return;
 
@@ -58,19 +83,16 @@ const UsersListView: React.FC = () => {
     }
 
     try {
-      const token = localStorage.getItem("token");
-
       const body = {
         page: pageToLoad,
         page_size: 20,
         search: search || null,
       };
 
-      const res = await fetch(`${BASE_URL}/users/paginated`, {
+      const res = await fetch(`${BASE_URL}/payments/paginated`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify(body),
       });
@@ -79,10 +101,10 @@ const UsersListView: React.FC = () => {
         throw new Error(`Error HTTP: ${res.status}`);
       }
 
-      const data = (await res.json()) as PaginatedUsersResponse;
+      const data = (await res.json()) as PaginatedPaymentsResponse;
 
       if (!data.success || !data.data) {
-        throw new Error(data.message || "Error al obtener usuarios");
+        throw new Error(data.message || "Error al obtener pagos");
       }
 
       const { items: newItems, has_next, page: returnedPage } = data.data;
@@ -95,7 +117,7 @@ const UsersListView: React.FC = () => {
 
       setPage(returnedPage);
       setHasMore(has_next);
-    } catch (err: unknown) {
+    } catch (err) {
       console.error(err);
       if (err instanceof Error) {
         setError(err.message);
@@ -109,9 +131,7 @@ const UsersListView: React.FC = () => {
     }
   };
 
-  // -------------------------------------------------
-  // Manejo de scroll
-  // -------------------------------------------------
+  // Scroll infinito (igual que en UsersListView)
   const handleScroll = () => {
     const container = scrollContainerRef.current;
     if (!container) return;
@@ -120,77 +140,51 @@ const UsersListView: React.FC = () => {
     const nearBottom = scrollTop + clientHeight >= scrollHeight - 100;
 
     if (nearBottom && hasMore && !loadingRef.current) {
-      void loadUsers(page + 1);
+      void loadPayments(page + 1);
     }
   };
 
-  // Primera carga
   useEffect(() => {
-    void loadUsers(1, true);
+    void loadPayments(1, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // -------------------------------------------------
+  // ---------------------------------
   // Handlers
-  // -------------------------------------------------
+  // ---------------------------------
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setPage(1);
     setHasMore(true);
-    void loadUsers(1, true);
+    void loadPayments(1, true);
   };
 
-  const handleCreate = () => {
-    navigate("/admin/users/create");
-  };
-
-  const handleEdit = (id: number) => {
-    navigate(`/admin/users/${id}/edit`);
-  };
-
-  const handleEnrollments = (id: number) => {
-    navigate(`/admin/users/${id}/enrollments`);
-  };
-
-  const handleDelete = async (id: number) => {
-    const ok = window.confirm("¿Seguro que querés eliminar este usuario?");
-    if (!ok) return;
-
-    try {
-      const res = await fetch(`${BASE_URL}/users/${id}`, {
-        method: "DELETE",
-      });
-
-      if (!res.ok) {
-        console.error("Error eliminando usuario");
-        alert("No se pudo eliminar el usuario");
-        return;
+  const handleGoToDetail = (row: PaymentRow) => {
+    navigate(
+      `/admin/users/${row.user_id}/enrollments/${row.id_usuarioxcarrera}/payments`,
+      {
+        state: { from: "global-payments" },
       }
-
-      setItems((prev) => prev.filter((u) => u.id !== id));
-    } catch (err) {
-      console.error(err);
-      alert("Error eliminando el usuario");
-    }
+    );
   };
 
-  // -------------------------------------------------
+  // ---------------------------------
   // Render
-  // -------------------------------------------------
+  // ---------------------------------
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2>Alumnos / Usuarios</h2>
-        <button className="btn btn-primary" onClick={handleCreate}>
-          + Nuevo usuario
-        </button>
+        <h2>Pagos</h2>
+        <small className="text-muted">
+          Historial de pagos (últimos primero)
+        </small>
       </div>
 
       <form className="mb-3" onSubmit={handleSearchSubmit}>
         <div className="input-group">
           <input
             className="form-control"
-            placeholder="Buscar por usuario, nombre, DNI, email..."
+            placeholder="Buscar por alumno, DNI, carrera..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -206,7 +200,7 @@ const UsersListView: React.FC = () => {
         ref={scrollContainerRef}
         onScroll={handleScroll}
         style={{
-          height: "70vh",
+          height: "70vh",           // 👉 igual que la tabla de alumnos
           overflowY: "auto",
           border: "1px solid #dee2e6",
           borderRadius: "0.5rem",
@@ -216,49 +210,39 @@ const UsersListView: React.FC = () => {
       >
         {initialLoading ? (
           <div className="text-center text-muted py-3">
-            Cargando usuarios...
+            Cargando pagos...
           </div>
         ) : (
           <>
             <table className="table table-striped table-hover mb-0">
               <thead>
                 <tr>
-                  <th>ID</th>
-                  <th>Usuario</th>
-                  <th>Nombre</th>
+                  <th>Fecha</th>
+                  <th>Alumno</th>
                   <th>DNI</th>
-                  <th>Email</th>
-                  <th style={{ width: "220px" }}>Acciones</th>
+                  <th>Carrera</th>
+                  <th>Cuota</th>
+                  <th>Monto</th>
+                  <th>Estado</th>
+                  <th style={{ width: "160px" }}>Acciones</th>
                 </tr>
               </thead>
               <tbody>
-                {items.map((u) => (
-                  <tr key={u.id}>
-                    <td>{u.id}</td>
-                    <td>{u.username}</td>
+                {items.map((p) => (
+                  <tr key={p.id}>
+                    <td>{formatFecha(p.fecha_pago || null)}</td>
+                    <td>{formatAlumno(p)}</td>
+                    <td>{p.dni}</td>
+                    <td>{p.career_name}</td>
+                    <td>{p.numero_cuota}</td>
+                    <td>${p.monto}</td>
+                    <td>{formatEstado(p)}</td>
                     <td>
-                      {u.first_name} {u.last_name}
-                    </td>
-                    <td>{u.dni}</td>
-                    <td>{u.email}</td>
-                    <td>
                       <button
-                        className="btn btn-sm btn-outline-primary me-2"
-                        onClick={() => handleEdit(u.id)}
+                        className="btn btn-sm btn-outline-primary"
+                        onClick={() => handleGoToDetail(p)}
                       >
-                        Editar
-                      </button>
-                      <button
-                        className="btn btn-sm btn-outline-secondary me-2"
-                        onClick={() => handleEnrollments(u.id)}
-                      >
-                        Carreras
-                      </button>
-                      <button
-                        className="btn btn-sm btn-outline-danger"
-                        onClick={() => handleDelete(u.id)}
-                      >
-                        Eliminar
+                        Ver detalle
                       </button>
                     </td>
                   </tr>
@@ -266,8 +250,8 @@ const UsersListView: React.FC = () => {
 
                 {items.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="text-center">
-                      No se encontraron usuarios.
+                    <td colSpan={8} className="text-center">
+                      No se encontraron pagos.
                     </td>
                   </tr>
                 )}
@@ -276,13 +260,13 @@ const UsersListView: React.FC = () => {
 
             {loadingMore && (
               <div className="text-center text-muted py-2">
-                Cargando más usuarios...
+                Cargando más pagos...
               </div>
             )}
 
             {!hasMore && items.length > 0 && (
               <div className="text-center text-muted py-2">
-                No hay más usuarios para cargar.
+                No hay más pagos para cargar.
               </div>
             )}
           </>
@@ -292,4 +276,4 @@ const UsersListView: React.FC = () => {
   );
 };
 
-export default UsersListView;
+export default PaymentsListView;

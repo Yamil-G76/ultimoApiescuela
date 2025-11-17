@@ -1,33 +1,31 @@
-// src/views/auth/admin/UsersListView.tsx
+// src/views/auth/admin/CareerListView.tsx
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../../../config/backend";
 
-interface UserItem {
+interface CareerItem {
   id: number;
-  username: string;
-  first_name?: string;
-  last_name?: string;
-  dni?: string;
-  email?: string;
-  type: string; // "admin" | "alumno"
+  name: string;
+  costo_mensual: number;
+  duracion_meses: number;
+  inicio_cursado?: string | null;
 }
 
-type PaginatedUsersResponse = {
+interface PaginatedCareersResponse {
   success?: boolean;
   message?: string;
   data?: {
-    items: UserItem[];
+    items: CareerItem[];
     page: number;
     page_size: number;
     total_items: number;
     total_pages: number;
     has_next: boolean;
   };
-};
+}
 
-const UsersListView: React.FC = () => {
-  const [items, setItems] = useState<UserItem[]>([]);
+const CareerListView: React.FC = () => {
+  const [items, setItems] = useState<CareerItem[]>([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -41,10 +39,17 @@ const UsersListView: React.FC = () => {
 
   const navigate = useNavigate();
 
-  // -------------------------------------------------
-  // Cargar usuarios con paginado (scroll infinito)
-  // -------------------------------------------------
-  const loadUsers = async (pageToLoad: number, reset = false) => {
+  const formatFecha = (value?: string | null) => {
+    if (!value) return "-";
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return value;
+    return d.toLocaleDateString();
+  };
+
+  // ---------------------------------
+  // Cargar carreras (paginado)
+  // ---------------------------------
+  const loadCareers = async (pageToLoad: number, reset = false) => {
     if (loadingRef.current) return;
     if (!hasMore && !reset && pageToLoad !== 1) return;
 
@@ -58,19 +63,16 @@ const UsersListView: React.FC = () => {
     }
 
     try {
-      const token = localStorage.getItem("token");
-
       const body = {
         page: pageToLoad,
         page_size: 20,
         search: search || null,
       };
 
-      const res = await fetch(`${BASE_URL}/users/paginated`, {
+      const res = await fetch(`${BASE_URL}/careers/paginated`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify(body),
       });
@@ -79,10 +81,10 @@ const UsersListView: React.FC = () => {
         throw new Error(`Error HTTP: ${res.status}`);
       }
 
-      const data = (await res.json()) as PaginatedUsersResponse;
+      const data = (await res.json()) as PaginatedCareersResponse;
 
       if (!data.success || !data.data) {
-        throw new Error(data.message || "Error al obtener usuarios");
+        throw new Error(data.message || "Error al obtener carreras");
       }
 
       const { items: newItems, has_next, page: returnedPage } = data.data;
@@ -95,7 +97,7 @@ const UsersListView: React.FC = () => {
 
       setPage(returnedPage);
       setHasMore(has_next);
-    } catch (err: unknown) {
+    } catch (err) {
       console.error(err);
       if (err instanceof Error) {
         setError(err.message);
@@ -109,9 +111,7 @@ const UsersListView: React.FC = () => {
     }
   };
 
-  // -------------------------------------------------
-  // Manejo de scroll
-  // -------------------------------------------------
+  // Scroll infinito
   const handleScroll = () => {
     const container = scrollContainerRef.current;
     if (!container) return;
@@ -120,69 +120,68 @@ const UsersListView: React.FC = () => {
     const nearBottom = scrollTop + clientHeight >= scrollHeight - 100;
 
     if (nearBottom && hasMore && !loadingRef.current) {
-      void loadUsers(page + 1);
+      void loadCareers(page + 1);
     }
   };
 
-  // Primera carga
   useEffect(() => {
-    void loadUsers(1, true);
+    void loadCareers(1, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // -------------------------------------------------
+  // ---------------------------------
   // Handlers
-  // -------------------------------------------------
+  // ---------------------------------
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setPage(1);
     setHasMore(true);
-    void loadUsers(1, true);
+    void loadCareers(1, true);
   };
 
   const handleCreate = () => {
-    navigate("/admin/users/create");
+    navigate("/admin/careers/create");
   };
 
   const handleEdit = (id: number) => {
-    navigate(`/admin/users/${id}/edit`);
+    navigate(`/admin/careers/${id}/edit`);
   };
 
-  const handleEnrollments = (id: number) => {
-    navigate(`/admin/users/${id}/enrollments`);
+  const handleViewPrices = (id: number) => {
+    navigate(`/admin/careers/${id}/prices`);
   };
 
   const handleDelete = async (id: number) => {
-    const ok = window.confirm("¿Seguro que querés eliminar este usuario?");
+    const ok = window.confirm("¿Seguro que querés eliminar esta carrera?");
     if (!ok) return;
 
     try {
-      const res = await fetch(`${BASE_URL}/users/${id}`, {
+      const res = await fetch(`${BASE_URL}/careers/${id}`, {
         method: "DELETE",
       });
 
       if (!res.ok) {
-        console.error("Error eliminando usuario");
-        alert("No se pudo eliminar el usuario");
+        console.error("Error eliminando carrera");
+        alert("No se pudo eliminar la carrera");
         return;
       }
 
-      setItems((prev) => prev.filter((u) => u.id !== id));
+      setItems((prev) => prev.filter((c) => c.id !== id));
     } catch (err) {
       console.error(err);
-      alert("Error eliminando el usuario");
+      alert("Error eliminando la carrera");
     }
   };
 
-  // -------------------------------------------------
+  // ---------------------------------
   // Render
-  // -------------------------------------------------
+  // ---------------------------------
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2>Alumnos / Usuarios</h2>
+        <h2>Carreras</h2>
         <button className="btn btn-primary" onClick={handleCreate}>
-          + Nuevo usuario
+          + Nueva carrera
         </button>
       </div>
 
@@ -190,7 +189,7 @@ const UsersListView: React.FC = () => {
         <div className="input-group">
           <input
             className="form-control"
-            placeholder="Buscar por usuario, nombre, DNI, email..."
+            placeholder="Buscar por nombre de carrera..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -216,7 +215,7 @@ const UsersListView: React.FC = () => {
       >
         {initialLoading ? (
           <div className="text-center text-muted py-3">
-            Cargando usuarios...
+            Cargando carreras...
           </div>
         ) : (
           <>
@@ -224,39 +223,37 @@ const UsersListView: React.FC = () => {
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Usuario</th>
                   <th>Nombre</th>
-                  <th>DNI</th>
-                  <th>Email</th>
-                  <th style={{ width: "220px" }}>Acciones</th>
+                  <th>Costo mensual</th>
+                  <th>Duración (meses)</th>
+                  <th>Inicio cursado</th>
+                  <th style={{ width: "250px" }}>Acciones</th>
                 </tr>
               </thead>
               <tbody>
-                {items.map((u) => (
-                  <tr key={u.id}>
-                    <td>{u.id}</td>
-                    <td>{u.username}</td>
-                    <td>
-                      {u.first_name} {u.last_name}
-                    </td>
-                    <td>{u.dni}</td>
-                    <td>{u.email}</td>
+                {items.map((c) => (
+                  <tr key={c.id}>
+                    <td>{c.id}</td>
+                    <td>{c.name}</td>
+                    <td>${c.costo_mensual}</td>
+                    <td>{c.duracion_meses}</td>
+                    <td>{formatFecha(c.inicio_cursado || null)}</td>
                     <td>
                       <button
                         className="btn btn-sm btn-outline-primary me-2"
-                        onClick={() => handleEdit(u.id)}
+                        onClick={() => handleEdit(c.id)}
                       >
                         Editar
                       </button>
                       <button
                         className="btn btn-sm btn-outline-secondary me-2"
-                        onClick={() => handleEnrollments(u.id)}
+                        onClick={() => handleViewPrices(c.id)}
                       >
-                        Carreras
+                        Historial precios
                       </button>
                       <button
                         className="btn btn-sm btn-outline-danger"
-                        onClick={() => handleDelete(u.id)}
+                        onClick={() => handleDelete(c.id)}
                       >
                         Eliminar
                       </button>
@@ -267,7 +264,7 @@ const UsersListView: React.FC = () => {
                 {items.length === 0 && (
                   <tr>
                     <td colSpan={6} className="text-center">
-                      No se encontraron usuarios.
+                      No se encontraron carreras.
                     </td>
                   </tr>
                 )}
@@ -276,13 +273,13 @@ const UsersListView: React.FC = () => {
 
             {loadingMore && (
               <div className="text-center text-muted py-2">
-                Cargando más usuarios...
+                Cargando más carreras...
               </div>
             )}
 
             {!hasMore && items.length > 0 && (
               <div className="text-center text-muted py-2">
-                No hay más usuarios para cargar.
+                No hay más carreras para cargar.
               </div>
             )}
           </>
@@ -292,4 +289,4 @@ const UsersListView: React.FC = () => {
   );
 };
 
-export default UsersListView;
+export default CareerListView;

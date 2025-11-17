@@ -12,6 +12,17 @@ import LoginView from "../views/auth/LoginView";
 import UsersListView from "../views/auth/admin/UsersListView";
 import UserCreateView from "../views/auth/admin/UserCreateView";
 import UserEditView from "../views/auth/admin/UserEditView";
+import UserEnrollmentsView from "../views/auth/admin/UserEnrollmentsView"; // 👈 NUEVO
+
+// Carreras - Admin
+import CareersListView from "../views/auth/admin/CareerListView";
+import CareerCreateView from "../views/auth/admin/CareerCreateView";
+import CareerEditView from "../views/auth/admin/CareerEditView";
+import CareerPricesHistoryView from "../views/auth/admin/CarerrPricesHistoriView"; // 👈 corregido
+
+// Pagos - Admin
+import PaymentsListView from "../views/auth/admin/PaymentListView";
+import UserPaymentsView from "../views/auth/admin/UserPaymentsView";
 
 // Noticias - Admin
 import NewsCreateView from "../views/auth/admin/NewsCreateView";
@@ -20,6 +31,15 @@ import NewsEditView from "../views/auth/admin/NewsEditView";
 
 // Noticias - Alumno
 import NewsFeedView from "../views/auth/Alumno/NewsFedd";
+
+// Alumno - vistas nuevas
+import AlumnoHomeView from "../views/auth/Alumno/AlumnoHomeView";
+import AlumnoProfileView from "../views/auth/Alumno/AlumnoProfileView";
+import AlumnoCareersView from "../views/auth/Alumno/AlumnoCareersView";
+import AlumnoPaymentsView from "../views/auth/Alumno/AlumnoPaymentsView";
+
+// Dashboard Admin
+import AdminDashboardView from "../views/auth/admin/AdminDashboardView"; // 👈 NUEVO
 
 const AppRouter: React.FC = () => {
   return (
@@ -34,21 +54,33 @@ const AppRouter: React.FC = () => {
         <Route element={<MainLayout />}>
           {/* ADMIN */}
           <Route path="/admin">
-            <Route index element={<div>Dashboard Admin (TODO)</div>} />
+            {/* Dashboard admin */}
+            <Route index element={<AdminDashboardView />} />
 
             {/* Usuarios */}
             <Route path="users" element={<UsersListView />} />
             <Route path="users/create" element={<UserCreateView />} />
             <Route path="users/:id/edit" element={<UserEditView />} />
-
-            {/* Carreras / Pagos (TODO) */}
             <Route
-              path="careers"
-              element={<div>Listado de carreras (TODO)</div>}
+              path="users/:id/enrollments"
+              element={<UserEnrollmentsView />}
             />
+
+            {/* Carreras */}
+            <Route path="careers" element={<CareersListView />} />
+            <Route path="careers/create" element={<CareerCreateView />} />
+            <Route path="careers/:id/edit" element={<CareerEditView />} />
             <Route
-              path="payments"
-              element={<div>Listado de pagos (TODO)</div>}
+              path="careers/:id/prices"
+              element={<CareerPricesHistoryView />}
+            />
+
+            {/* Pagos */}
+            <Route path="payments" element={<PaymentsListView />} />
+            {/* Detalle de pagos por alumno/carrera (admin) */}
+            <Route
+              path="users/:userId/enrollments/:enrollmentId/payments"
+              element={<UserPaymentsView />}
             />
 
             {/* Noticias Admin */}
@@ -59,8 +91,10 @@ const AppRouter: React.FC = () => {
 
           {/* ALUMNO */}
           <Route path="/alumno">
-            <Route index element={<div>Home Alumno (TODO)</div>} />
-            {/* Noticias Alumno */}
+            <Route index element={<AlumnoHomeView />} />
+            <Route path="profile" element={<AlumnoProfileView />} />
+            <Route path="careers" element={<AlumnoCareersView />} />
+            <Route path="payments" element={<AlumnoPaymentsView />} />
             <Route path="news" element={<NewsFeedView />} />
           </Route>
         </Route>

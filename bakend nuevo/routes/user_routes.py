@@ -1,11 +1,18 @@
+# routes/user_routes.py
+
 from typing import Optional, List
 
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, validator
 from sqlalchemy.orm import Session
 
 from config.db import get_db
 from models.user import User, UserDetail
+
+
+from sqlalchemy import or_
+
+
 
 router = APIRouter()
 
@@ -22,27 +29,58 @@ class LoginInput(BaseModel):
 class UsersPaginatedRequest(BaseModel):
     page: int = 1
     page_size: int = 20
-    search: Optional[str] = None  # 🔍 nuevo campo de búsqueda
+    search: Optional[str] = None  #  búsqueda
 
 
-class UserCreate(BaseModel):
+class UserBase(BaseModel):
     username: str
+    first_name: str
+    last_name: str
+    dni: str
+    email: EmailStr
+    type: str  # "admin" o "alumno"
+
+    @validator("username", "first_name", "last_name", "dni", "type")
+    def not_empty(cls, v: str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("Campo obligatorio")
+        return v
+
+    @validator("type")
+    def valid_type(cls, v: str) -> str:
+        if v not in ("admin", "alumno"):
+            raise ValueError("El tipo debe ser 'admin' o 'alumno'")
+        return v
+
+    @validator("dni")
+    def valid_dni(cls, v: str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("El DNI es obligatorio")
+        if not v.isdigit():
+            raise ValueError("El DNI debe ser numérico")
+        if len(v) < 7 or len(v) > 9:
+            raise ValueError("El DNI debe tener entre 7 y 9 dígitos")
+        return v
+
+
+class UserCreate(UserBase):
     password: str
-    first_name: str
-    last_name: str
-    dni: str
-    email: str
-    type: str  # "admin" o "alumno"
+
+    @validator("password")
+    def valid_password(cls, v: str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("La contraseña es obligatoria")
+        if len(v) < 6:
+            raise ValueError("La contraseña debe tener al menos 6 caracteres")
+        return v
 
 
-class UserUpdate(BaseModel):
-    username: str
-    password: Optional[str] = None  # si viene vacío, no se cambia
-    first_name: str
-    last_name: str
-    dni: str
-    email: str
-    type: str  # "admin" o "alumno"
+class UserUpdate(UserBase):
+    """Editar usuario (NO cambia password)."""
+    pass
 
 
 # -------------------------------------------------------------------
@@ -51,14 +89,6 @@ class UserUpdate(BaseModel):
 
 @router.post("/login")
 def login_user(payload: LoginInput, db: Session = Depends(get_db)):
-    """
-    Login simple para el front:
-    - Busca usuario por username.
-    - Compara password en texto plano.
-    - Devuelve token de prueba + datos básicos del usuario (incluye type desde UserDetail).
-    """
-
-    # Buscar usuario
     user: Optional[User] = (
         db.query(User)
         .filter(User.username == payload.username)
@@ -72,13 +102,9 @@ def login_user(payload: LoginInput, db: Session = Depends(get_db)):
             "data": None,
         }
 
-    # Buscar detalle (puede ser None si aún no lo creaste)
     detalle: Optional[UserDetail] = user.userdetail
-
-    # Rol: si hay detalle usamos su type, si no, por defecto "alumno"
     user_type = detalle.type if detalle and detalle.type else "alumno"
 
-    # Por ahora, token “fake” pero estable:
     token = f"fake-token-user-{user.id}"
 
     return {
@@ -89,32 +115,32 @@ def login_user(payload: LoginInput, db: Session = Depends(get_db)):
             "usuario": {
                 "id": user.id,
                 "username": user.username,
-                "type": user_type,  # "admin" o "alumno"
+                "type": user_type,
             },
         },
     }
 
 
 # -------------------------------------------------------------------
-# CREAR USUARIO
+# CREAR USUARIO (con password)
 # -------------------------------------------------------------------
 
 @router.post("/users")
 def create_user(payload: UserCreate, db: Session = Depends(get_db)):
-    # Validar username único
+    # Username único
     existing = db.query(User).filter(User.username == payload.username).first()
     if existing:
         raise HTTPException(status_code=400, detail="El nombre de usuario ya existe")
 
-    # Validar DNI único
+    # DNI único
     existing_dni = db.query(UserDetail).filter(UserDetail.dni == payload.dni).first()
     if existing_dni:
         raise HTTPException(status_code=400, detail="El DNI ya está registrado")
 
-    # Crear User
+    # Crear User con password enviada (sin hash, por ahora)
     new_user = User(username=payload.username, password=payload.password)
     db.add(new_user)
-    db.flush()  # para tener new_user.id sin commit todavía
+    db.flush()  # para tener new_user.id
 
     # Crear UserDetail
     new_detail = UserDetail(
@@ -173,7 +199,7 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
 
 
 # -------------------------------------------------------------------
-# EDITAR USUARIO
+# EDITAR USUARIO (sin tocar password)
 # -------------------------------------------------------------------
 
 @router.put("/users/{user_id}")
@@ -184,7 +210,7 @@ def update_user(user_id: int, payload: UserUpdate, db: Session = Depends(get_db)
 
     detalle: Optional[UserDetail] = user.userdetail
 
-    # Validar username único (si cambia)
+    # Username único (si cambia)
     existing = (
         db.query(User)
         .filter(User.username == payload.username, User.id != user_id)
@@ -193,7 +219,7 @@ def update_user(user_id: int, payload: UserUpdate, db: Session = Depends(get_db)
     if existing:
         raise HTTPException(status_code=400, detail="El nombre de usuario ya existe")
 
-    # Validar DNI único (si cambia)
+    # DNI único (si cambia)
     if detalle:
         existing_dni = (
             db.query(UserDetail)
@@ -203,10 +229,8 @@ def update_user(user_id: int, payload: UserUpdate, db: Session = Depends(get_db)
         if existing_dni:
             raise HTTPException(status_code=400, detail="El DNI ya está registrado")
 
-    # Actualizar User
+    # Actualizar User (NO cambiamos password)
     user.username = payload.username
-    if payload.password:  # solo si viene algo
-        user.password = payload.password
 
     # Actualizar UserDetail
     if not detalle:
@@ -257,8 +281,6 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
 
     detalle: Optional[UserDetail] = user.userdetail
 
-    # ⚠️ Esto es simple: si hay relaciones (carreras/pagos) puede fallar por FK.
-    # Para proyecto académico está bien; en producción habría que manejar cascadas o estados.
     if detalle:
         db.delete(detalle)
     db.delete(user)
@@ -270,37 +292,44 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
 # -------------------------------------------------------------------
 # USUARIOS PAGINADOS + BÚSQUEDA
 # -------------------------------------------------------------------
-
 @router.post("/users/paginated")
-def get_users_paginated(payload: UsersPaginatedRequest, db: Session = Depends(get_db)):
+def get_users_paginated(
+    payload: UsersPaginatedRequest,
+    db: Session = Depends(get_db),
+):
     """
-    Devuelve usuarios paginados para la vista de Admin.
-    Permite búsqueda por username, nombre, apellido, dni o email.
+    Devuelve SOLO alumnos (type = 'alumno') paginados para la vista de Admin.
+    Se puede buscar por username, nombre, apellido, DNI o email.
     """
 
     page = payload.page if payload.page > 0 else 1
     page_size = payload.page_size if payload.page_size > 0 else 20
 
+    # Base: solo alumnos
     query = (
         db.query(User)
         .outerjoin(UserDetail, UserDetail.id_user == User.id)
+        .filter(UserDetail.type == "alumno")  # 👈 solo alumnos
         .order_by(User.id)
     )
 
+    # Búsqueda
     if payload.search:
         search = f"%{payload.search}%"
         query = query.filter(
-            (User.username.ilike(search)) |
-            (UserDetail.first_name.ilike(search)) |
-            (UserDetail.last_name.ilike(search)) |
-            (UserDetail.dni.ilike(search)) |
-            (UserDetail.email.ilike(search))
+            or_(
+                User.username.ilike(search),
+                UserDetail.first_name.ilike(search),
+                UserDetail.last_name.ilike(search),
+                UserDetail.dni.ilike(search),
+                UserDetail.email.ilike(search),
+            )
         )
 
     total_items = query.count()
     total_pages = (total_items + page_size - 1) // page_size if total_items > 0 else 1
 
-    users_db: List[User] = (
+    users_db = (
         query
         .offset((page - 1) * page_size)
         .limit(page_size)
@@ -310,7 +339,6 @@ def get_users_paginated(payload: UsersPaginatedRequest, db: Session = Depends(ge
     items = []
     for u in users_db:
         detalle: Optional[UserDetail] = u.userdetail
-        user_type = detalle.type if detalle and detalle.type else "alumno"
 
         items.append(
             {
@@ -320,13 +348,14 @@ def get_users_paginated(payload: UsersPaginatedRequest, db: Session = Depends(ge
                 "last_name": getattr(detalle, "last_name", None),
                 "dni": getattr(detalle, "dni", None),
                 "email": getattr(detalle, "email", None),
-                "type": user_type,
+                # Podés seguir mandando el type aunque no lo uses en la tabla
+                "type": "alumno",
             }
         )
 
     return {
         "success": True,
-        "message": "Usuarios obtenidos correctamente",
+        "message": "Alumnos obtenidos correctamente",
         "data": {
             "items": items,
             "page": page,
