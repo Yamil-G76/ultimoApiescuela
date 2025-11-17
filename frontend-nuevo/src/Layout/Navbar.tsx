@@ -50,9 +50,7 @@ const Navbar: React.FC = () => {
       <div>
         <div className="p-3 border-bottom border-light">
           <h5 className="mb-0">ApiEscuela</h5>
-          <small>
-            {isAdmin ? "Panel administrador" : "Panel alumno"}
-          </small>
+          <small>{isAdmin ? "Panel administrador" : "Panel alumno"}</small>
         </div>
 
         <nav className="nav flex-column p-2">
@@ -97,6 +95,7 @@ const Navbar: React.FC = () => {
                 Pagos
               </NavLink>
 
+              {/* Noticias */}
               <NavLink
                 to="/admin/news"
                 className={({ isActive }) =>
@@ -104,6 +103,14 @@ const Navbar: React.FC = () => {
                 }
               >
                 Noticias
+              </NavLink>
+              <NavLink
+                to="/admin/news/create"
+                className={({ isActive }) =>
+                  `nav-link text-white ps-4 ${isActive ? "fw-bold" : ""}`
+                }
+              >
+                + Crear noticia
               </NavLink>
             </>
           ) : (
