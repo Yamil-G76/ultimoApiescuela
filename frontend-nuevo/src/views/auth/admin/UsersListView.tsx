@@ -1,143 +1,165 @@
-import React, { useEffect, useRef, useState } from "react";
-import UsersDataView from "../../../components/data/UsersDataView";
-import type { User } from "../../../components/data/UsersDataView";
-// 1) Tipos
-type PaginatedUsersResponse = {
-  success?: boolean;
-  message?: string;
-  data?: {
-    items: User[];
-    page: number;
-    page_size: number;
-    total_items: number;
-    total_pages: number;
-    has_next: boolean;
-  };
-};
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { BASE_URL } from "../../../config/backend";
 
-// 2) Constantes backend
-const BACKEND_IP = "127.0.0.1";
-const BACKEND_PORT = "8000";
-const ENDPOINT = "/users/paginated";
-const URL = `http://${BACKEND_IP}:${BACKEND_PORT}${ENDPOINT}`;
+interface UserItem {
+  id: number;
+  username: string;
+  first_name?: string;
+  last_name?: string;
+  dni?: string;
+  email?: string;
+  type: string; // "admin" | "alumno"
+}
 
-// 3) Hooks (useState, useRef, useEffect)
-const UsersListView: React.FC = () => {
-  const [users, setUsers] = useState<User[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [initialLoading, setInitialLoading] = useState(true);
+const UsersListView = () => {
+  const [items, setItems] = useState<UserItem[]>([]);
+  const [search, setSearch] = useState("");
+  const [page] = useState(1); // para futuro paginado real
+  const [loading, setLoading] = useState(false);
 
-  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
-  const loadingRef = useRef<boolean>(false);
+  const navigate = useNavigate();
 
-  // 4) Funciones internas
-
-  const getUsersPag = async (page: number) => {
-    if (loadingRef.current) return;
-    if (!hasMore && page !== 1) return;
-
-    loadingRef.current = true;
-    setError(null);
-
+  const loadUsers = async () => {
+    setLoading(true);
     try {
-      const token = localStorage.getItem("token");
-
-      const body = {
-        page,
-        page_size: 20,
-      };
-
-      const res = await fetch(URL, {
+      const res = await fetch(`${BASE_URL}/users/paginated`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify(body),
+        body: JSON.stringify({
+          page,
+          page_size: 50,
+          search: search || null,
+        }),
       });
 
       if (!res.ok) {
-        throw new Error(`Error HTTP: ${res.status}`);
+        console.error("Error cargando usuarios");
+        return;
       }
 
-      const data = (await res.json()) as PaginatedUsersResponse;
-
-      if (!data.success || !data.data) {
-        throw new Error(data.message || "Error al obtener usuarios");
-      }
-
-      const { items, has_next, page: returnedPage } = data.data;
-
-      if (page === 1) {
-        setUsers(items);
-      } else {
-        setUsers((prev) => [...prev, ...items]);
-      }
-
-      setCurrentPage(returnedPage);
-      setHasMore(has_next);
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        setError(error.message);
-      } else {
-        setError("Error desconocido");
-      }
+      const data = await res.json();
+      setItems(data.data.items);
+    } catch (err) {
+      console.error(err);
     } finally {
-      loadingRef.current = false;
-      setInitialLoading(false);
+      setLoading(false);
     }
   };
 
-  const handleScroll = () => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
-    const { scrollTop, scrollHeight, clientHeight } = container;
-
-    const nearBottom = scrollTop + clientHeight >= scrollHeight - 100;
-
-    if (nearBottom && hasMore && !loadingRef.current) {
-      void getUsersPag(currentPage + 1);
-    }
-  };
-
-  // 5) useEffect para cargar datos al montar
   useEffect(() => {
-    void getUsersPag(1);
+    loadUsers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 6) JSX con DataView
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    loadUsers();
+  };
+
+  const handleCreate = () => {
+    navigate("/admin/users/create");
+  };
+
+  const handleEdit = (id: number) => {
+    navigate(`/admin/users/${id}/edit`);
+  };
+
+  const handleDelete = async (id: number) => {
+    const ok = window.confirm("¿Seguro que querés eliminar este usuario?");
+    if (!ok) return;
+
+    const res = await fetch(`${BASE_URL}/users/${id}`, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) {
+      console.error("Error eliminando usuario");
+      alert("No se pudo eliminar el usuario");
+      return;
+    }
+
+    setItems((prev) => prev.filter((u) => u.id !== id));
+  };
+
   return (
-    <div>
-      <h3 className="mb-3">Alumnos / Usuarios</h3>
-
-      {error && <div className="alert alert-danger py-2">{error}</div>}
-
-      <div
-        ref={scrollContainerRef}
-        onScroll={handleScroll}
-        style={{
-          height: "60vh",
-          overflowY: "auto",
-          border: "1px solid #dee2e6",
-          borderRadius: "0.5rem",
-          backgroundColor: "#ffffff",
-          padding: "0.75rem",
-        }}
-      >
-        {initialLoading ? (
-          <div className="text-center text-muted py-3">Cargando usuarios...</div>
-        ) : (
-          <UsersDataView
-            users={users}
-            loadingMore={loadingRef.current}
-            hasMore={hasMore}
-          />
-        )}
+    <div className="container mt-4">
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h2>Alumnos / Usuarios</h2>
+        <button className="btn btn-primary" onClick={handleCreate}>
+          + Nuevo usuario
+        </button>
       </div>
+
+      <form className="mb-3" onSubmit={handleSearchSubmit}>
+        <div className="input-group">
+          <input
+            className="form-control"
+            placeholder="Buscar por usuario, nombre, DNI, email..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <button className="btn btn-outline-secondary" type="submit">
+            Buscar
+          </button>
+        </div>
+      </form>
+
+      {loading ? (
+        <div>Cargando usuarios...</div>
+      ) : (
+        <table className="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Usuario</th>
+              <th>Nombre</th>
+              <th>DNI</th>
+              <th>Email</th>
+              <th>Rol</th>
+              <th style={{ width: "160px" }}>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((u) => (
+              <tr key={u.id}>
+                <td>{u.id}</td>
+                <td>{u.username}</td>
+                <td>
+                  {u.first_name} {u.last_name}
+                </td>
+                <td>{u.dni}</td>
+                <td>{u.email}</td>
+                <td>{u.type}</td>
+                <td>
+                  <button
+                    className="btn btn-sm btn-outline-primary me-2"
+                    onClick={() => handleEdit(u.id)}
+                  >
+                    Editar
+                  </button>
+                  <button
+                    className="btn btn-sm btn-outline-danger"
+                    onClick={() => handleDelete(u.id)}
+                  >
+                    Eliminar
+                  </button>
+                </td>
+              </tr>
+            ))}
+
+            {items.length === 0 && (
+              <tr>
+                <td colSpan={7} className="text-center">
+                  No se encontraron usuarios.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 };

@@ -7,7 +7,11 @@ import MainLayout from "../Layout/MainLayout";
 
 // Views
 import LoginView from "../views/auth/LoginView";
+
+// Usuarios - Admin
 import UsersListView from "../views/auth/admin/UsersListView";
+import UserCreateView from "../views/auth/admin/UserCreateView";
+import UserEditView from "../views/auth/admin/UserEditView";
 
 // Noticias - Admin
 import NewsCreateView from "../views/auth/admin/NewsCreateView";
@@ -31,9 +35,21 @@ const AppRouter: React.FC = () => {
           {/* ADMIN */}
           <Route path="/admin">
             <Route index element={<div>Dashboard Admin (TODO)</div>} />
+
+            {/* Usuarios */}
             <Route path="users" element={<UsersListView />} />
-            <Route path="careers" element={<div>Listado de carreras (TODO)</div>} />
-            <Route path="payments" element={<div>Listado de pagos (TODO)</div>} />
+            <Route path="users/create" element={<UserCreateView />} />
+            <Route path="users/:id/edit" element={<UserEditView />} />
+
+            {/* Carreras / Pagos (TODO) */}
+            <Route
+              path="careers"
+              element={<div>Listado de carreras (TODO)</div>}
+            />
+            <Route
+              path="payments"
+              element={<div>Listado de pagos (TODO)</div>}
+            />
 
             {/* Noticias Admin */}
             <Route path="news" element={<NewsListView />} />
@@ -44,7 +60,6 @@ const AppRouter: React.FC = () => {
           {/* ALUMNO */}
           <Route path="/alumno">
             <Route index element={<div>Home Alumno (TODO)</div>} />
-
             {/* Noticias Alumno */}
             <Route path="news" element={<NewsFeedView />} />
           </Route>
