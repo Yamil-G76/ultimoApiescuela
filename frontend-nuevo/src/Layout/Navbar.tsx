@@ -1,4 +1,3 @@
-// src/components/layout/Navbar.tsx
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
@@ -7,10 +6,8 @@ import {
   FiCreditCard,
   FiBell,
   FiUsers,
-  FiUser,
   FiLogOut,
   FiMenu,
-  FiPlusCircle,
 } from "react-icons/fi";
 
 type UserType = "admin" | "alumno";
@@ -27,7 +24,7 @@ const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
 
-  // ====== LÓGICA DE ROL (TUYA) =======================================
+  // ====== LÓGICA DE ROL =======================================
   let userType: UserType = "alumno";
 
   const storedType = localStorage.getItem("user_type");
@@ -83,6 +80,14 @@ const Navbar: React.FC = () => {
     navigate("/login");
   };
 
+  const handleGoToProfile = () => {
+    if (isAdmin) {
+      navigate("/admin/profile");
+    } else {
+      navigate("/alumno/profile");
+    }
+  };
+
   // ====== MENÚS ======================================================
   const adminMenu: MenuItem[] = [
     {
@@ -111,12 +116,7 @@ const Navbar: React.FC = () => {
       label: "Usuarios",
       icon: <FiUsers />,
     },
-    {
-      to: "/admin/news/create",
-      label: "Crear noticia",
-      icon: <FiPlusCircle />,
-      isSub: true,
-    },
+    // 👇 "Crear noticia" ya no va acá, se hace desde el botón en la vista de noticias
   ];
 
   const alumnoMenu: MenuItem[] = [
@@ -126,11 +126,7 @@ const Navbar: React.FC = () => {
       icon: <FiHome />,
       exact: true,
     },
-    {
-      to: "/alumno/profile",
-      label: "Mi perfil",
-      icon: <FiUser />,
-    },
+    // Mi perfil del alumno también se maneja desde el footer
     {
       to: "/alumno/careers",
       label: "Mis carreras",
@@ -153,7 +149,6 @@ const Navbar: React.FC = () => {
   // ====== RENDER =====================================================
   return (
     <aside className={`sidebar ${collapsed ? "sidebar--collapsed" : ""}`}>
-      {}
       <div className="sidebar-top">
         <button
           type="button"
@@ -186,11 +181,13 @@ const Navbar: React.FC = () => {
         </nav>
       </div>
 
-      {/* FOOTER: perfil + cerrar sesión, estilo de menú */}
+      {/* FOOTER: perfil + cerrar sesión */}
       <div className="sidebar-footer">
-        <div
+        <button
+          type="button"
           className="sidebar-item sidebar-item--profile"
           data-label={userName}
+          onClick={handleGoToProfile}
         >
           <div className="sidebar-item-icon sidebar-item-icon--avatar">
             <span>{userInitials}</span>
@@ -203,7 +200,7 @@ const Navbar: React.FC = () => {
               </div>
             </div>
           )}
-        </div>
+        </button>
 
         <button
           type="button"

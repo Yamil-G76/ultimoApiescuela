@@ -12,13 +12,12 @@ import LoginView from "../views/auth/LoginView";
 import UsersListView from "../views/auth/admin/UsersListView";
 import UserCreateView from "../views/auth/admin/UserCreateView";
 import UserEditView from "../views/auth/admin/UserEditView";
-import UserEnrollmentsView from "../views/auth/admin/UserEnrollmentsView"; // 👈 NUEVO
+import UserEnrollmentsView from "../views/auth/admin/UserEnrollmentsView";
 
 // Carreras - Admin
 import CareersListView from "../views/auth/admin/CareerListView";
 import CareerCreateView from "../views/auth/admin/CareerCreateView";
 import CareerEditView from "../views/auth/admin/CareerEditView";
-// 👇 NUEVO: historial de precios con el diseño moderno
 import CareerPricesHistoryView from "../views/auth/admin/CareerHistoryPrice";
 
 // Pagos - Admin
@@ -40,7 +39,10 @@ import AlumnoCareersView from "../views/auth/Alumno/AlumnoCareersView";
 import AlumnoPaymentsView from "../views/auth/Alumno/AlumnoPaymentsView";
 
 // Dashboard Admin
-import AdminDashboardView from "../views/auth/admin/AdminDashboardView"; // 👈 NUEVO
+import AdminDashboardView from "../views/auth/admin/AdminDashboardView";
+
+// ✅ Perfil Admin
+import AdminProfileView from "../views/auth/admin/AdminProfile";
 
 const AppRouter: React.FC = () => {
   return (
@@ -57,6 +59,9 @@ const AppRouter: React.FC = () => {
           <Route path="/admin">
             {/* Dashboard admin */}
             <Route index element={<AdminDashboardView />} />
+
+            {/* Perfil admin */}
+            <Route path="profile" element={<AdminProfileView />} />
 
             {/* Usuarios */}
             <Route path="users" element={<UsersListView />} />

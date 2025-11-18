@@ -351,4 +351,185 @@
     width: 100%;
     max-height: 260px;
   }
+}/* ===========================================
+   FORMULARIOS CREAR / EDITAR NOTICIA
+   =========================================== */
+
+.news-form-section {
+  margin-top: 4px;
+}
+
+.news-form-card {
+  position: relative;
+  background: radial-gradient(
+    circle at 0% 0%,
+    #e0f2fe 0,
+    #f5f3ff 40%,
+    #ffffff 70%
+  );
+  border-radius: 24px;
+  box-shadow: var(--shadow-soft);
+  padding: 18px 22px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.news-form-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  border-top: 4px solid #8b5cf6; /* violeta como la lista */
+  pointer-events: none;
+}
+
+.news-form-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.news-form-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background-color: #eef2ff;
+  color: #3730a3;
+}
+
+.news-form-caption {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Grilla de campos */
+.news-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px 32px;
+  margin-top: 10px;
+}
+
+.news-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Campos que deben ocupar todo el ancho */
+.news-form-field--full {
+  grid-column: 1 / -1;
+}
+
+.news-form-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.news-form-input {
+  border-radius: 10px;
+  border: 1px solid var(--input-border);
+  padding: 9px 12px;
+  font-size: 0.9rem;
+  outline: none;
+  background-color: #ffffff;
+}
+
+.news-form-input::placeholder {
+  color: var(--input-placeholder);
+}
+
+.news-form-input:focus {
+  border-color: var(--primary-600);
+  box-shadow: 0 0 0 2px var(--input-focus-ring);
+}
+
+.news-form-textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.news-form-hint {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* Preview de imagen nueva / actual */
+.news-form-preview,
+.news-form-current-image {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.news-form-preview img,
+.news-form-current-image img {
+  max-width: 320px;
+  max-height: 220px;
+  border-radius: 14px;
+  object-fit: cover;
+  border: 1px solid #e5e7eb;
+}
+
+/* Acciones del formulario */
+.news-form-actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* Botón principal con degradado (igual lógica que Nueva noticia) */
+.news-form-btn-primary {
+  border-radius: 999px;
+  border: 1px solid #14b8a6;
+  background: linear-gradient(
+    135deg,
+    #22c55e,
+    #0ea5e9
+  );
+  color: #ffffff;
+}
+
+.news-form-btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #16a34a, #0284c7);
+  box-shadow: 0 10px 22px rgba(34, 197, 94, 0.35);
+  transform: translateY(-1px);
+}
+
+/* Botón secundario suave */
+.news-form-btn-secondary {
+  background-color: #e5e7eb;
+  color: #111827;
+}
+
+.news-form-btn-secondary:hover:not(:disabled) {
+  background-color: #d1d5db;
+  box-shadow: 0 6px 16px rgba(17, 24, 39, 0.18);
+  transform: translateY(-1px);
+}
+
+/* Responsive formularios noticia */
+@media (max-width: 900px) {
+  .news-form-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .news-form-grid {
+    gap: 14px 18px;
+  }
+
+  .news-form-preview img,
+  .news-form-current-image img {
+    max-width: 100%;
+  }
 }

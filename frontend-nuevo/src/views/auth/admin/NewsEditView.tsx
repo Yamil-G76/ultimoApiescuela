@@ -1,6 +1,8 @@
+// src/views/auth/admin/NewsEditView.tsx
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { BASE_URL } from "../../../config/backend";
+import "../../../styles/news.css";
 
 interface NewsData {
   id: number;
@@ -45,7 +47,7 @@ const NewsEditView = () => {
     };
 
     if (id) {
-      loadNews();
+      void loadNews();
     }
   }, [id]);
 
@@ -115,77 +117,117 @@ const NewsEditView = () => {
   };
 
   if (loading) {
-    return <div className="container mt-4">Cargando noticia...</div>;
+    return (
+      <div className="news-page">
+        <div className="news-message news-message--muted">
+          Cargando noticia...
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="container mt-4">
-      <h2>Editar Noticia</h2>
+    <div className="news-page">
+      {/* Header */}
+      <header className="page-header">
+        <div>
+          <h2 className="page-header-title">Editar noticia</h2>
+          <p className="page-header-subtitle">
+            Actualizá el contenido y la imagen de la noticia seleccionada.
+          </p>
+        </div>
 
-      <div className="mb-3">
-        <label className="form-label">Título</label>
-        <input
-          className="form-control"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-      </div>
+        <button
+          className="btn btn-outline"
+          type="button"
+          onClick={() => navigate("/admin/news")}
+        >
+          Volver a noticias
+        </button>
+      </header>
 
-      <div className="mb-3">
-        <label className="form-label">Contenido</label>
-        <textarea
-          className="form-control"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          rows={4}
-        />
-      </div>
-
-      <div className="mb-3">
-        <label className="form-label">Imagen</label>
-
-        {currentImageUrl && !preview && (
-          <div className="mb-2">
-            <span className="d-block mb-1">Imagen actual:</span>
-            <img
-              src={`${BASE_URL}${currentImageUrl}`}
-              alt="actual"
-              style={{ maxHeight: 150, borderRadius: 10 }}
-            />
+      {/* Card formulario */}
+      <section className="news-form-section">
+        <div className="news-form-card">
+          <div className="news-form-card-header">
+            <span className="news-form-chip">Edición</span>
+            <span className="news-form-caption">
+              Modificá solo lo necesario. Podés cambiar título, contenido e
+              imagen.
+            </span>
           </div>
-        )}
 
-        {preview && (
-          <div className="mb-2">
-            <span className="d-block mb-1">Nueva imagen:</span>
-            <img
-              src={preview}
-              alt="nueva"
-              style={{ maxHeight: 150, borderRadius: 10 }}
-            />
+          <div className="news-form-grid">
+            <div className="news-form-field news-form-field--full">
+              <label className="news-form-label">Título</label>
+              <input
+                className="news-form-input"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+            </div>
+
+            <div className="news-form-field news-form-field--full">
+              <label className="news-form-label">Contenido</label>
+              <textarea
+                className="news-form-input news-form-textarea"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                rows={5}
+              />
+            </div>
+
+            <div className="news-form-field news-form-field--full">
+              <label className="news-form-label">Imagen</label>
+
+              {currentImageUrl && !preview && (
+                <div className="news-form-current-image">
+                  <span className="news-form-hint">Imagen actual:</span>
+                  <img
+                    src={`${BASE_URL}${currentImageUrl}`}
+                    alt="actual"
+                  />
+                </div>
+              )}
+
+              {preview && (
+                <div className="news-form-current-image">
+                  <span className="news-form-hint">Nueva imagen:</span>
+                  <img src={preview} alt="nueva" />
+                </div>
+              )}
+
+              <input
+                className="news-form-input"
+                type="file"
+                onChange={handleFile}
+              />
+              <p className="news-form-hint">
+                Si elegís una nueva imagen, reemplazará a la actual.
+              </p>
+            </div>
           </div>
-        )}
 
-        <input className="form-control" type="file" onChange={handleFile} />
-        <small className="text-muted">
-          Si elegís una nueva imagen, reemplazará a la actual.
-        </small>
-      </div>
-
-      <button
-        className="btn btn-primary me-2"
-        onClick={handleSubmit}
-        disabled={saving}
-      >
-        {saving ? "Guardando..." : "Guardar cambios"}
-      </button>
-
-      <button
-        className="btn btn-secondary"
-        onClick={() => navigate("/admin/news")}
-      >
-        Cancelar
-      </button>
+          <div className="news-form-actions">
+            <button
+              className="btn news-form-btn-secondary"
+              type="button"
+              onClick={() => navigate("/admin/news")}
+              disabled={saving}
+            >
+              Cancelar
+            </button>
+            <button
+              className="btn news-form-btn-primary"
+              onClick={handleSubmit}
+              disabled={saving}
+              type="button"
+            >
+              {saving ? "Guardando..." : "Guardar cambios"}
+            </button>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };

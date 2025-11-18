@@ -1,0 +1,251 @@
+/* ===========================================
+   PÁGINA PERFIL ADMIN
+   =========================================== */
+
+.profile-page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  color: var(--text-main);
+}
+
+/* -------------------------------------------
+   HEADER "MI PERFIL"
+   ------------------------------------------- */
+
+.page-header.page-header--profile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #ffffff, #e0f2fe);
+  border: 1px solid var(--primary-100);
+  box-shadow: var(--shadow-soft);
+}
+
+/* barrita superior teal + violeta como el resto */
+.page-header.page-header--profile::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 22px;
+  border-top: 4px solid #8b5cf6;
+  pointer-events: none;
+}
+
+.profile-header-main .page-header-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-800);
+}
+
+.profile-header-main .page-header-subtitle {
+  margin: 4px 0 0 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* Avatar + texto a la derecha */
+.profile-header-avatar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.profile-avatar-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 2px solid #bfdbfe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1d4ed8;
+  font-weight: 700;
+  font-size: 1rem;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.22);
+}
+
+.profile-avatar-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-avatar-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.profile-avatar-role {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* ===========================================
+   GRID PRINCIPAL DE CARDS
+   =========================================== */
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1.4fr);
+  gap: 16px;
+}
+
+/* CARD BASE */
+.profile-card {
+  position: relative;
+  border-radius: 20px;
+  background-color: #ffffff;
+  box-shadow: var(--shadow-soft);
+  padding: 16px 18px 18px;
+  border: 1px solid #e5e7eb;
+}
+
+/* Top border acento */
+.profile-card--info::before,
+.profile-card--account::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  pointer-events: none;
+}
+
+/* Datos personales → verde/teal */
+.profile-card--info::before {
+  border-top: 3px solid #22c55e;
+}
+
+/* Cuenta/seguridad → violeta */
+.profile-card--account::before {
+  border-top: 3px solid #8b5cf6;
+}
+
+.profile-card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 10px;
+}
+
+.profile-card-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--primary-800);
+}
+
+.profile-card-subtitle {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--text-muted);
+}
+
+/* ===========================================
+   CAMPOS TIPO "DETALLE"
+   =========================================== */
+
+.profile-card-body {
+  position: relative;
+  z-index: 1;
+}
+
+.profile-fields-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px 20px;
+  margin-top: 6px;
+}
+
+.profile-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.profile-field-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.profile-field-value {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #0f172a;
+}
+
+/* Pill para rol */
+.profile-field-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background-color: #eef2ff;
+  color: #4c1d95;
+  border: 1px solid #a5b4fc;
+}
+
+/* Acciones dentro de la card de cuenta */
+.profile-actions-row {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Botón "Cambiar contraseña" (outline, degradado suave) */
+.profile-btn-outline {
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid #93c5fd;
+  background: linear-gradient(135deg, #eff6ff, #e0f2fe);
+  color: #1d4ed8;
+}
+
+.profile-btn-outline:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.profile-btn-outline:not(:disabled):hover {
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.22);
+  transform: translateY(-1px);
+}
+
+.profile-footer-hint {
+  margin-top: 8px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* ===========================================
+   RESPONSIVE
+   =========================================== */
+
+@media (max-width: 900px) {
+  .page-header.page-header--profile {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .profile-header-avatar {
+    align-self: stretch;
+    justify-content: flex-start;
+  }
+
+  .profile-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

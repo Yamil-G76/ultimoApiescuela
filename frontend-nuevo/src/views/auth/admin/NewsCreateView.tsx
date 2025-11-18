@@ -1,5 +1,8 @@
+// src/views/auth/admin/NewsCreateView.tsx
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../../../config/backend";
+import "../../../styles/news.css";
 
 const NewsCreateView = () => {
   const [title, setTitle] = useState("");
@@ -7,6 +10,8 @@ const NewsCreateView = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -86,49 +91,98 @@ const NewsCreateView = () => {
   };
 
   return (
-    <div className="container mt-4">
-      <h2>Crear Noticia</h2>
+    <div className="news-page">
+      {/* Header tipo card */}
+      <header className="page-header">
+        <div>
+          <h2 className="page-header-title">Crear noticia</h2>
+          <p className="page-header-subtitle">
+            Publicá una nueva novedad para que la vean los alumnos en el sistema.
+          </p>
+        </div>
 
-      <div className="mb-3">
-        <label className="form-label">Título</label>
-        <input
-          className="form-control"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-      </div>
+        <button
+          type="button"
+          className="btn btn-outline"
+          onClick={() => navigate("/admin/news")}
+        >
+          Volver a noticias
+        </button>
+      </header>
 
-      <div className="mb-3">
-        <label className="form-label">Contenido</label>
-        <textarea
-          className="form-control"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          rows={4}
-        />
-      </div>
+      {/* Card formulario */}
+      <section className="news-form-section">
+        <div className="news-form-card">
+          <div className="news-form-card-header">
+            <span className="news-form-chip">Nueva noticia</span>
+            <span className="news-form-caption">
+              Completá el título, el contenido y subí una imagen opcional antes
+              de publicar.
+            </span>
+          </div>
 
-      <div className="mb-3">
-        <label className="form-label">Imagen (opcional)</label>
-        <input className="form-control" type="file" onChange={handleFile} />
-      </div>
+          <div className="news-form-grid">
+            <div className="news-form-field news-form-field--full">
+              <label className="news-form-label">Título</label>
+              <input
+                className="news-form-input"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Ej: Se abre la inscripción al nuevo curso..."
+              />
+            </div>
 
-      {preview && (
-        <img
-          src={preview}
-          alt="preview"
-          className="img-fluid mb-3"
-          style={{ maxHeight: "200px", borderRadius: "10px" }}
-        />
-      )}
+            <div className="news-form-field news-form-field--full">
+              <label className="news-form-label">Contenido</label>
+              <textarea
+                className="news-form-input news-form-textarea"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                rows={5}
+                placeholder="Escribí el detalle de la noticia..."
+              />
+            </div>
 
-      <button
-        className="btn btn-primary"
-        onClick={handleSubmit}
-        disabled={saving}
-      >
-        {saving ? "Publicando..." : "Publicar"}
-      </button>
+            <div className="news-form-field news-form-field--full">
+              <label className="news-form-label">Imagen (opcional)</label>
+              <input
+                className="news-form-input"
+                type="file"
+                onChange={handleFile}
+              />
+              <p className="news-form-hint">
+                Formatos recomendados: JPG o PNG. La imagen se mostrará junto a
+                la noticia.
+              </p>
+            </div>
+
+            {preview && (
+              <div className="news-form-preview">
+                <img src={preview} alt="preview" />
+              </div>
+            )}
+          </div>
+
+          <div className="news-form-actions">
+            <button
+              type="button"
+              className="btn news-form-btn-secondary"
+              onClick={() => navigate("/admin/news")}
+              disabled={saving}
+            >
+              Cancelar
+            </button>
+            <button
+              className="btn news-form-btn-primary"
+              onClick={handleSubmit}
+              disabled={saving}
+              type="button"
+            >
+              {saving ? "Publicando..." : "Publicar noticia"}
+            </button>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };
