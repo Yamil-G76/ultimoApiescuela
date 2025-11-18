@@ -10,7 +10,9 @@ import "./styles/layout.css";
 import "./styles/sidevar.css";
 import "./styles/login.css";
 import "./styles/dashboard.css";
-import "./styles/careers.css"
+import "./styles/careers.css";
+import "./styles/career-prices.css";
+
 const rootElement = document.getElementById("root") as HTMLElement;
 
 ReactDOM.createRoot(rootElement).render(

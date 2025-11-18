@@ -98,7 +98,7 @@ const CareerCreateView: React.FC = () => {
   };
 
   return (
-    <div className="career-page">
+    <div className="container mt-4 careers-page">
       <header className="page-header">
         <div>
           <h2 className="page-header-title">Nueva carrera</h2>
@@ -119,6 +119,13 @@ const CareerCreateView: React.FC = () => {
       )}
 
       <div className="career-form-card">
+        <div className="career-form-card-header">
+          <span className="career-form-chip">Alta de carrera</span>
+          <span className="career-form-caption">
+            Completá los campos obligatorios antes de guardar.
+          </span>
+        </div>
+
         <div className="form-grid">
           <div className="form-column">
             {/* Nombre */}
@@ -161,7 +168,8 @@ const CareerCreateView: React.FC = () => {
             {/* Fecha de inicio (opcional) */}
             <div className="form-field">
               <label className="form-label">
-                Inicio de cursado <span className="form-label-optional">(opcional)</span>
+                Inicio de cursado{" "}
+                <span className="form-label-optional">(opcional)</span>
               </label>
               <input
                 type="date"

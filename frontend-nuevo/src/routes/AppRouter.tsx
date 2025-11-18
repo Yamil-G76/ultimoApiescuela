@@ -18,7 +18,8 @@ import UserEnrollmentsView from "../views/auth/admin/UserEnrollmentsView"; // �
 import CareersListView from "../views/auth/admin/CareerListView";
 import CareerCreateView from "../views/auth/admin/CareerCreateView";
 import CareerEditView from "../views/auth/admin/CareerEditView";
-import CareerPricesHistoryView from "../views/auth/admin/CarerrPricesHistoriView"; // 👈 corregido
+// 👇 NUEVO: historial de precios con el diseño moderno
+import CareerPricesHistoryView from "../views/auth/admin/CareerHistoryPrice";
 
 // Pagos - Admin
 import PaymentsListView from "../views/auth/admin/PaymentListView";
@@ -77,7 +78,6 @@ const AppRouter: React.FC = () => {
 
             {/* Pagos */}
             <Route path="payments" element={<PaymentsListView />} />
-            {/* Detalle de pagos por alumno/carrera (admin) */}
             <Route
               path="users/:userId/enrollments/:enrollmentId/payments"
               element={<UserPaymentsView />}

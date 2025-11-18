@@ -9,18 +9,35 @@
   color: var(--text-main);
 }
 
-/* Encabezados genéricos de página */
-.page-header {
+/* Encabezado superior */
+.career-page .page-header {
+  position: relative;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: 16px;
+  padding: 14px 18px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #ffffff, var(--primary-50));
+  border: 1px solid var(--primary-100);
+  box-shadow: var(--shadow-soft);
+}
+
+/* Borde superior/acento en verde-agua */
+.career-page .page-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 22px;
+  border-top: 4px solid #14b8a6;
+  pointer-events: none;
 }
 
 .page-header-title {
   margin: 0;
   font-size: 1.5rem;
   font-weight: 700;
+  color: var(--primary-800);
 }
 
 .page-header-subtitle {
@@ -42,11 +59,6 @@
 .alert-error {
   background-color: #ffe5e5;
   color: #a32020;
-}
-
-.alert-list {
-  margin: 0;
-  padding-left: 18px;
 }
 
 /* Mensajes de lista (centrados) */
@@ -112,7 +124,7 @@
   transform: translateY(-1px);
 }
 
-/* Bordeado */
+/* Bordeado genérico */
 .btn-outline {
   background-color: #ffffff;
   color: var(--primary-700);
@@ -137,30 +149,44 @@
   transform: translateY(-1px);
 }
 
-/* Tamaño reducido para acciones en tabla */
+/* Tamaño reducido base */
 .btn-small {
   padding: 6px 10px;
   font-size: 0.78rem;
 }
 
 /* ===========================================
-   FORMULARIOS
+   FORMULARIOS (CREATE / EDIT)
    =========================================== */
 
 .career-form-card {
-  background-color: #ffffff;
+  position: relative;
+  background:
+    radial-gradient(circle at 0% 0%, var(--primary-50) 0, #ffffff 55%);
   border-radius: 24px;
   box-shadow: var(--shadow-soft);
-  padding: 20px 24px;
+  padding: 18px 22px 20px;
   display: flex;
   flex-direction: column;
   gap: 18px;
 }
 
+/* Barrita superior de color */
+.career-form-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  border-top: 4px solid var(--primary-400);
+  pointer-events: none;
+}
+
+/* Grilla de campos, etc */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 18px 32px;
+  margin-top: 6px;
 }
 
 .form-column {
@@ -177,12 +203,6 @@
 
 .form-label {
   font-size: 0.85rem;
-  color: var(--text-muted);
-}
-
-.form-label-optional {
-  font-weight: 400;
-  font-size: 0.8rem;
   color: var(--text-muted);
 }
 
@@ -204,70 +224,214 @@
   box-shadow: 0 0 0 2px var(--input-focus-ring);
 }
 
-/* Acciones del formulario */
 .form-actions {
-  margin-top: 6px;
+  margin-top: 8px;
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 /* ===========================================
-   BUSCADOR LISTA CARRERAS
+   BUSCADOR LISTA CARRERAS (INLINE EN CARD)
    =========================================== */
 
-.career-search {
-  margin-top: 4px;
-}
-
-.career-search-input-wrapper {
+.career-search-inline {
   display: flex;
-  gap: 8px;
-  max-width: 520px;
+  gap: 10px;
+  align-items: center;
+  max-width: 560px;
 }
 
 .career-search-input {
   flex: 1;
 }
 
+/* Botón de búsqueda con borde verde suave */
+.career-search-inline .career-search-btn {
+  border-color: #6ee7b7;
+  color: #047857;
+  background-color: #ecfdf5;
+}
+
+.career-search-inline .career-search-btn:hover:not(:disabled) {
+  background-color: #d1fae5;
+  box-shadow: 0 6px 16px rgba(4, 120, 87, 0.25);
+  transform: translateY(-1px);
+}
+
 /* ===========================================
-   LISTA CARRERAS (TABLA)
+   CARD + TABLA CARRERAS
+   (adaptada a la lógica de pagos)
    =========================================== */
 
-.career-list-container {
-  margin-top: 4px;
-  height: 70vh;
-  overflow-y: auto;
-  border-radius: 18px;
+.career-table-card {
+  position: relative;
+  border-radius: 18px;              /* similar a payments-card */
   background-color: #ffffff;
   box-shadow: var(--shadow-soft);
-  padding: 10px 12px;
+  padding: 10px 12px 14px;
 }
 
-/* Tabla ya usa .table-modern del dashboard */
+/* Bordecito superior de color, mismo concepto que pagos */
+.career-table-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  border-top: 4px solid #3b82f6;    /* azul, distinto del header */
+  pointer-events: none;
+}
+
+.career-table-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.career-table-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--primary-800);
+}
+
+.career-table-subtitle {
+  margin: 4px 0 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* SCROLL SOLO EN LA TABLA (igual lógica que payments-table-scroll) */
+.career-table-wrapper {
+  position: relative;
+  max-height: 40vh;      /* controla el alto de la tabla */
+  overflow-y: auto;
+  margin-top: 4px;
+}
+
+/* TABLA (equivalente a payments-table) */
+
 .career-table {
   width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
 }
 
-/* Alinear botones dentro de la celda de acciones */
+/* Encabezado sticky, fondo sólido, como en pagos */
+.career-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  text-align: left;
+  padding: 10px 10px;
+  background-color: #f3f4f6;
+  border-bottom: 1px solid #e5e7eb;
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+.career-table tbody td {
+  padding: 9px 8px;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #ffffff;
+}
+
+/* Zebra suave */
+.career-table tbody tr:nth-child(even) td {
+  background-color: #f9fafb;
+}
+
+/* Hover filas marcado */
+.career-table tbody tr:hover td {
+  background: #eef3ff;
+}
+
+/* ===========================================
+   ACCIONES EN TABLA
+   =========================================== */
+
 .career-table-actions {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;          /* para que queden en una sola fila */
   gap: 6px;
 }
 
-/* Responsive */
+/* Botones más chicos y alineados */
+.career-table-actions .btn {
+  padding: 5px 10px;
+  font-size: 0.76rem;
+  min-width: 90px;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+/* EDITAR – azul suave */
+.career-table-actions .career-btn-edit {
+  border: 1px solid var(--primary-200);
+  background-color: #eef2ff;
+  color: #1d4ed8;
+}
+
+.career-table-actions .career-btn-edit:hover:not(:disabled) {
+  background-color: #e0e7ff;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.28);
+  transform: translateY(-1px);
+}
+
+/* HISTORIAL – violeta */
+.career-table-actions .career-btn-history {
+  border: 1px solid #a5b4fc;
+  background-color: #f5f3ff;
+  color: #4c1d95;
+}
+
+.career-table-actions .career-btn-history:hover:not(:disabled) {
+  background-color: #ede9fe;
+  box-shadow: 0 6px 16px rgba(76, 29, 149, 0.3);
+  transform: translateY(-1px);
+}
+
+/* ELIMINAR – rojo suave */
+.career-table-actions .career-btn-delete {
+  border: 1px solid #fecaca;
+  background-color: #fef2f2;
+  color: #b91c1c;
+}
+
+.career-table-actions .career-btn-delete:hover:not(:disabled) {
+  background-color: #fee2e2;
+  box-shadow: 0 6px 16px rgba(185, 28, 28, 0.32);
+  transform: translateY(-1px);
+}
+
+/* ===========================================
+   RESPONSIVE
+   =========================================== */
+
 @media (max-width: 900px) {
-  .page-header {
+  .career-page .page-header {
     flex-direction: column;
     align-items: flex-start;
   }
 
-  .career-list-container {
-    height: 60vh;
+  .career-table-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .career-search-inline {
+    width: 100%;
+    max-width: none;
+  }
+
+  .career-table-wrapper {
+    max-height: 50vh;
   }
 
   .career-table-actions {
-    flex-direction: row;
+    flex-wrap: wrap;          /* en móvil los dejamos romper fila */
   }
 }

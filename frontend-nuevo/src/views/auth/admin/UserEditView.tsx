@@ -1,6 +1,8 @@
+// src/views/auth/admin/UserEditView.tsx
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { BASE_URL } from "../../../config/backend";
+import "../../../styles/users.css";
 
 interface UserData {
   id: number;
@@ -114,8 +116,8 @@ const UserEditView = () => {
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
         console.error("Error actualizando usuario:", errData);
-        if (errData.detail) {
-          setErrors([String(errData.detail)]);
+        if ((errData as { detail?: unknown }).detail) {
+          setErrors([String((errData as { detail?: unknown }).detail)]);
         } else {
           setErrors(["No se pudo actualizar el usuario"]);
         }
@@ -141,8 +143,16 @@ const UserEditView = () => {
   }
 
   return (
-    <div className="container mt-4">
-      <h2>Editar usuario</h2>
+    <div className="user-page">
+      {/* Header tipo card, coherente con alumnos */}
+      <header className="page-header">
+        <div>
+          <h2 className="page-header-title">Editar alumno</h2>
+          <p className="page-header-subtitle">
+            Actualizá los datos personales, DNI, email y rol del alumno.
+          </p>
+        </div>
+      </header>
 
       {errors.length > 0 && (
         <div className="alert alert-danger py-2">
@@ -154,90 +164,113 @@ const UserEditView = () => {
         </div>
       )}
 
-      <div className="row">
-        <div className="col-md-6">
-          {/* Usuario */}
-          <div className="mb-3">
-            <label className="form-label">Usuario</label>
-            <input
-              className="form-control"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
+      {/* Card del formulario (versión edición: más lila) */}
+      <div className="user-form-card user-form-card--edit">
+        <div className="user-form-card-header">
+          <span className="user-form-chip user-form-chip--edit">
+            Edición de alumno
+          </span>
+          <span className="user-form-caption">
+            Modificá sólo los campos necesarios y guardá los cambios.
+          </span>
+        </div>
+
+        <div className="user-form-grid">
+          <div className="user-form-column">
+            {/* Usuario */}
+            <div className="user-form-field">
+              <label className="user-form-label">Usuario</label>
+              <input
+                className="user-form-input"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Usuario de ingreso al sistema"
+              />
+            </div>
+
+            {/* Rol */}
+            <div className="user-form-field">
+              <label className="user-form-label">Rol</label>
+              <select
+                className="user-form-input user-form-select"
+                value={type}
+                onChange={(e) =>
+                  setType(e.target.value as "admin" | "alumno")
+                }
+              >
+                <option value="alumno">Alumno</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
           </div>
 
-          {/* Rol */}
-          <div className="mb-3">
-            <label className="form-label">Rol</label>
-            <select
-              className="form-select"
-              value={type}
-              onChange={(e) => setType(e.target.value as "admin" | "alumno")}
-            >
-              <option value="alumno">Alumno</option>
-              <option value="admin">Admin</option>
-            </select>
+          <div className="user-form-column">
+            {/* Nombre */}
+            <div className="user-form-field">
+              <label className="user-form-label">Nombre</label>
+              <input
+                className="user-form-input"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder="Nombre del alumno"
+              />
+            </div>
+
+            {/* Apellido */}
+            <div className="user-form-field">
+              <label className="user-form-label">Apellido</label>
+              <input
+                className="user-form-input"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                placeholder="Apellido del alumno"
+              />
+            </div>
+
+            {/* DNI */}
+            <div className="user-form-field">
+              <label className="user-form-label">DNI</label>
+              <input
+                className="user-form-input"
+                value={dni}
+                onChange={(e) => setDni(e.target.value)}
+                placeholder="Sólo números"
+              />
+            </div>
+
+            {/* Email */}
+            <div className="user-form-field">
+              <label className="user-form-label">Email</label>
+              <input
+                type="email"
+                className="user-form-input"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="correo@ejemplo.com"
+              />
+            </div>
           </div>
         </div>
 
-        <div className="col-md-6">
-          {/* Nombre */}
-          <div className="mb-3">
-            <label className="form-label">Nombre</label>
-            <input
-              className="form-control"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-            />
-          </div>
+        <div className="user-form-actions user-form-actions--edit">
+          <button
+            className="btn btn-primary"
+            onClick={handleSubmit}
+            disabled={saving}
+            type="button"
+          >
+            {saving ? "Guardando..." : "Guardar cambios"}
+          </button>
 
-          {/* Apellido */}
-          <div className="mb-3">
-            <label className="form-label">Apellido</label>
-            <input
-              className="form-control"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-            />
-          </div>
-
-          {/* DNI */}
-          <div className="mb-3">
-            <label className="form-label">DNI</label>
-            <input
-              className="form-control"
-              value={dni}
-              onChange={(e) => setDni(e.target.value)}
-            />
-          </div>
-
-          {/* Email */}
-          <div className="mb-3">
-            <label className="form-label">Email</label>
-            <input
-              type="email"
-              className="form-control"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
+          <button
+            className="btn btn-secondary"
+            type="button"
+            onClick={() => navigate("/admin/users")}
+          >
+            Cancelar
+          </button>
         </div>
       </div>
-
-      <button
-        className="btn btn-primary me-2"
-        onClick={handleSubmit}
-        disabled={saving}
-      >
-        {saving ? "Guardando..." : "Guardar cambios"}
-      </button>
-
-      <button
-        className="btn btn-secondary"
-        onClick={() => navigate("/admin/users")}
-      >
-        Cancelar
-      </button>
     </div>
   );
 };

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../../../config/backend";
+import "../../../styles/dashboard.css";
 
 // Tipos genéricos para paginados simples (solo usamos total_items)
 interface SimplePaginatedData<T> {
@@ -45,7 +46,6 @@ interface NewsItem {
   id: number;
   title: string;
   created_at?: string | null;
-  // Campos opcionales para el detalle, por si en tu backend se llama distinto
   content?: string | null;
   body?: string | null;
 }
@@ -218,11 +218,9 @@ const AdminDashboardView: React.FC = () => {
         <div className="dashboard-loading">Cargando datos del dashboard...</div>
       ) : (
         <>
-          {/* Fila superior:
-              - Izquierda: tarjetas apiladas (Alumnos / Carreras), más angostas
-              - Derecha: tarjeta ancha "Últimos pagos realizados" (~70%) */}
+          {/* TOP: tarjetas + panel últimos pagos (misma estructura que pagos registrados) */}
           <section className="dashboard-top">
-            {/* Columna izquierda: tarjetas */}
+            {/* Columna izquierda: tarjetas resumen más compactas y centradas */}
             <div className="dashboard-column-left">
               <article className="dashboard-card dashboard-card--alumnos">
                 <h3 className="dashboard-card-title">Alumnos</h3>
@@ -230,6 +228,7 @@ const AdminDashboardView: React.FC = () => {
                 <button
                   className="dashboard-card-btn"
                   onClick={() => navigate("/admin/users")}
+                  type="button"
                 >
                   Ver alumnos
                 </button>
@@ -241,23 +240,40 @@ const AdminDashboardView: React.FC = () => {
                 <button
                   className="dashboard-card-btn"
                   onClick={() => navigate("/admin/careers")}
+                  type="button"
                 >
                   Ver carreras
                 </button>
               </article>
             </div>
 
-            {/* Columna derecha: tarjeta ancha con mini tabla de pagos */}
-            <article className="dashboard-card dashboard-card--top-pagos">
-              <h3 className="dashboard-card-title">Últimos pagos realizados</h3>
+            {/* Derecha: panel de “Últimos pagos realizados” con card + tabla scrolleable */}
+            <div className="dashboard-panel dashboard-panel--mini-payments">
+              <div className="dashboard-panel-header">
+                <div>
+                  <h3 className="dashboard-panel-title">
+                    Últimos pagos realizados
+                  </h3>
+                  <p className="dashboard-panel-subtitle">
+                    Pagos más recientes registrados en el sistema.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className="dashboard-panel-link"
+                  onClick={() => navigate("/admin/payments")}
+                >
+                  Ver pagos
+                </button>
+              </div>
 
               {lastPayments.length === 0 ? (
-                <p className="dashboard-empty-text dashboard-top-pagos-empty">
+                <p className="dashboard-empty-text dashboard-panel-message">
                   Todavía no hay pagos registrados.
                 </p>
               ) : (
-                <div className="dashboard-top-pagos-mini">
-                  <table className="table-modern table-modern--compact">
+                <div className="dashboard-table-wrapper dashboard-table-wrapper--mini">
+                  <table className="dashboard-table">
                     <thead>
                       <tr>
                         <th>Alumno</th>
@@ -279,47 +295,60 @@ const AdminDashboardView: React.FC = () => {
                   </table>
                 </div>
               )}
-            </article>
+            </div>
           </section>
 
-          {/* Sección amplia: Últimas noticias con detalle recortado */}
+          {/* Sección: Últimas noticias y novedades (misma lógica de card+tabla que pagos) */}
           <section className="dashboard-section dashboard-news-section">
-            <div className="dashboard-section-header">
-              <h3>Últimas noticias y novedades</h3>
-              <p>
-                Listado de las noticias más recientes publicadas en el sistema (
-                total: {stats.totalNoticias}).
-              </p>
-            </div>
-
-            {lastNews.length === 0 ? (
-              <p className="dashboard-empty-text">
-                Todavía no hay noticias publicadas.
-              </p>
-            ) : (
-              <div className="dashboard-panel dashboard-news-panel">
-                <table className="table-modern">
-                  <thead>
-                    <tr>
-                      <th>Título</th>
-                      <th>Detalle</th>
-                      <th>Fecha</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {lastNews.map((n) => (
-                      <tr key={n.id}>
-                        <td>{n.title}</td>
-                        <td className="dashboard-news-detail-cell">
-                          {getNewsSnippet(n)}
-                        </td>
-                        <td>{formatFecha(n.created_at)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+            <div className="dashboard-panel dashboard-panel--news">
+              <div className="dashboard-panel-header">
+                <div>
+                  <h3 className="dashboard-panel-title">
+                    Últimas noticias y novedades
+                  </h3>
+                  <p className="dashboard-panel-subtitle">
+                    Noticias recientes publicadas en el sistema (total:{" "}
+                    {stats.totalNoticias}).
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className="dashboard-panel-link dashboard-panel-link--violet"
+                  onClick={() => navigate("/admin/news")}
+                >
+                  Ver noticias
+                </button>
               </div>
-            )}
+
+              {lastNews.length === 0 ? (
+                <p className="dashboard-empty-text dashboard-panel-message">
+                  Todavía no hay noticias publicadas.
+                </p>
+              ) : (
+                <div className="dashboard-table-wrapper dashboard-table-wrapper--news">
+                  <table className="dashboard-table dashboard-table--news">
+                    <thead>
+                      <tr>
+                        <th>Título</th>
+                        <th>Detalle</th>
+                        <th>Fecha</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {lastNews.map((n) => (
+                        <tr key={n.id}>
+                          <td>{n.title}</td>
+                          <td className="dashboard-news-detail-cell">
+                            {getNewsSnippet(n)}
+                          </td>
+                          <td>{formatFecha(n.created_at)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
           </section>
         </>
       )}

@@ -189,3 +189,332 @@
   cursor: pointer;
   text-align: left;
 }
+/* ===========================================
+   INSCRIPCIONES DEL ALUMNO
+   =========================================== */
+
+.user-enroll-page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  color: var(--text-main);
+}
+
+/* Header tipo card, reutilizando .page-header base */
+.page-header.page-header--enroll {
+  background: linear-gradient(135deg, #ffffff, #e0f2fe);
+  border-radius: 22px;
+  border: 1px solid var(--primary-100);
+  box-shadow: var(--shadow-soft);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  position: relative;
+}
+
+/* barrita superior teal + violeta */
+.page-header.page-header--enroll::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 22px;
+  border-top: 4px solid #14b8a6;
+  pointer-events: none;
+}
+
+.page-header--enroll .page-header-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-800);
+}
+
+.page-header--enroll .page-header-subtitle {
+  margin: 4px 0 0 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* Botón volver (celeste/verde suave) */
+.user-enroll-back-btn {
+  border-radius: 999px;
+  padding: 8px 18px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  background: linear-gradient(135deg, #e0f2fe, #ccfbf1);
+  color: #064e3b;
+}
+
+.user-enroll-back-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #bae6fd, #a7f3d0);
+  border-color: #22c55e;
+  box-shadow: 0 10px 24px rgba(34, 197, 94, 0.35);
+  transform: translateY(-1px);
+}
+
+/* ===========================================
+   INSCRIPCIONES DEL ALUMNO (VERSIÓN SUAVE)
+   =========================================== */
+
+.user-enroll-page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  color: var(--text-main);
+}
+
+/* Header tipo card muy liviana */
+.page-header.page-header--enroll {
+  background-color: #ffffff;
+  border-radius: 20px;
+  border: 1px solid var(--primary-100);
+  box-shadow: var(--shadow-soft);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  position: relative;
+}
+
+/* Línea superior violeta suave */
+.page-header.page-header--enroll::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  border-top: 3px solid #8b5cf6;
+  pointer-events: none;
+}
+
+.page-header--enroll .page-header-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-800);
+}
+
+.page-header--enroll .page-header-subtitle {
+  margin: 4px 0 0 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* Botón VOLVER – azul/celeste acorde a la app */
+.user-enroll-back-btn {
+  border-radius: 999px;
+  padding: 8px 18px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border: 1px solid #bfdbfe;          /* azul clarito */
+  background: linear-gradient(
+    135deg,
+    #eff6ff,                          /* celeste muy suave */
+    #e0f2fe
+  );
+  color: #1d4ed8;                      /* azul medio */
+}
+
+.user-enroll-back-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  border-color: #60a5fa;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.22);
+  transform: translateY(-1px);
+}
+
+/* -------------------------------------------
+   CARDS (ASIGNAR + TITULO CARRERAS)
+   ------------------------------------------- */
+
+.user-enroll-card {
+  position: relative;
+  border-radius: 18px;
+  box-shadow: var(--shadow-soft);
+  padding: 16px 18px 18px;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  margin-top: 2px;
+}
+
+/* Asignar nueva carrera → leve acento verde arriba */
+.user-enroll-card--assign::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  border-top: 3px solid #22c55e;
+  pointer-events: none;
+}
+
+/* Título “Carreras actuales” → acento violeta arriba */
+.user-enroll-card--list::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  border-top: 3px solid #8b5cf6;
+  pointer-events: none;
+}
+
+.user-enroll-card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.user-enroll-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--primary-800);
+}
+
+.user-enroll-subtitle {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--text-muted);
+}
+
+/* -------------------------------------------
+   ASIGNAR CARRERA
+   ------------------------------------------- */
+
+.user-enroll-assign-row {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  align-items: flex-end;
+}
+
+.user-enroll-assign-select {
+  min-width: 260px;
+  max-width: 420px;
+}
+
+/* Botón asignar – verde sólido */
+.user-enroll-btn-assign {
+  width: 100%;
+  border-radius: 999px;
+  padding: 9px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 1px solid #22c55e;
+  background-color: #10b981;
+  color: #f9fafb;
+}
+
+.user-enroll-btn-assign:hover:not(:disabled) {
+  background-color: #059669;
+  border-color: #16a34a;
+  box-shadow: 0 6px 16px rgba(4, 120, 87, 0.25);
+  transform: translateY(-1px);
+}
+
+/* -------------------------------------------
+   TABLA DE CARRERAS ACTUALES
+   (sin tarjeta, sólo tabla)
+   ------------------------------------------- */
+
+.user-enroll-table-container {
+  margin-top: 10px;
+  max-height: 50vh;
+  overflow-y: auto;
+  overflow-x: auto;
+  /* sin fondo, sin borde, sin sombra -> deja de parecer card */
+}
+
+/* Eliminamos por completo cualquier borde superior decorativo */
+/* (si tenías un ::before previo, podés borrarlo) */
+
+.user-enroll-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+/* Encabezado simple en gris/azul muy suave */
+.user-enroll-table thead th {
+  text-align: left;
+  padding: 10px 10px;
+  background-color: #f5f7fb;
+  border-bottom: 1px solid var(--primary-100);
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+.user-enroll-table tbody td {
+  padding: 9px 10px;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #ffffff;
+}
+
+.user-enroll-table tbody tr:nth-child(even) td {
+  background-color: #f9fafb;
+}
+
+.user-enroll-table tbody tr:hover td {
+  background-color: #eef3ff;
+}
+
+/* Acciones dentro de la tabla */
+.user-enroll-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Ver pagos → violeta suave */
+.user-enroll-btn-payments {
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  border-radius: 999px;
+  border: 1px solid #a5b4fc;
+  background-color: #f5f3ff;
+  color: #4c1d95;
+}
+
+.user-enroll-btn-payments:hover:not(:disabled) {
+  background-color: #ede9fe;
+  box-shadow: 0 4px 12px rgba(76, 29, 149, 0.2);
+  transform: translateY(-1px);
+}
+
+/* Quitar → rojo suave */
+.user-enroll-btn-remove {
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  border-radius: 999px;
+  border: 1px solid #fecaca;
+  background-color: #fef2f2;
+  color: #b91c1c;
+}
+
+.user-enroll-btn-remove:hover:not(:disabled) {
+  background-color: #fee2e2;
+  box-shadow: 0 4px 12px rgba(185, 28, 28, 0.25);
+  transform: translateY(-1px);
+}
+
+/* -------------------------------------------
+   RESPONSIVE
+   ------------------------------------------- */
+
+@media (max-width: 900px) {
+  .page-header.page-header--enroll {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .user-enroll-assign-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .user-enroll-table-container {
+    max-height: 55vh;
+  }
+}

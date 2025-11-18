@@ -112,7 +112,7 @@ const CareerListView: React.FC = () => {
     }
   };
 
-  // Scroll infinito
+  // Scroll infinito SOLO dentro del wrapper de la tabla
   const handleScroll = () => {
     const container = scrollContainerRef.current;
     if (!container) return;
@@ -179,6 +179,7 @@ const CareerListView: React.FC = () => {
   // ---------------------------------
   return (
     <div className="career-page">
+      {/* Header superior */}
       <header className="page-header">
         <div>
           <h2 className="page-header-title">Carreras</h2>
@@ -187,109 +188,126 @@ const CareerListView: React.FC = () => {
           </p>
         </div>
 
-        <button className="btn btn-primary" onClick={handleCreate} type="button">
+        <button
+          className="btn btn-primary"
+          onClick={handleCreate}
+          type="button"
+        >
           + Nueva carrera
         </button>
       </header>
 
-      <form className="career-search" onSubmit={handleSearchSubmit}>
-        <div className="career-search-input-wrapper">
-          <input
-            className="form-input career-search-input"
-            placeholder="Buscar por nombre de carrera..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <button className="btn btn-outline" type="submit">
-            Buscar
-          </button>
-        </div>
-      </form>
-
-      {error && <div className="alert-box alert-error">{error}</div>}
-
-      <div
-        ref={scrollContainerRef}
-        onScroll={handleScroll}
-        className="career-list-container"
-      >
-        {initialLoading ? (
-          <div className="list-message list-message--muted">
-            Cargando carreras...
+      {/* Card con tabla + buscador adentro */}
+      <section className="career-table-card">
+        <header className="career-table-card-header">
+          <div>
+            <h3 className="career-table-title">Listado de carreras</h3>
+            <p className="career-table-subtitle">
+              Buscá por nombre y desplazate para ver más carreras.
+            </p>
           </div>
-        ) : (
-          <>
-            <table className="table-modern career-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Nombre</th>
-                  <th>Costo mensual</th>
-                  <th>Duración (meses)</th>
-                  <th>Inicio cursado</th>
-                  <th style={{ width: "260px" }}>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((c) => (
-                  <tr key={c.id}>
-                    <td>{c.id}</td>
-                    <td>{c.name}</td>
-                    <td>${c.costo_mensual}</td>
-                    <td>{c.duracion_meses}</td>
-                    <td>{formatFecha(c.inicio_cursado || null)}</td>
-                    <td className="career-table-actions">
-                      <button
-                        className="btn btn-small btn-outline"
-                        type="button"
-                        onClick={() => handleEdit(c.id)}
-                      >
-                        Editar
-                      </button>
-                      <button
-                        className="btn btn-small btn-outline"
-                        type="button"
-                        onClick={() => handleViewPrices(c.id)}
-                      >
-                        Historial precios
-                      </button>
-                      <button
-                        className="btn btn-small btn-danger"
-                        type="button"
-                        onClick={() => handleDelete(c.id)}
-                      >
-                        Eliminar
-                      </button>
-                    </td>
-                  </tr>
-                ))}
 
-                {items.length === 0 && (
+          <form
+            className="career-search-inline"
+            onSubmit={handleSearchSubmit}
+          >
+            <input
+              className="form-input career-search-input"
+              placeholder="Buscar carrera..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <button className="btn btn-outline career-search-btn" type="submit">
+              Buscar
+            </button>
+          </form>
+        </header>
+
+        {error && <div className="alert-box alert-error">{error}</div>}
+
+        <div
+          ref={scrollContainerRef}
+          onScroll={handleScroll}
+          className="career-table-wrapper"
+        >
+          {initialLoading ? (
+            <div className="list-message list-message--muted">
+              Cargando carreras...
+            </div>
+          ) : (
+            <>
+              <table className="table-modern career-table">
+                <thead>
                   <tr>
-                    <td colSpan={6}>
-                      <div className="list-message list-message--muted">
-                        No se encontraron carreras.
-                      </div>
-                    </td>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Costo mensual</th>
+                    <th>Duración (meses)</th>
+                    <th>Inicio cursado</th>
+                    <th style={{ width: "300px" }}>Acciones</th>
                   </tr>
-                )}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {items.map((c) => (
+                    <tr key={c.id}>
+                      <td>{c.id}</td>
+                      <td>{c.name}</td>
+                      <td>${c.costo_mensual}</td>
+                      <td>{c.duracion_meses}</td>
+                      <td>{formatFecha(c.inicio_cursado || null)}</td>
+                      <td className="career-table-actions">
+                        <button
+                          className="btn btn-small career-btn-edit"
+                          type="button"
+                          onClick={() => handleEdit(c.id)}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          className="btn btn-small career-btn-history"
+                          type="button"
+                          onClick={() => handleViewPrices(c.id)}
+                        >
+                          Historial precios
+                        </button>
+                        <button
+                          className="btn btn-small career-btn-delete"
+                          type="button"
+                          onClick={() => handleDelete(c.id)}
+                        >
+                          Eliminar
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
 
-            {loadingMore && (
-              <div className="list-message list-message--muted">
-                Cargando más carreras...
-              </div>
-            )}
+                  {items.length === 0 && (
+                    <tr>
+                      <td colSpan={6}>
+                        <div className="list-message list-message--muted">
+                          No se encontraron carreras.
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
 
-            {!hasMore && items.length > 0 && (
-              <div className="list-message list-message--muted">
-                No hay más carreras para cargar.
-              </div>
-            )}
-          </>
-        )}
-      </div>
+              {loadingMore && (
+                <div className="list-message list-message--muted">
+                  Cargando más carreras...
+                </div>
+              )}
+
+              {!hasMore && items.length > 0 && (
+                <div className="list-message list-message--muted">
+                  No hay más carreras para cargar.
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </section>
     </div>
   );
 };

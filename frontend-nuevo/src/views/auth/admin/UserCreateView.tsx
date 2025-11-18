@@ -1,8 +1,9 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../../../config/backend";
+import "../../../styles/users.css";
 
-const UserCreateView = () => {
+const UserCreateView: React.FC = () => {
   const [username, setUsername] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -74,8 +75,8 @@ const UserCreateView = () => {
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
         console.error("Error creando usuario:", errData);
-        if (errData.detail) {
-          setErrors([String(errData.detail)]);
+        if ((errData as { detail?: unknown }).detail) {
+          setErrors([String((errData as { detail?: unknown }).detail)]);
         } else {
           setErrors(["No se pudo crear el usuario"]);
         }
@@ -93,12 +94,21 @@ const UserCreateView = () => {
   };
 
   return (
-    <div className="container mt-4">
-      <h2>Nuevo usuario</h2>
+    <div className="user-page">
+      {/* Header tipo card */}
+      <header className="page-header">
+        <div>
+          <h2 className="page-header-title">Nuevo alumno </h2>
+          <p className="page-header-subtitle">
+            Registrá un nuevo alumno  con sus datos de acceso.
+          </p>
+        </div>
+      </header>
 
+      {/* Errores */}
       {errors.length > 0 && (
-        <div className="alert alert-danger py-2">
-          <ul className="mb-0">
+        <div className="alert-box alert-error">
+          <ul className="alert-list">
             {errors.map((e, idx) => (
               <li key={idx}>{e}</li>
             ))}
@@ -106,104 +116,124 @@ const UserCreateView = () => {
         </div>
       )}
 
-      <div className="row">
-        <div className="col-md-6">
-          {/* Usuario */}
-          <div className="mb-3">
-            <label className="form-label">Usuario</label>
-            <input
-              className="form-control"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
+      {/* Card de formulario */}
+      <div className="user-form-card">
+        <div className="user-form-card-header">
+          <span className="user-form-chip">Datos de la cuenta</span>
+          <span className="user-form-caption">
+            Completá usuario, contraseña, rol y datos personales.
+          </span>
+        </div>
+
+        <div className="user-form-grid">
+          {/* Columna izquierda: acceso */}
+          <div className="user-form-column">
+            {/* Usuario */}
+            <div className="user-form-field">
+              <label className="user-form-label">Usuario</label>
+              <input
+                className="user-form-input"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Ej: alumno1"
+              />
+            </div>
+
+            {/* Contraseña */}
+            <div className="user-form-field">
+              <label className="user-form-label">Contraseña</label>
+              <input
+                type="password"
+                className="user-form-input"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Mínimo 6 caracteres"
+              />
+              <span className="user-form-hint">Mínimo 6 caracteres.</span>
+            </div>
+
+            {/* Rol */}
+            <div className="user-form-field">
+              <label className="user-form-label">Rol</label>
+              <select
+                className="user-form-input user-form-select"
+                value={type}
+                onChange={(e) => setType(e.target.value as "admin" | "alumno")}
+              >
+                <option value="alumno">Alumno</option>
+  
+              </select>
+            </div>
           </div>
 
-          {/* Contraseña */}
-          <div className="mb-3">
-            <label className="form-label">Contraseña</label>
-            <input
-              type="password"
-              className="form-control"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <small className="text-muted">
-              Mínimo 6 caracteres.
-            </small>
-          </div>
+          {/* Columna derecha: datos personales */}
+          <div className="user-form-column">
+            {/* Nombre */}
+            <div className="user-form-field">
+              <label className="user-form-label">Nombre</label>
+              <input
+                className="user-form-input"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder="Nombre"
+              />
+            </div>
 
-          {/* Rol */}
-          <div className="mb-3">
-            <label className="form-label">Rol</label>
-            <select
-              className="form-select"
-              value={type}
-              onChange={(e) => setType(e.target.value as "admin" | "alumno")}
-            >
-              <option value="alumno">Alumno</option>
-              <option value="admin">Admin</option>
-            </select>
+            {/* Apellido */}
+            <div className="user-form-field">
+              <label className="user-form-label">Apellido</label>
+              <input
+                className="user-form-input"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                placeholder="Apellido"
+              />
+            </div>
+
+            {/* DNI */}
+            <div className="user-form-field">
+              <label className="user-form-label">DNI</label>
+              <input
+                className="user-form-input"
+                value={dni}
+                onChange={(e) => setDni(e.target.value)}
+                placeholder="Solo números"
+              />
+            </div>
+
+            {/* Email */}
+            <div className="user-form-field">
+              <label className="user-form-label">Email</label>
+              <input
+                type="email"
+                className="user-form-input"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="ejemplo@correo.com"
+              />
+            </div>
           </div>
         </div>
 
-        <div className="col-md-6">
-          {/* Nombre */}
-          <div className="mb-3">
-            <label className="form-label">Nombre</label>
-            <input
-              className="form-control"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-            />
-          </div>
+        <div className="user-form-actions">
+          <button
+            className="btn btn-primary"
+            onClick={handleSubmit}
+            disabled={saving}
+            type="button"
+          >
+            {saving ? "Guardando..." : "Guardar usuario"}
+          </button>
 
-          {/* Apellido */}
-          <div className="mb-3">
-            <label className="form-label">Apellido</label>
-            <input
-              className="form-control"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-            />
-          </div>
-
-          {/* DNI */}
-          <div className="mb-3">
-            <label className="form-label">DNI</label>
-            <input
-              className="form-control"
-              value={dni}
-              onChange={(e) => setDni(e.target.value)}
-            />
-          </div>
-
-          {/* Email */}
-          <div className="mb-3">
-            <label className="form-label">Email</label>
-            <input
-              type="email"
-              className="form-control"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
+          <button
+            className="btn btn-secondary"
+            type="button"
+            onClick={() => navigate("/admin/users")}
+          >
+            Cancelar
+          </button>
         </div>
       </div>
-
-      <button
-        className="btn btn-primary me-2"
-        onClick={handleSubmit}
-        disabled={saving}
-      >
-        {saving ? "Guardando..." : "Guardar"}
-      </button>
-
-      <button
-        className="btn btn-secondary"
-        onClick={() => navigate("/admin/users")}
-      >
-        Cancelar
-      </button>
     </div>
   );
 };

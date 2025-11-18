@@ -202,6 +202,13 @@ const CareerEditView: React.FC = () => {
       )}
 
       <div className="career-form-card">
+        <div className="career-form-card-header">
+          <span className="career-form-chip">Edición de carrera</span>
+          <span className="career-form-caption">
+            Modificá solo los datos necesarios y guardá los cambios.
+          </span>
+        </div>
+
         <div className="form-grid">
           <div className="form-column">
             {/* Nombre */}
@@ -241,7 +248,8 @@ const CareerEditView: React.FC = () => {
             {/* Inicio cursado */}
             <div className="form-field">
               <label className="form-label">
-                Inicio de cursado <span className="form-label-optional">(opcional)</span>
+                Inicio de cursado{" "}
+                <span className="form-label-optional">(opcional)</span>
               </label>
               <input
                 type="date"

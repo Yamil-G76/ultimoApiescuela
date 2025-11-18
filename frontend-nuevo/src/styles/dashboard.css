@@ -1,266 +1,376 @@
-/* =========================
+/* ===========================================
    DASHBOARD ADMIN
-   ========================= */
+   =========================================== */
 
 .dashboard-page {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
   color: var(--text-main);
 }
 
-/* Encabezado */
-.dashboard-header h2 {
-  margin: 0 0 4px 0;
-  font-size: 1.6rem;
-}
+/* -------------------------------------------
+   ENCABEZADO GENERAL
+   ------------------------------------------- */
 
-.dashboard-header p {
-  margin: 0;
-  color: var(--text-muted);
-  font-size: 0.95rem;
-}
-
-/* Mensajes de estado */
-.dashboard-error {
-  margin-bottom: 8px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  background-color: #ffe5e5;
-  color: #a32020;
-  font-size: 0.9rem;
-}
-
-.dashboard-loading {
-  font-size: 0.95rem;
-  color: var(--text-muted);
-}
-
-/* =========================
-   FILA SUPERIOR
-   ========================= */
-
-.dashboard-top {
-  display: flex;
-  gap: 20px;
-  align-items: stretch;
-}
-
-/* Columna izquierda: tarjetas apiladas, más angostas */
-.dashboard-column-left {
-  flex: 0 0 30%;
-  max-width: 320px;
-  min-width: 260px;
+.dashboard-header {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-}
-
-/* Tarjeta de últimos pagos: ocupa ~70% restante */
-.dashboard-card--top-pagos {
-  flex: 1;
-  min-width: 0;
-}
-
-/* ======================================
-   TARJETAS
-   ====================================== */
-
-.dashboard-card {
-  position: relative;
-  background: linear-gradient(135deg, #ffffff, #f4f7ff);
-  padding: 18px 18px 16px;
+  gap: 4px;
+  padding: 14px 18px;
   border-radius: 22px;
-  box-shadow: 0 16px 35px rgba(15, 23, 42, 0.12);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  background: linear-gradient(135deg, #ffffff, var(--primary-50));
+  border: 1px solid var(--primary-100);
+  box-shadow: var(--shadow-soft);
+  position: relative;
 }
 
-/* Barra superior de color */
-.dashboard-card::before {
+/* Bordecito superior celeste/teal */
+.dashboard-header::before {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: 22px;
-  border-top: 4px solid var(--primary-400);
-  opacity: 0.95;
+  border-top: 4px solid #0ea5e9;
   pointer-events: none;
 }
 
-/* Hover */
-.dashboard-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.2);
-}
-
-/* Título */
-.dashboard-card-title {
-  color: var(--text-muted);
-  font-size: 0.85rem;
+.dashboard-header h2 {
   margin: 0;
-}
-
-/* Valor grande */
-.dashboard-card-value {
-  font-size: 2.1rem;
+  font-size: 1.6rem;
   font-weight: 700;
-  margin: 0;
   color: var(--primary-800);
 }
 
-/* Botón */
-.dashboard-card-btn {
-  margin-top: 8px;
-  align-self: flex-start;
-  padding: 7px 16px;
-  border-radius: 999px;
-  border: none;
-  background-color: var(--primary-600);
-  color: #ffffff;
-  cursor: pointer;
-  font-size: 0.82rem;
-  font-weight: 600;
-  transition: background 0.15s ease, box-shadow 0.15s ease,
-    transform 0.08s ease;
-}
-
-.dashboard-card-btn:hover {
-  background-color: var(--primary-700);
-  box-shadow: 0 10px 22px rgba(15, 77, 180, 0.45);
-  transform: translateY(-1px);
-}
-
-/* Variantes por tipo */
-.dashboard-card--alumnos::before {
-  border-top-color: #22c55e;
-}
-.dashboard-card--alumnos .dashboard-card-value {
-  color: #15803d;
-}
-
-.dashboard-card--carreras::before {
-  border-top-color: #0ea5e9;
-}
-.dashboard-card--carreras .dashboard-card-value {
-  color: #0369a1;
-}
-
-/* Tarjeta de últimos pagos arriba */
-.dashboard-card--top-pagos::before {
-  border-top-color: #f97316;
-}
-
-/* Contenido vacío */
-.dashboard-top-pagos-empty {
-  margin-top: 6px;
-}
-
-/* Mini tabla dentro de la tarjeta de últimos pagos */
-.dashboard-top-pagos-mini {
-  margin-top: 10px;
-  border-radius: 14px;
-  background: #ffffff;
-  box-shadow: var(--shadow-soft);
-  padding: 6px 8px;
-  max-height: 220px;
-  overflow-y: auto;
-}
-
-/* ======================================
-   SECCIÓN: ÚLTIMAS NOTICIAS
-   ====================================== */
-
-.dashboard-section {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.dashboard-news-section {
-  margin-top: 8px;
-}
-
-.dashboard-section-header h3 {
-  margin: 0 0 2px 0;
-  font-size: 1.1rem;
-}
-
-.dashboard-section-header p {
+.dashboard-header p {
   margin: 0;
+  font-size: 0.9rem;
   color: var(--text-muted);
-  font-size: 0.85rem;
+}
+
+/* -------------------------------------------
+   ESTADOS GENERALES
+   ------------------------------------------- */
+
+.dashboard-error {
+  padding: 10px 14px;
+  border-radius: 12px;
+  background-color: #fee2e2;
+  color: #b91c1c;
+  font-size: 0.9rem;
+}
+
+.dashboard-loading {
+  padding: 16px 10px;
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--text-muted);
 }
 
 .dashboard-empty-text {
-  margin: 0;
-  color: var(--text-muted);
   font-size: 0.9rem;
+  color: var(--text-muted);
 }
 
-/* Panel noticias grande */
-.dashboard-news-panel {
+/* -------------------------------------------
+   FILA SUPERIOR (TARJETAS + PANEL PAGOS)
+   ------------------------------------------- */
+
+.dashboard-top {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+
+/* Columna izquierda: tarjetas apiladas */
+.dashboard-column-left {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 0 0 260px;
+  max-width: 320px;
+}
+
+/* Tarjeta resumen */
+.dashboard-card {
+  position: relative;
+  border-radius: 22px;
+  padding: 14px 18px;
   background: #ffffff;
-  border-radius: 20px;
   box-shadow: var(--shadow-soft);
-  padding: 12px 16px;
-  max-height: 360px;
+}
+
+/* Tarjetas Alumnos / Carreras centradas */
+.dashboard-card--alumnos,
+.dashboard-card--carreras {
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 6px;
+}
+
+/* Barritas de color arriba según card */
+.dashboard-card--alumnos::before,
+.dashboard-card--carreras::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 22px;
+  pointer-events: none;
+}
+
+/* Alumnos → verde/teal */
+.dashboard-card--alumnos::before {
+  border-top: 4px solid #22c55e;
+}
+
+/* Carreras → celeste */
+.dashboard-card--carreras::before {
+  border-top: 4px solid #0ea5e9;
+}
+
+.dashboard-card-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary-800);
+}
+
+.dashboard-card-value {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--primary-700);
+}
+
+.dashboard-card-btn {
+  margin-top: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #0ea5e9, #22c55e);
+  color: #ffffff;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.08s ease;
+}
+
+.dashboard-card-btn:hover:not(:disabled) {
+  box-shadow: 0 10px 22px rgba(14, 148, 136, 0.35);
+  transform: translateY(-1px);
+}
+
+/* -------------------------------------------
+   PANEL BASE (MISMA IDEA QUE “PAGOS REGISTRADOS”)
+   ------------------------------------------- */
+
+.dashboard-panel {
+  position: relative;
+  border-radius: 18px;
+  background-color: #ffffff;
+  box-shadow: var(--shadow-soft);
+  padding: 12px 14px;
+  flex: 1 1 320px;
+}
+
+/* Header dentro del panel: título + subtítulo + link derecha */
+.dashboard-panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dashboard-panel-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--primary-800);
+}
+
+.dashboard-panel-subtitle {
+  margin: 2px 0 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Botón/Link tipo pill a la derecha del header */
+.dashboard-panel-link {
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid #6ee7b7;
+  background: linear-gradient(135deg, #e0f2fe, #ccfbf1);
+  color: #064e3b;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.08s ease,
+    border-color 0.15s ease;
+}
+
+.dashboard-panel-link:hover:not(:disabled) {
+  background: linear-gradient(135deg, #bae6fd, #a7f3d0);
+  border-color: #22c55e;
+  box-shadow: 0 10px 24px rgba(34, 197, 94, 0.35);
+  transform: translateY(-1px);
+}
+
+/* Variante violeta para noticias */
+.dashboard-panel-link--violet {
+  border-color: #a5b4fc;
+  background: linear-gradient(135deg, #ede9fe, #e0f2fe);
+  color: #4338ca;
+}
+
+.dashboard-panel-link--violet:hover:not(:disabled) {
+  background: linear-gradient(135deg, #ddd6fe, #bfdbfe);
+  border-color: #6366f1;
+  box-shadow: 0 10px 24px rgba(99, 102, 241, 0.35);
+}
+
+/* Mensaje dentro del panel cuando no hay datos */
+.dashboard-panel-message {
+  margin-top: 8px;
+}
+
+/* -------------------------------------------
+   PANEL: ÚLTIMOS PAGOS REALIZADOS
+   ------------------------------------------- */
+
+.dashboard-panel--mini-payments {
+  background: radial-gradient(circle at 0% 0%, #e0f2fe 0, #ffffff 55%);
+  border: 1px solid #e5e7eb;
+}
+
+/* Bordecito superior azul-violeta */
+.dashboard-panel--mini-payments::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  border-top: 4px solid #6366f1;
+  pointer-events: none;
+}
+
+/* Wrapper scrolleable para la tabla mini */
+.dashboard-table-wrapper--mini {
+  margin-top: 6px;
+  max-height: 230px;
   overflow-y: auto;
 }
 
-/* Celda de detalle de noticias */
-.dashboard-news-detail-cell {
-  color: var(--text-muted);
-  font-size: 0.85rem;
+/* -------------------------------------------
+   PANEL: ÚLTIMAS NOTICIAS Y NOVEDADES
+   ------------------------------------------- */
+
+.dashboard-news-section {
+  margin-top: 4px;
 }
 
-/* ======================================
-   TABLAS
-   ====================================== */
+.dashboard-panel--news {
+  background: radial-gradient(circle at 0% 0%, #f3e8ff 0, #ffffff 55%);
+  border: 1px solid #e5e7eb;
+}
 
-.table-modern {
+/* Bordecito superior violeta */
+.dashboard-panel--news::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  border-top: 4px solid #8b5cf6;
+  pointer-events: none;
+}
+
+/* Wrapper scrolleable para la tabla de noticias */
+.dashboard-table-wrapper--news {
+  margin-top: 6px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+/* -------------------------------------------
+   TABLAS DENTRO DE LOS PANELS
+   ------------------------------------------- */
+
+.dashboard-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
 }
 
-.table-modern th {
+/* Encabezado base (para pagos) */
+.dashboard-table thead th {
   text-align: left;
-  padding: 10px;
-  background: var(--primary-50);
-  font-size: 0.85rem;
+  padding: 9px 8px;
+  background: linear-gradient(90deg, var(--primary-100), #e5f3ff);
+  border-bottom: 1px solid var(--primary-200);
+  color: var(--text-main);
+  font-weight: 600;
 }
 
-.table-modern td {
-  padding: 10px;
-  background: #ffffff;
-  border-bottom: 1px solid #eeeeee;
+.dashboard-table tbody td {
+  padding: 8px 8px;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #ffffff;
 }
 
-.table-modern tr:hover td {
-  background: #f4f7ff;
+/* Zebra */
+.dashboard-table tbody tr:nth-child(even) td {
+  background-color: #f9fafb;
 }
 
-/* Tabla compacta para la tarjeta de pagos */
-.table-modern--compact th,
-.table-modern--compact td {
-  padding: 6px 8px;
-  font-size: 0.8rem;
+/* Hover */
+.dashboard-table tbody tr:hover td {
+  background-color: #eef3ff;
 }
 
-/* Responsive */
+/* Variante encabezado para noticias (más violeta) */
+.dashboard-table--news thead th {
+  background: linear-gradient(90deg, var(--primary-100), #e9d5ff);
+}
+
+/* Columna detalle recortada */
+.dashboard-news-detail-cell {
+  max-width: 340px;
+  font-size: 0.84rem;
+  color: var(--text-muted);
+}
+
+/* -------------------------------------------
+   RESPONSIVE
+   ------------------------------------------- */
+
 @media (max-width: 900px) {
   .dashboard-top {
     flex-direction: column;
   }
 
   .dashboard-column-left {
-    flex: 1;
+    flex: 1 1 auto;
     max-width: 100%;
   }
 
-  .dashboard-card--top-pagos {
-    flex: 1;
+  .dashboard-table-wrapper--mini {
+    max-height: 220px;
+  }
+
+  .dashboard-table-wrapper--news {
+    max-height: 220px;
   }
 }

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { BASE_URL } from "../../../config/backend";
+import "../../../styles/users.css";
 
 interface UserData {
   id: number;
@@ -19,7 +20,7 @@ interface CareerOption {
 }
 
 interface EnrollmentItem {
-  id: number;               // id de usuarioxcarrera
+  id: number; // id de usuarioxcarrera
   career_id: number;
   career_name: string;
   inicio_cursado?: string | null;
@@ -258,7 +259,9 @@ const UserEnrollmentsView: React.FC = () => {
   // Eliminar inscripción
   // -------------------------------
   const handleDeleteEnrollment = async (enrollmentId: number) => {
-    const ok = window.confirm("¿Seguro que querés quitar esta carrera al alumno?");
+    const ok = window.confirm(
+      "¿Seguro que querés quitar esta carrera al alumno?"
+    );
     if (!ok) return;
 
     try {
@@ -300,131 +303,149 @@ const UserEnrollmentsView: React.FC = () => {
     );
   };
 
+  // -------------------------------
+  // Render
+  // -------------------------------
   return (
-    <div className="container mt-4">
-      {/* Encabezado */}
-      <div className="d-flex justify-content-between align-items-center mb-3">
+    <div className="user-enroll-page">
+      {/* Encabezado con card y botón volver */}
+      <header className="page-header page-header--enroll">
         <div>
-          <h2 className="mb-0">Inscripciones del alumno</h2>
+          <h2 className="page-header-title">Inscripciones del alumno</h2>
           {user && (
-            <small className="text-muted">
-              {user.username} — {user.first_name} {user.last_name}{" "}
+            <p className="page-header-subtitle">
+              {user.first_name} {user.last_name} — {user.username}{" "}
               {user.dni ? `(${user.dni})` : ""}
-            </small>
+            </p>
           )}
         </div>
-        <button className="btn btn-secondary" onClick={handleBack}>
-          Volver a usuarios
+        <button
+          className="btn btn-secondary user-enroll-back-btn"
+          onClick={handleBack}
+          type="button"
+        >
+          Volver a alumnos
         </button>
-      </div>
+      </header>
 
-      {/* Selector de carrera + botón agregar */}
-      <div className="card mb-3">
-        <div className="card-body">
-          <h5 className="card-title">Asignar nueva carrera</h5>
-
-          {careersError && (
-            <div className="alert alert-danger py-2 mb-2">
-              {careersError}
-            </div>
-          )}
-
-          <div className="row g-2 align-items-end">
-            <div className="col-md-6">
-              <label className="form-label">Carrera</label>
-              <select
-                className="form-select"
-                value={selectedCareerId}
-                onChange={(e) => setSelectedCareerId(e.target.value)}
-                disabled={careersLoading}
-              >
-                <option value="">-- Seleccionar carrera --</option>
-                {careers.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="col-md-3">
-              <button
-                className="btn btn-primary w-100"
-                onClick={handleAddEnrollment}
-                disabled={saving || careersLoading}
-              >
-                {saving ? "Asignando..." : "Asignar carrera"}
-              </button>
-            </div>
+      {/* Card: asignar nueva carrera (verde/teal) */}
+      <section className="user-enroll-card user-enroll-card--assign">
+        <div className="user-enroll-card-header">
+          <div>
+            <h3 className="user-enroll-title">Asignar nueva carrera</h3>
+            <p className="user-enroll-subtitle">
+              Seleccioná una carrera disponible y asignala al alumno.
+            </p>
           </div>
         </div>
-      </div>
 
-      {/* Lista de inscripciones */}
-      <div className="card">
-        <div className="card-body">
-          <h5 className="card-title">Carreras actuales</h5>
+        {careersError && (
+          <div className="alert alert-danger py-2 mb-2">{careersError}</div>
+        )}
 
-          {enrollError && (
-            <div className="alert alert-danger py-2 mb-2">
-              {enrollError}
-            </div>
-          )}
-
-          {enrollLoading ? (
-            <div className="text-muted">Cargando inscripciones...</div>
-          ) : (
-            <div
-              style={{
-                maxHeight: "60vh",
-                overflowY: "auto",
-              }}
+        <div className="user-enroll-assign-row">
+          <div className="user-enroll-assign-select">
+            <label className="user-form-label">Carrera</label>
+            <select
+              className="user-form-input user-form-select"
+              value={selectedCareerId}
+              onChange={(e) => setSelectedCareerId(e.target.value)}
+              disabled={careersLoading}
             >
-              <table className="table table-striped table-hover mb-0">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Carrera</th>
-                    <th>Inicio cursado (carrera)</th>
-                    <th style={{ width: "220px" }}>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {enrollments.map((e) => (
-                    <tr key={e.id}>
-                      <td>{e.id}</td>
-                      <td>{e.career_name}</td>
-                      <td>{formatFecha(e.inicio_cursado || null)}</td>
-                      <td>
+              <option value="">-- Seleccionar carrera --</option>
+              {careers.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="user-enroll-assign-btn">
+            <button
+              className="btn user-enroll-btn-assign"
+              onClick={handleAddEnrollment}
+              disabled={saving || careersLoading}
+              type="button"
+            >
+              {saving ? "Asignando..." : "Asignar carrera"}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Card: lista de carreras actuales (violeta/celeste + tabla scrollable) */}
+      <section className="user-enroll-card user-enroll-card--list">
+        <div className="user-enroll-card-header">
+          <div>
+            <h3 className="user-enroll-title">Carreras actuales</h3>
+            <p className="user-enroll-subtitle">
+              Revisá las inscripciones activas y accedé al detalle de pagos.
+            </p>
+          </div>
+        </div>
+
+        {enrollError && (
+          <div className="alert alert-danger py-2 mb-2">{enrollError}</div>
+        )}
+
+        {enrollLoading ? (
+          <div className="user-list-message user-list-message--muted">
+            Cargando inscripciones...
+          </div>
+        ) : (
+          <div className="user-enroll-table-container">
+            <table className="user-enroll-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Carrera</th>
+                  <th>Inicio cursado (carrera)</th>
+                  <th style={{ width: "220px" }}>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {enrollments.map((e) => (
+                  <tr key={e.id}>
+                    <td>{e.id}</td>
+                    <td>{e.career_name}</td>
+                    <td>{formatFecha(e.inicio_cursado || null)}</td>
+                    <td>
+                      <div className="user-enroll-actions">
                         <button
-                          className="btn btn-sm btn-outline-primary me-2"
+                          className="btn user-enroll-btn-payments"
                           onClick={() => handleViewPayments(e.id)}
+                          type="button"
                         >
                           Ver pagos
                         </button>
                         <button
-                          className="btn btn-sm btn-outline-danger"
+                          className="btn user-enroll-btn-remove"
                           onClick={() => handleDeleteEnrollment(e.id)}
+                          type="button"
                         >
                           Quitar
                         </button>
-                      </td>
-                    </tr>
-                  ))}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
 
-                  {enrollments.length === 0 && (
-                    <tr>
-                      <td colSpan={4} className="text-center">
-                        Este alumno todavía no tiene carreras asignadas.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      </div>
+                {enrollments.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan={4}
+                      className="user-list-message user-list-message--muted"
+                    >
+                      Este alumno todavía no tiene carreras asignadas.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
     </div>
   );
 };

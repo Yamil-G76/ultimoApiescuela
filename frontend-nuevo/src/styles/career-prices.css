@@ -1,0 +1,256 @@
+/* ===========================================
+   PÁGINA HISTORIAL DE PRECIOS
+   =========================================== */
+
+.prices-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  color: var(--text-main);
+}
+
+/* ===========================================
+   HEADER PRINCIPAL (card violeta)
+   =========================================== */
+
+.prices-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 22px;
+  border-radius: 26px;
+  background: linear-gradient(
+    135deg,
+    #ffffff,
+    #f3e8ff,
+    var(--primary-50)
+  );
+  box-shadow: var(--shadow-soft);
+}
+
+/* Borde superior violeta, redondeado como la card/tabla */
+.prices-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 26px;
+  border-top: 4px solid #8b5cf6; /* violeta */
+  pointer-events: none;
+}
+
+.prices-header-title {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--primary-900);
+}
+
+.prices-header-subtitle {
+  margin: 4px 0 0 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* Botón VOLVER A CARRERAS */
+.prices-back-btn {
+  border-radius: 999px;
+  padding: 8px 18px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  background: linear-gradient(135deg, #f9fafb, #e0f2fe);
+  color: #0f172a;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.08s ease,
+    border-color 0.15s ease;
+}
+
+.header-back-btn:hover:not(:disabled) {
+  background: linear-gradient(
+    135deg,
+    #bae6fd,
+    #a7f3d0
+  );
+  border-color: #22c55e;
+  box-shadow: 0 10px 24px rgba(34, 197, 94, 0.35);
+  transform: translateY(-1px);
+}
+
+.header-back-btn:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+/* ===========================================
+   SECCIÓN LISTADO
+   =========================================== */
+
+.prices-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.prices-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.prices-section-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--primary-800);
+}
+
+.prices-section-subtitle {
+  margin: 4px 0 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Etiqueta "Historial de montos" (ya NO parece botón) */
+.prices-badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  background-color: rgba(148, 163, 184, 0.08); /* gris lavanda suave */
+  border: 1px dashed #c7d2fe;                  /* borde finito */
+  color: var(--text-muted);
+}
+
+/* ===========================================
+   CONTENEDOR SCROLLABLE
+   =========================================== */
+
+.prices-list-container {
+  position: relative;
+  margin-top: 2px;
+  height: 65vh;
+  overflow-y: auto;
+  border-radius: 18px;
+  background: linear-gradient(
+    135deg,
+    #ffffff,
+    #f9fafb
+  );
+  box-shadow: var(--shadow-soft);
+  padding: 10px 12px;
+}
+
+/* Bordecito superior LILA  */
+.prices-list-container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  border-top: 4px solid #a5b4fc;   /* lila suave */
+  pointer-events: none;
+}
+
+/* Mensajes dentro del panel (cargando / vacío) */
+.prices-message {
+  padding: 10px 6px;
+  font-size: 0.88rem;
+}
+
+.prices-message--muted {
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* ===========================================
+   TABLA HISTORIAL
+   =========================================== */
+
+.prices-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+/* Cabecera con mezcla violeta+azul */
+.prices-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  text-align: left;
+  padding: 10px 8px;
+  background: linear-gradient(
+    90deg,
+    var(--primary-100),
+
+  );
+
+  border-bottom: 1px solid var(--primary-200);
+  font-weight: 600;
+}
+
+/* Celdas */
+.prices-table tbody td {
+  padding: 9px 8px;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #ffffff;
+}
+
+/* Zebra suave */
+.prices-table tbody tr:nth-child(even) td {
+  background-color: #f9fafb;
+}
+
+/* Hover */
+.prices-table tbody tr:hover td {
+  background-color: #eef3ff;
+}
+
+/* Columna ID con pequeño pill "Actual" */
+.prices-table tbody td:first-child {
+  white-space: nowrap;
+}
+
+/* Pill verde/teal para el precio vigente */
+.prices-pill-current {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: linear-gradient(
+    135deg,
+    #bbf7d0,  /* verde pastel */
+    #a5f3fc   /* celeste pastel */
+  );
+  color: #064e3b;
+  border: 1px solid #6ee7b7;
+}
+
+/* ===========================================
+   RESPONSIVE
+   =========================================== */
+
+@media (max-width: 900px) {
+  .prices-section-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .prices-list-container {
+    height: 60vh;
+  }
+
+  .prices-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

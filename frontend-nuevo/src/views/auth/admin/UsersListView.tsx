@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../../../config/backend";
+import "../../../styles/users.css";
 
 interface UserItem {
   id: number;
@@ -42,7 +43,7 @@ const UsersListView: React.FC = () => {
   const navigate = useNavigate();
 
   // -------------------------------------------------
-  // Cargar usuarios con paginado (scroll infinito)
+  // Cargar alumnos con paginado (scroll infinito)
   // -------------------------------------------------
   const loadUsers = async (pageToLoad: number, reset = false) => {
     if (loadingRef.current) return;
@@ -82,7 +83,7 @@ const UsersListView: React.FC = () => {
       const data = (await res.json()) as PaginatedUsersResponse;
 
       if (!data.success || !data.data) {
-        throw new Error(data.message || "Error al obtener usuarios");
+        throw new Error(data.message || "Error al obtener alumnos");
       }
 
       const { items: newItems, has_next, page: returnedPage } = data.data;
@@ -110,7 +111,7 @@ const UsersListView: React.FC = () => {
   };
 
   // -------------------------------------------------
-  // Manejo de scroll
+  // Manejo de scroll del panel
   // -------------------------------------------------
   const handleScroll = () => {
     const container = scrollContainerRef.current;
@@ -153,7 +154,7 @@ const UsersListView: React.FC = () => {
   };
 
   const handleDelete = async (id: number) => {
-    const ok = window.confirm("¿Seguro que querés eliminar este usuario?");
+    const ok = window.confirm("¿Seguro que querés eliminar este alumno?");
     if (!ok) return;
 
     try {
@@ -162,15 +163,15 @@ const UsersListView: React.FC = () => {
       });
 
       if (!res.ok) {
-        console.error("Error eliminando usuario");
-        alert("No se pudo eliminar el usuario");
+        console.error("Error eliminando alumno");
+        alert("No se pudo eliminar el alumno");
         return;
       }
 
       setItems((prev) => prev.filter((u) => u.id !== id));
     } catch (err) {
       console.error(err);
-      alert("Error eliminando el usuario");
+      alert("Error eliminando el alumno");
     }
   };
 
@@ -178,57 +179,72 @@ const UsersListView: React.FC = () => {
   // Render
   // -------------------------------------------------
   return (
-    <div className="container mt-4">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2>Alumnos / Usuarios</h2>
-        <button className="btn btn-primary" onClick={handleCreate}>
-          + Nuevo usuario
-        </button>
-      </div>
-
-      <form className="mb-3" onSubmit={handleSearchSubmit}>
-        <div className="input-group">
-          <input
-            className="form-control"
-            placeholder="Buscar por usuario, nombre, DNI, email..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <button className="btn btn-outline-secondary" type="submit">
-            Buscar
-          </button>
+    <div className="user-page">
+      {/* Header principal */}
+      <header className="page-header">
+        <div>
+          <h2 className="page-header-title">Gestión de alumnos</h2>
+          <p className="page-header-subtitle">
+            Administrá los alumnos registrados y sus inscripciones a carreras.
+          </p>
         </div>
-      </form>
 
-      {error && <div className="alert alert-danger py-2">{error}</div>}
+        <button
+          className="btn btn-primary page-header-cta"
+          type="button"
+          onClick={handleCreate}
+        >
+          + Nuevo alumno
+        </button>
+      </header>
 
+      {/* Buscador */}
+      <section className="user-search">
+        <form className="user-search-form" onSubmit={handleSearchSubmit}>
+          <div className="user-search-input-wrapper">
+            <input
+              className="form-input user-search-input"
+              placeholder="Buscar por nombre, usuario, DNI o email..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <button className="btn btn-outline" type="submit">
+              Buscar
+            </button>
+          </div>
+          <p className="user-search-hint">
+            Tip: podés filtrar por nombre, apellido, DNI o email del alumno.
+          </p>
+        </form>
+      </section>
+
+      {error && (
+        <div className="alert-box alert-error">
+          <span>{error}</span>
+        </div>
+      )}
+
+      {/* Panel con tabla y scroll interno */}
       <div
         ref={scrollContainerRef}
+        className="user-list-container"
         onScroll={handleScroll}
-        style={{
-          height: "70vh",
-          overflowY: "auto",
-          border: "1px solid #dee2e6",
-          borderRadius: "0.5rem",
-          backgroundColor: "#ffffff",
-          padding: "0.75rem",
-        }}
       >
         {initialLoading ? (
-          <div className="text-center text-muted py-3">
-            Cargando usuarios...
+          <div className="user-list-message user-list-message--muted">
+            Cargando alumnos...
           </div>
         ) : (
           <>
-            <table className="table table-striped table-hover mb-0">
+            <table className="user-table">
               <thead>
                 <tr>
                   <th>ID</th>
                   <th>Usuario</th>
-                  <th>Nombre</th>
+                  <th>Nombre y apellido</th>
                   <th>DNI</th>
                   <th>Email</th>
-                  <th style={{ width: "220px" }}>Acciones</th>
+                  <th style={{ width: "260px" }}>Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -242,32 +258,40 @@ const UsersListView: React.FC = () => {
                     <td>{u.dni}</td>
                     <td>{u.email}</td>
                     <td>
-                      <button
-                        className="btn btn-sm btn-outline-primary me-2"
-                        onClick={() => handleEdit(u.id)}
-                      >
-                        Editar
-                      </button>
-                      <button
-                        className="btn btn-sm btn-outline-secondary me-2"
-                        onClick={() => handleEnrollments(u.id)}
-                      >
-                        Carreras
-                      </button>
-                      <button
-                        className="btn btn-sm btn-outline-danger"
-                        onClick={() => handleDelete(u.id)}
-                      >
-                        Eliminar
-                      </button>
+                      <div className="user-table-actions">
+                        <button
+                          type="button"
+                          className="btn user-btn-edit"
+                          onClick={() => handleEdit(u.id)}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          type="button"
+                          className="btn user-btn-enroll"
+                          onClick={() => handleEnrollments(u.id)}
+                        >
+                          Carreras
+                        </button>
+                        <button
+                          type="button"
+                          className="btn user-btn-delete"
+                          onClick={() => handleDelete(u.id)}
+                        >
+                          Eliminar
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
 
                 {items.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="text-center">
-                      No se encontraron usuarios.
+                    <td
+                      colSpan={6}
+                      className="user-list-message user-list-message--muted"
+                    >
+                      No se encontraron alumnos.
                     </td>
                   </tr>
                 )}
@@ -275,14 +299,14 @@ const UsersListView: React.FC = () => {
             </table>
 
             {loadingMore && (
-              <div className="text-center text-muted py-2">
-                Cargando más usuarios...
+              <div className="user-list-message user-list-message--muted">
+                Cargando más alumnos...
               </div>
             )}
 
             {!hasMore && items.length > 0 && (
-              <div className="text-center text-muted py-2">
-                No hay más usuarios para cargar.
+              <div className="user-list-message user-list-message--muted">
+                No hay más alumnos para cargar.
               </div>
             )}
           </>

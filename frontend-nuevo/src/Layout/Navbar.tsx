@@ -153,7 +153,7 @@ const Navbar: React.FC = () => {
   // ====== RENDER =====================================================
   return (
     <aside className={`sidebar ${collapsed ? "sidebar--collapsed" : ""}`}>
-      {/* TOP: solo hamburguesa + menú */}
+      {}
       <div className="sidebar-top">
         <button
           type="button"

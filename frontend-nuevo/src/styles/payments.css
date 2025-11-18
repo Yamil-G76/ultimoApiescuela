@@ -1,0 +1,248 @@
+/* ===========================================
+   PÁGINA LISTA DE PAGOS
+   =========================================== */
+
+.payments-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: var(--text-main);
+  min-height: 0;
+}
+
+/* -------------------------------------------
+   HEADER SUPERIOR (usa .page-header global)
+   ------------------------------------------- */
+
+.payments-page .page-header-subtitle {
+  margin-top: 4px;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* Pill "Vista global" */
+.payments-header-badge {
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid #a5b4fc;
+  background: linear-gradient(135deg, #eef2ff, #e0f2fe);
+  color: #1e3a8a;
+}
+
+.payments-header-badge:hover:not(:disabled) {
+  background: linear-gradient(135deg, #e0f2fe, #c7d2fe);
+  box-shadow: 0 6px 14px rgba(59, 130, 246, 0.25);
+  transform: translateY(-1px);
+}
+
+/* -------------------------------------------
+   BUSCADOR
+   ------------------------------------------- */
+
+.payments-search {
+  margin-top: 4px;
+}
+
+.payments-search-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.payments-search-input-wrapper {
+  display: flex;
+  gap: 8px;
+  max-width: 700px;
+}
+
+.payments-search-input {
+  flex: 1;
+}
+
+/* Botón de búsqueda verde/teal como en alumnos */
+.payments-search-btn {
+  border-color: #6ee7b7 !important;
+  color: #047857 !important;
+  background-color: #ecfdf5 !important;
+}
+
+.payments-search-btn:hover:not(:disabled) {
+  background-color: #d1fae5 !important;
+  box-shadow: 0 6px 16px rgba(4, 120, 87, 0.25);
+  transform: translateY(-1px);
+}
+
+.payments-search-hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* -------------------------------------------
+   CARD CONTENEDORA DE LA TABLA
+   (MISMA LÓGICA QUE EN ALUMNOS/CARRERAS)
+   ------------------------------------------- */
+
+.payments-card {
+  position: relative;
+  border-radius: 18px;
+  background-color: #ffffff;
+  box-shadow: var(--shadow-soft);
+  padding: 10px 12px 14px;
+}
+
+/* Bordecito superior de color que también se ve como borde de tabla */
+.payments-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  border-top: 4px solid #14b8a6; /* teal verdoso, mismo estilo que otras vistas */
+  pointer-events: none;
+}
+
+.payments-card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 8px;
+}
+
+.payments-card-title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--primary-800);
+}
+
+.payments-card-subtitle {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* -------------------------------------------
+   MENSAJES / ERRORES
+   ------------------------------------------- */
+
+.payments-message {
+  padding: 10px 8px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.payments-message--muted {
+  color: var(--text-muted);
+}
+
+/* -------------------------------------------
+   SCROLL SOLO EN LA TABLA
+   ------------------------------------------- */
+
+.payments-table-scroll {
+  position: relative;
+  max-height: 40vh;      /* controla el alto de la tabla */
+  overflow-y: auto;
+  margin-top: 4px;
+}
+
+/* -------------------------------------------
+   TABLA
+   ------------------------------------------- */
+
+.payments-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+/* Encabezado sticky, fondo sólido (no se rompe al scrollear) */
+.payments-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  text-align: left;
+  padding: 10px 10px;
+  background-color: #f3f4f6;
+  border-bottom: 1px solid #e5e7eb;
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+.payments-table tbody td {
+  padding: 9px 10px;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #ffffff;
+}
+
+/* Zebra suave */
+.payments-table tbody tr:nth-child(even) td {
+  background-color: #f9fafb;
+}
+
+/* Hover suave */
+.payments-table tbody tr:hover td {
+  background-color: #eef3ff;
+}
+
+/* -------------------------------------------
+   ESTADO (ACTIVO / ANULADO)
+   ------------------------------------------- */
+
+.payments-status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 70px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.payments-status-pill--active {
+  background-color: #dcfce7;
+  color: #166534;
+  border: 1px solid #4ade80;
+}
+
+.payments-status-pill--canceled {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+/* -------------------------------------------
+   BOTÓN "VER DETALLE"
+   ------------------------------------------- */
+
+.payments-btn-detail {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  border-radius: 999px;
+  border: 1px solid #93c5fd;
+  background-color: #eff6ff;
+  color: #1d4ed8;
+}
+
+.payments-btn-detail:hover:not(:disabled) {
+  background-color: #dbeafe;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.28);
+  transform: translateY(-1px);
+}
+
+/* -------------------------------------------
+   RESPONSIVE
+   ------------------------------------------- */
+
+@media (max-width: 900px) {
+  .payments-search-input-wrapper {
+    flex-direction: column;
+  }
+
+  .payments-table-scroll {
+    max-height: 50vh;
+  }
+}

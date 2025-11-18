@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../../../config/backend";
+import "../../../styles/payments.css";
 
 interface PaymentRow {
   id: number;
@@ -131,7 +132,7 @@ const PaymentsListView: React.FC = () => {
     }
   };
 
-  // Scroll infinito (igual que en UsersListView)
+  // Scroll infinito solo dentro de la tabla
   const handleScroll = () => {
     const container = scrollContainerRef.current;
     if (!container) return;
@@ -172,106 +173,140 @@ const PaymentsListView: React.FC = () => {
   // Render
   // ---------------------------------
   return (
-    <div className="container mt-4">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2>Pagos</h2>
-        <small className="text-muted">
-          Historial de pagos (últimos primero)
-        </small>
-      </div>
-
-      <form className="mb-3" onSubmit={handleSearchSubmit}>
-        <div className="input-group">
-          <input
-            className="form-control"
-            placeholder="Buscar por alumno, DNI, carrera..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <button className="btn btn-outline-secondary" type="submit">
-            Buscar
-          </button>
+    <div className="container mt-4 payments-page">
+      {/* Header */}
+      <header className="page-header page-header--payments">
+        <div>
+          <h2 className="page-header-title">Gestión de pagos</h2>
+          <p className="page-header-subtitle">
+            Historial de pagos registrados, del más reciente al más antiguo.
+          </p>
         </div>
-      </form>
+        <div className="page-header-badge payments-header-badge">
+          Vista global
+        </div>
+      </header>
 
-      {error && <div className="alert alert-danger py-2">{error}</div>}
-
-      <div
-        ref={scrollContainerRef}
-        onScroll={handleScroll}
-        style={{
-          height: "70vh",           // 👉 igual que la tabla de alumnos
-          overflowY: "auto",
-          border: "1px solid #dee2e6",
-          borderRadius: "0.5rem",
-          backgroundColor: "#ffffff",
-          padding: "0.75rem",
-        }}
-      >
-        {initialLoading ? (
-          <div className="text-center text-muted py-3">
-            Cargando pagos...
+      {/* Buscador */}
+      <section className="payments-search">
+        <form className="payments-search-form" onSubmit={handleSearchSubmit}>
+          <div className="payments-search-input-wrapper">
+            <input
+              className="form-input payments-search-input"
+              placeholder="Buscar por alumno, DNI, carrera..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <button
+              className="btn btn-outline payments-search-btn"
+              type="submit"
+            >
+              Buscar
+            </button>
           </div>
-        ) : (
-          <>
-            <table className="table table-striped table-hover mb-0">
-              <thead>
-                <tr>
-                  <th>Fecha</th>
-                  <th>Alumno</th>
-                  <th>DNI</th>
-                  <th>Carrera</th>
-                  <th>Cuota</th>
-                  <th>Monto</th>
-                  <th>Estado</th>
-                  <th style={{ width: "160px" }}>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((p) => (
-                  <tr key={p.id}>
-                    <td>{formatFecha(p.fecha_pago || null)}</td>
-                    <td>{formatAlumno(p)}</td>
-                    <td>{p.dni}</td>
-                    <td>{p.career_name}</td>
-                    <td>{p.numero_cuota}</td>
-                    <td>${p.monto}</td>
-                    <td>{formatEstado(p)}</td>
-                    <td>
-                      <button
-                        className="btn btn-sm btn-outline-primary"
-                        onClick={() => handleGoToDetail(p)}
-                      >
-                        Ver detalle
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+          <p className="payments-search-hint">
+            Tip: podés buscar por nombre de alumno, DNI o nombre de carrera.
+          </p>
+        </form>
+      </section>
 
-                {items.length === 0 && (
-                  <tr>
-                    <td colSpan={8} className="text-center">
-                      No se encontraron pagos.
-                    </td>
-                  </tr>
+      {error && (
+        <div className="alert-box alert-error payments-alert-error">
+          {error}
+        </div>
+      )}
+
+      {/* Card + tabla normal dentro */}
+      <section className="payments-list">
+        <div className="payments-card">
+          <div className="payments-card-header">
+            <h3 className="payments-card-title">Pagos registrados</h3>
+            <p className="payments-card-subtitle">
+              Revisá los pagos y accedé al detalle de cada alumno.
+            </p>
+          </div>
+
+          <div
+            ref={scrollContainerRef}
+            onScroll={handleScroll}
+            className="payments-table-scroll"
+          >
+            {initialLoading ? (
+              <div className="payments-message payments-message--muted">
+                Cargando pagos...
+              </div>
+            ) : (
+              <>
+                <table className="payments-table">
+                  <thead>
+                    <tr>
+                      <th>Fecha</th>
+                      <th>Alumno</th>
+                      <th>DNI</th>
+                      <th>Carrera</th>
+                      <th>Cuota</th>
+                      <th>Monto</th>
+                      <th>Estado</th>
+                      <th style={{ width: "150px" }}>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {items.map((p) => (
+                      <tr key={p.id}>
+                        <td>{formatFecha(p.fecha_pago || null)}</td>
+                        <td>{formatAlumno(p)}</td>
+                        <td>{p.dni}</td>
+                        <td>{p.career_name}</td>
+                        <td>{p.numero_cuota}</td>
+                        <td>${p.monto}</td>
+                        <td>
+                          <span
+                            className={
+                              p.anulado
+                                ? "payments-pill payments-pill--cancelled"
+                                : "payments-pill payments-pill--active"
+                            }
+                          >
+                            {formatEstado(p)}
+                          </span>
+                        </td>
+                        <td>
+                          <button
+                            className="btn payments-btn-detail"
+                            onClick={() => handleGoToDetail(p)}
+                          >
+                            Ver detalle
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+
+                    {items.length === 0 && (
+                      <tr>
+                        <td colSpan={8} className="payments-message">
+                          No se encontraron pagos.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+
+                {loadingMore && (
+                  <div className="payments-message payments-message--muted">
+                    Cargando más pagos...
+                  </div>
                 )}
-              </tbody>
-            </table>
 
-            {loadingMore && (
-              <div className="text-center text-muted py-2">
-                Cargando más pagos...
-              </div>
+                {!hasMore && items.length > 0 && (
+                  <div className="payments-message payments-message--muted">
+                    No hay más pagos para cargar.
+                  </div>
+                )}
+              </>
             )}
-
-            {!hasMore && items.length > 0 && (
-              <div className="text-center text-muted py-2">
-                No hay más pagos para cargar.
-              </div>
-            )}
-          </>
-        )}
-      </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };
