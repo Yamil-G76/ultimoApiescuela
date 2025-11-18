@@ -12,7 +12,7 @@ import "./styles/login.css";
 import "./styles/dashboard.css";
 import "./styles/careers.css";
 import "./styles/career-prices.css";
-
+import "./styles/news.css"
 const rootElement = document.getElementById("root") as HTMLElement;
 
 ReactDOM.createRoot(rootElement).render(

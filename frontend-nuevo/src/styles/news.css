@@ -1,0 +1,354 @@
+/* ===========================================
+   PÁGINA LISTA DE NOTICIAS
+   =========================================== */
+
+.news-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: var(--text-main);
+  min-height: 0;
+}
+
+/* -------------------------------------------
+   HEADER PRINCIPAL (MISMO ESTILO QUE CARRERAS)
+   ------------------------------------------- */
+
+.news-page .page-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #ffffff, var(--primary-50));
+  border: 1px solid var(--primary-100);
+  box-shadow: var(--shadow-soft);
+}
+
+.news-page .page-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 22px;
+  border-top: 4px solid #14b8a6; /* teal como en otras vistas */
+  pointer-events: none;
+}
+
+.news-page .page-header-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-800);
+}
+
+.news-page .page-header-subtitle {
+  margin: 4px 0 0 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* ===========================================
+   CARD CONTENEDORA DEL LISTADO
+   =========================================== */
+
+.news-list-section {
+  margin-top: 4px;
+}
+
+.news-list-card {
+  position: relative;
+  border-radius: 24px;
+  background-color: #ffffff;
+  box-shadow: var(--shadow-soft);
+  padding: 16px 18px 18px;
+}
+
+/* 🔧 Barrita superior que SIGUE el borde de la card */
+.news-list-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;                       /* ocupa todo el tamaño de la card */
+  border-radius: 24px;            /* mismo radio que la card */
+  border-top: 4px solid #8b5cf6;  /* violeta suave */
+  pointer-events: none;
+}
+
+.news-list-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.news-list-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--primary-800);
+}
+
+.news-list-subtitle {
+  margin: 4px 0 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Botón "Nueva noticia" con degradado suave brillante */
+.news-list-cta-btn {
+  border-radius: 999px;
+  border: 1px solid #14b8a6;
+  background: linear-gradient(
+    135deg,
+    #22c55e, /* verde */
+    #0ea5e9  /* celeste */
+  );
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.news-list-cta-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #16a34a, #0284c7);
+  box-shadow: 0 10px 22px rgba(34, 197, 94, 0.35);
+  transform: translateY(-1px);
+}
+
+/* ===========================================
+   CONTENEDOR TABLA (SCROLL INTERNO)
+   =========================================== */
+
+.news-table-wrapper {
+  position: relative;
+  margin-top: 4px;
+  max-height: 60vh;
+  overflow-y: auto;
+  border-radius: 16px;
+  background-color: #ffffff;
+  padding: 8px 10px;
+}
+
+/* Scrollbar sutil */
+.news-table-wrapper::-webkit-scrollbar {
+  width: 6px;
+}
+.news-table-wrapper::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background-color: rgba(148, 163, 184, 0.5);
+}
+
+/* ===========================================
+   MENSAJES
+   =========================================== */
+
+.news-message {
+  padding: 10px 8px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.news-message--muted {
+  color: var(--text-muted);
+}
+
+/* ===========================================
+   TABLA DE NOTICIAS
+   =========================================== */
+
+.news-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+/* Encabezado fijo dentro del scroll, estilo pagos */
+.news-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  text-align: left;
+  padding: 10px 8px;
+  background-color: #f3f4f6; /* fondo sólido */
+  border-bottom: 1px solid #e5e7eb;
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+.news-table tbody td {
+  padding: 9px 8px;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #ffffff;
+}
+
+/* Zebra */
+.news-table tbody tr:nth-child(even) td {
+  background-color: #f9fafb;
+}
+
+/* Hover fila principal */
+.news-row:hover td {
+  background-color: #eef3ff;
+}
+
+/* Título + preview en la columna de título */
+.news-cell-title-main {
+  font-weight: 600;
+  color: var(--primary-800);
+}
+
+.news-cell-title-preview {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* Mini thumbnail en la tabla */
+.news-table-thumb {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+}
+
+.news-table-no-image {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* ===========================================
+   ACCIONES
+   =========================================== */
+
+.news-table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Botones compactos como en otras tablas */
+.news-table-actions .btn {
+  padding: 5px 10px;
+  font-size: 0.78rem;
+  border-radius: 999px;
+}
+
+/* Ver detalle – celeste */
+.news-btn-detail {
+  border: 1px solid var(--primary-200);
+  background-color: #eff6ff;
+  color: #1d4ed8;
+}
+
+.news-btn-detail:hover:not(:disabled) {
+  background-color: #dbeafe;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.28);
+  transform: translateY(-1px);
+}
+
+/* Editar – violeta */
+.news-btn-edit {
+  border: 1px solid #a5b4fc;
+  background-color: #f5f3ff;
+  color: #4c1d95;
+}
+
+.news-btn-edit:hover:not(:disabled) {
+  background-color: #ede9fe;
+  box-shadow: 0 6px 16px rgba(76, 29, 149, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Eliminar – rojo suave */
+.news-btn-delete {
+  border: 1px solid #fecaca;
+  background-color: #fef2f2;
+  color: #b91c1c;
+}
+
+.news-btn-delete:hover:not(:disabled) {
+  background-color: #fee2e2;
+  box-shadow: 0 6px 16px rgba(185, 28, 28, 0.32);
+}
+
+/* ===========================================
+   FILA DE DETALLE
+   =========================================== */
+
+.news-row-detail td {
+  background-color: #f9fafb;
+}
+
+.news-row-detail-inner {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.news-row-detail-image {
+  width: 220px;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+}
+
+.news-row-detail-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.news-row-detail-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary-800);
+}
+
+.news-row-detail-content {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-main);
+}
+
+/* ===========================================
+   RESPONSIVE
+   =========================================== */
+
+@media (max-width: 900px) {
+  .news-page .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .news-list-card {
+    padding: 12px 12px 14px;
+  }
+
+  .news-list-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .news-list-cta-btn {
+    align-self: stretch;
+    text-align: center;
+  }
+
+  .news-table-wrapper {
+    max-height: 70vh;
+  }
+
+  .news-row-detail-inner {
+    flex-direction: column;
+  }
+
+  .news-row-detail-image {
+    width: 100%;
+    max-height: 260px;
+  }
+}

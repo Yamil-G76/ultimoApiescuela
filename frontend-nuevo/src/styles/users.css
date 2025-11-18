@@ -68,29 +68,60 @@
 }
 
 /* -------------------------------------------
-   CONTENEDOR DE LISTA (CARD + SCROLL INTERNO)
-   -> mismo concepto que payments-card + payments-table-scroll
+   CARD CONTENEDORA + LISTA (estilo pagos/carreras)
    ------------------------------------------- */
 
-.user-list-container {
-  position: relative;
+.user-list {
   margin-top: 4px;
-  max-height: 40vh;           /* similar a pagos/carreras */
-  overflow-y: auto;
+}
+
+.user-card {
+  position: relative;
   border-radius: 18px;
   background-color: #ffffff;
   box-shadow: var(--shadow-soft);
-  padding: 10px 12px;
+  padding: 10px 12px 14px;
 }
 
-/* Bordecito superior MORADO para diferenciar de carreras */
-.user-list-container::before {
+/* Bordecito superior MORADO para diferenciar de carreras/pagos */
+.user-card::before {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: 18px;
   border-top: 4px solid #8b5cf6; /* violeta */
   pointer-events: none;
+}
+
+.user-card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 8px;
+}
+
+.user-card-title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--primary-800);
+}
+
+.user-card-subtitle {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* -------------------------------------------
+   SCROLL SOLO EN LA TABLA (como payments-table-scroll)
+   ------------------------------------------- */
+
+.user-table-scroll {
+  position: relative;
+  max-height: 40vh;           /* alto fijo → scroll interno */
+  overflow-y: auto;
+  margin-top: 4px;
 }
 
 /* -------------------------------------------
@@ -104,10 +135,13 @@
 }
 
 /* Encabezado sticky, fondo sólido (no se rompe al scrollear) */
-.user-table thead th {
+.user-table-scroll .user-table thead th {
   position: sticky;
   top: 0;
   z-index: 1;
+}
+
+.user-table thead th {
   text-align: left;
   padding: 10px 10px;
   background-color: #f3f4f6;
@@ -205,7 +239,7 @@
 
 /* -------------------------------------------
    FORMULARIO CREAR / EDITAR ALUMNO / USUARIO
-   (se mantiene como lo tenías)
+   (igual que ya tenías)
    ------------------------------------------- */
 
 .user-form-card {
@@ -354,8 +388,13 @@
     flex-direction: column;
   }
 
-  .user-list-container {
-    max-height: 60vh;
+  .user-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .user-table-scroll {
+    max-height: 50vh;
   }
 
   .user-table-actions {

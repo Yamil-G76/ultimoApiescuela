@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../../../config/backend";
+import "../../../styles/news.css";
 
 interface NewsItem {
   id: number;
@@ -34,7 +35,7 @@ const NewsListView = () => {
       setItems(data.data.items);
     };
 
-    loadNews();
+    void loadNews();
   }, []);
 
   const toggleExpand = (id: number) => {
@@ -65,86 +66,151 @@ const NewsListView = () => {
     }
   };
 
+  const handleCreate = () => {
+    navigate("/admin/news/create");
+  };
+
+  // -----------------------------
+  // Render
+  // -----------------------------
   return (
-    <div className="container mt-4">
-      <h2>Noticias Publicadas</h2>
+    <div className="news-page">
+      {/* Header principal en card (como carreras/usuarios) */}
+      <header className="page-header">
+        <div>
+          <h2 className="page-header-title">Noticias</h2>
+          <p className="page-header-subtitle">
+            Administrá las noticias que se muestran a los alumnos en el sistema.
+          </p>
+        </div>
+      </header>
 
-      {items.map((n) => {
-        const isExpanded = expandedId === n.id;
-
-        return (
-          <div
-            key={n.id}
-            className="card mb-3 p-3"
-            style={{ borderRadius: "10px" }}
-          >
-            {/* Vista compacta */}
-            <div className="d-flex align-items-center gap-3">
-              {n.image_url && (
-                <img
-                  src={`${BASE_URL}${n.image_url}`}
-                  alt={n.title}
-                  style={{
-                    width: 80,
-                    height: 80,
-                    objectFit: "cover",
-                    borderRadius: 10,
-                    flexShrink: 0,
-                  }}
-                />
-              )}
-
-              <div className="flex-grow-1">
-                <h5 className="mb-1">{n.title}</h5>
-                <small className="text-muted d-block mb-2">
-                  {new Date(n.created_at).toLocaleString()}
-                </small>
-
-                <div className="d-flex gap-2">
-                  <button
-                    className="btn btn-sm btn-outline-primary"
-                    onClick={() => toggleExpand(n.id)}
-                  >
-                    {isExpanded ? "Cerrar detalle" : "Ver detalle"}
-                  </button>
-
-                    <button
-                      className="btn btn-sm btn-outline-secondary"
-                      onClick={() => handleEdit(n.id)}
-                    >
-                      Editar
-                    </button>
-
-                    <button
-                      className="btn btn-sm btn-outline-danger"
-                      onClick={() => handleDelete(n.id)}
-                    >
-                      Eliminar
-                    </button>
-                </div>
-              </div>
+      {/* Card de listado con botón adentro a la derecha */}
+      <section className="news-list-section">
+        <div className="news-list-card">
+          <div className="news-list-card-header">
+            <div>
+              <h3 className="news-list-title">Noticias publicadas</h3>
+              <p className="news-list-subtitle">
+                Visualizá, editá y eliminá las noticias cargadas. Expandí para
+                ver el detalle.
+              </p>
             </div>
 
-            {/* Detalle expandido */}
-            {isExpanded && (
-              <div className="mt-3">
-                <hr />
-                {n.image_url && (
-                  <img
-                    src={`${BASE_URL}${n.image_url}`}
-                    alt={n.title}
-                    className="img-fluid mb-3"
-                    style={{ borderRadius: 10 }}
-                  />
-                )}
+            <button
+              type="button"
+              className="btn news-list-cta-btn"
+              onClick={handleCreate}
+            >
+              + Nueva noticia
+            </button>
+          </div>
 
-                <h4 className="mb-2">{n.title}</h4>
-                <p>{n.content}</p>
+          <div className="news-table-wrapper">
+            {items.length === 0 ? (
+              <div className="news-message news-message--muted">
+                No hay noticias cargadas.
               </div>
+            ) : (
+              <table className="news-table">
+                <thead>
+                  <tr>
+                    <th style={{ width: "60px" }}>ID</th>
+                    <th>Título</th>
+                    <th style={{ width: "180px" }}>Fecha</th>
+                    <th style={{ width: "120px" }}>Imagen</th>
+                    <th style={{ width: "260px" }}>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {items.map((n) => {
+                    const isExpanded = expandedId === n.id;
+
+                    return [
+                      // Fila principal
+                      <tr
+                        key={n.id}
+                        className={isExpanded ? "news-row news-row--expanded" : "news-row"}
+                      >
+                        <td>{n.id}</td>
+                        <td className="news-cell-title">
+                          <div className="news-cell-title-main">{n.title}</div>
+                          <div className="news-cell-title-preview">
+                            {n.content.length > 80
+                              ? `${n.content.slice(0, 80)}...`
+                              : n.content}
+                          </div>
+                        </td>
+                        <td>{new Date(n.created_at).toLocaleString()}</td>
+                        <td>
+                          {n.image_url ? (
+                            <img
+                              src={`${BASE_URL}${n.image_url}`}
+                              alt={n.title}
+                              className="news-table-thumb"
+                            />
+                          ) : (
+                            <span className="news-table-no-image">Sin imagen</span>
+                          )}
+                        </td>
+                        <td>
+                          <div className="news-table-actions">
+                            <button
+                              className="btn news-btn-detail"
+                              type="button"
+                              onClick={() => toggleExpand(n.id)}
+                            >
+                              {isExpanded ? "Cerrar detalle" : "Ver detalle"}
+                            </button>
+                            <button
+                              className="btn news-btn-edit"
+                              type="button"
+                              onClick={() => handleEdit(n.id)}
+                            >
+                              Editar
+                            </button>
+                            <button
+                              className="btn news-btn-delete"
+                              type="button"
+                              onClick={() => handleDelete(n.id)}
+                            >
+                              Eliminar
+                            </button>
+                          </div>
+                        </td>
+                      </tr>,
+
+                      // Fila de detalle expandido
+                      isExpanded && (
+                        <tr key={`${n.id}-detail`} className="news-row-detail">
+                          <td colSpan={5}>
+                            <div className="news-row-detail-inner">
+                              {n.image_url && (
+                                <img
+                                  src={`${BASE_URL}${n.image_url}`}
+                                  alt={n.title}
+                                  className="news-row-detail-image"
+                                />
+                              )}
+
+                              <div className="news-row-detail-text">
+                                <h4 className="news-row-detail-title">{n.title}</h4>
+                                <p className="news-row-detail-content">
+                                  {n.content}
+                                </p>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      ),
+                    ];
+                  })}
+                </tbody>
+              </table>
             )}
           </div>
-        );
-      })}
+        </div>
+      </section>
     </div>
   );
 };

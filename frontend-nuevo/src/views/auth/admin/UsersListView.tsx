@@ -224,94 +224,105 @@ const UsersListView: React.FC = () => {
         </div>
       )}
 
-      {/* Panel con tabla y scroll interno */}
-      <div
-        ref={scrollContainerRef}
-        className="user-list-container"
-        onScroll={handleScroll}
-      >
-        {initialLoading ? (
-          <div className="user-list-message user-list-message--muted">
-            Cargando alumnos...
+      {/* Card + tabla con scroll interno (mismo patrón que pagos/carreras) */}
+      <section className="user-list">
+        <div className="user-card">
+          <div className="user-card-header">
+            <h3 className="user-card-title">Alumnos registrados</h3>
+            <p className="user-card-subtitle">
+              Revisá los alumnos, gestioná sus carreras y modificaciones.
+            </p>
           </div>
-        ) : (
-          <>
-            <table className="user-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Usuario</th>
-                  <th>Nombre y apellido</th>
-                  <th>DNI</th>
-                  <th>Email</th>
-                  <th style={{ width: "260px" }}>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((u) => (
-                  <tr key={u.id}>
-                    <td>{u.id}</td>
-                    <td>{u.username}</td>
-                    <td>
-                      {u.first_name} {u.last_name}
-                    </td>
-                    <td>{u.dni}</td>
-                    <td>{u.email}</td>
-                    <td>
-                      <div className="user-table-actions">
-                        <button
-                          type="button"
-                          className="btn user-btn-edit"
-                          onClick={() => handleEdit(u.id)}
-                        >
-                          Editar
-                        </button>
-                        <button
-                          type="button"
-                          className="btn user-btn-enroll"
-                          onClick={() => handleEnrollments(u.id)}
-                        >
-                          Carreras
-                        </button>
-                        <button
-                          type="button"
-                          className="btn user-btn-delete"
-                          onClick={() => handleDelete(u.id)}
-                        >
-                          Eliminar
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
 
-                {items.length === 0 && (
-                  <tr>
-                    <td
-                      colSpan={6}
-                      className="user-list-message user-list-message--muted"
-                    >
-                      No se encontraron alumnos.
-                    </td>
-                  </tr>
+          <div
+            ref={scrollContainerRef}
+            className="user-table-scroll"
+            onScroll={handleScroll}
+          >
+            {initialLoading ? (
+              <div className="user-list-message user-list-message--muted">
+                Cargando alumnos...
+              </div>
+            ) : (
+              <>
+                <table className="user-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Usuario</th>
+                      <th>Nombre y apellido</th>
+                      <th>DNI</th>
+                      <th>Email</th>
+                      <th style={{ width: "260px" }}>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {items.map((u) => (
+                      <tr key={u.id}>
+                        <td>{u.id}</td>
+                        <td>{u.username}</td>
+                        <td>
+                          {u.first_name} {u.last_name}
+                        </td>
+                        <td>{u.dni}</td>
+                        <td>{u.email}</td>
+                        <td>
+                          <div className="user-table-actions">
+                            <button
+                              type="button"
+                              className="btn user-btn-edit"
+                              onClick={() => handleEdit(u.id)}
+                            >
+                              Editar
+                            </button>
+                            <button
+                              type="button"
+                              className="btn user-btn-enroll"
+                              onClick={() => handleEnrollments(u.id)}
+                            >
+                              Carreras
+                            </button>
+                            <button
+                              type="button"
+                              className="btn user-btn-delete"
+                              onClick={() => handleDelete(u.id)}
+                            >
+                              Eliminar
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+
+                    {items.length === 0 && (
+                      <tr>
+                        <td
+                          colSpan={6}
+                          className="user-list-message user-list-message--muted"
+                        >
+                          No se encontraron alumnos.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+
+                {loadingMore && (
+                  <div className="user-list-message user-list-message--muted">
+                    Cargando más alumnos...
+                  </div>
                 )}
-              </tbody>
-            </table>
 
-            {loadingMore && (
-              <div className="user-list-message user-list-message--muted">
-                Cargando más alumnos...
-              </div>
+                {!hasMore && items.length > 0 && (
+                  <div className="user-list-message user-list-message--muted">
+                    No hay más alumnos para cargar.
+                  </div>
+                )}
+              </>
             )}
-
-            {!hasMore && items.length > 0 && (
-              <div className="user-list-message user-list-message--muted">
-                No hay más alumnos para cargar.
-              </div>
-            )}
-          </>
-        )}
-      </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };

@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { BASE_URL } from "../../../config/backend";
+import "../../../styles/payments.css";
 
 interface UserData {
   id: number;
@@ -103,6 +104,7 @@ const UserPaymentsView: React.FC = () => {
   // Campos para crear pago
   const [numeroCuota, setNumeroCuota] = useState("");
   const [fechaPago, setFechaPago] = useState(""); // input type="date"
+  const [adelantadoFlag, setAdelantadoFlag] = useState(false);
   const [saving, setSaving] = useState(false);
 
   // -----------------------------
@@ -338,7 +340,7 @@ const UserPaymentsView: React.FC = () => {
       } = {
         id_usuarioxcarrera: enrollmentIdNum,
         numero_cuota: cuotaNum,
-        adelantado: false,
+        adelantado: adelantadoFlag,
       };
 
       if (fecha) {
@@ -367,6 +369,7 @@ const UserPaymentsView: React.FC = () => {
       // reseteo inputs
       setNumeroCuota("");
       setFechaPago("");
+      setAdelantadoFlag(false);
 
       // recargar primera página
       setPage(1);
@@ -443,97 +446,128 @@ const UserPaymentsView: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId, enrollmentId]);
 
-  // -----------------------------
+ // -----------------------------
   // Render
   // -----------------------------
   return (
-    <div className="container mt-4">
-      {/* Encabezado */}
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <div>
-          <h2 className="mb-0">Pagos del alumno</h2>
-
-          {loadingUser ? (
-            <small className="text-muted">Cargando alumno...</small>
-          ) : userError ? (
-            <small className="text-danger">{userError}</small>
-          ) : (
-            user && (
-              <div>
-                <small className="text-muted">
-                  {formatHeaderAlumno()}{" "}
-                  {user.dni ? `— DNI: ${user.dni}` : ""}
-                </small>
-              </div>
-            )
-          )}
-
-          {loadingEnrollment ? (
-            <div>
-              <small className="text-muted">Cargando carrera...</small>
-            </div>
-          ) : enrollmentError ? (
-            <div>
-              <small className="text-danger">{enrollmentError}</small>
-            </div>
-          ) : (
-            enrollment && (
-              <div>
-                <small className="text-muted">
-                  Carrera: {formatHeaderCarrera()}
-                </small>
-              </div>
-            )
-          )}
+    <div className="payments-page user-payments-page">
+      {/* Header tipo card como en otras vistas */}
+      <header className="page-header page-header--payments user-payments-header">
+        <div className="user-payments-header-main">
+          <h2 className="page-header-title">Pagos del alumno</h2>
+          <p className="page-header-subtitle">
+            Gestioná los pagos de la inscripción seleccionada.
+          </p>
         </div>
 
-        <button className="btn btn-secondary" onClick={handleBack}>
-          Volver
-        </button>
-      </div>
+        <div className="user-payments-header-inline">
+          <div className="user-payments-header-extra">
+            {loadingUser ? (
+              <span>Cargando alumno...</span>
+            ) : userError ? (
+              <span className="text-error">{userError}</span>
+            ) : (
+              user && (
+                <>
+                  <span>
+                    <strong>Alumno:</strong> {formatHeaderAlumno()}
+                  </span>
+                  {user.dni && (
+                    <span>
+                      <strong>DNI:</strong> {user.dni}
+                    </span>
+                  )}
+                </>
+              )
+            )}
 
-      {/* Formulario para registrar pago */}
-      <div className="card mb-3">
-        <div className="card-body">
-          <h5 className="card-title">Registrar nuevo pago</h5>
+            {loadingEnrollment ? (
+              <span>Cargando carrera...</span>
+            ) : enrollmentError ? (
+              <span className="text-error">{enrollmentError}</span>
+            ) : (
+              enrollment && (
+                <span>
+                  <strong>Carrera:</strong> {formatHeaderCarrera()}
+                </span>
+              )
+            )}
+          </div>
 
-          <div className="row g-3">
-            <div className="col-md-3">
-              <label className="form-label">N° de cuota</label>
+          <button
+            className="btn user-payments-back-btn"
+            type="button"
+            onClick={handleBack}
+          >
+            Volver
+          </button>
+        </div>
+      </header>
+
+      {/* Card formulario registrar pago */}
+      <section className="user-payments-form">
+        <div className="payments-card user-payments-form-card">
+          <div className="payments-card-header">
+            <h3 className="payments-card-title">Registrar nuevo pago</h3>
+            <p className="payments-card-subtitle">
+              Cargá el número de cuota, la fecha y marcá si es pago adelantado.
+            </p>
+          </div>
+
+          <div className="user-payments-form-grid">
+            <div className="user-payments-form-field">
+              <label htmlFor="numeroCuota">N° de cuota</label>
               <input
+                id="numeroCuota"
                 type="number"
                 min={1}
-                className="form-control"
+                className="form-input"
                 placeholder="Ej: 1"
                 value={numeroCuota}
                 onChange={(e) => setNumeroCuota(e.target.value)}
               />
             </div>
 
-            <div className="col-md-3">
-              <label className="form-label">Fecha de pago</label>
+            <div className="user-payments-form-field">
+              <label htmlFor="fechaPago">Fecha de pago</label>
               <input
+                id="fechaPago"
                 type="date"
-                className="form-control"
+                className="form-input"
                 value={fechaPago}
                 onChange={(e) => setFechaPago(e.target.value)}
               />
-              <small className="text-muted">
+              <small className="user-payments-hint">
                 Si la dejás vacía, se usa la fecha actual.
               </small>
             </div>
 
-            <div className="col-md-3 d-flex align-items-end">
+            <div className="user-payments-form-field user-payments-adelantado">
+              <label className="user-payments-checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={adelantadoFlag}
+                  onChange={(e) => setAdelantadoFlag(e.target.checked)}
+                />
+                Pago adelantado
+              </label>
+              <small className="user-payments-hint">
+                Marcá si corresponde a una cuota futura.
+              </small>
+            </div>
+
+            <div className="user-payments-form-field user-payments-form-actions">
               <button
-                className="btn btn-primary w-100"
+                className="btn btn-primary"
                 onClick={handleCreatePayment}
                 disabled={saving || !!enrollmentError}
+                type="button"
               >
                 {saving ? "Guardando..." : "Registrar pago"}
               </button>
             </div>
 
-            <div className="col-md-3 d-flex align-items-end">
+            <div className="user-payments-toggle">
               <div className="form-check form-switch">
                 <input
                   id="switchAnulados"
@@ -554,36 +588,36 @@ const UserPaymentsView: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Lista de pagos */}
-      <div className="card">
-        <div className="card-body">
-          <h5 className="card-title">Historial de pagos</h5>
+      {/* Card listado de pagos */}
+      <section className="user-payments-list">
+        <div className="payments-card user-payments-list-card">
+          <div className="payments-card-header">
+            <h3 className="payments-card-title">Historial de pagos</h3>
+            <p className="payments-card-subtitle">
+              Pagos de esta inscripción, del más reciente al más antiguo.
+            </p>
+          </div>
 
           {paymentsError && (
-            <div className="alert alert-danger py-2 mb-2">
+            <div className="alert-box alert-error user-payments-alert">
               {paymentsError}
             </div>
           )}
 
-          {loadingPayments ? (
-            <div className="text-muted">Cargando pagos...</div>
-          ) : (
-            <>
-              <div
-                ref={scrollContainerRef}
-                onScroll={handleScroll}
-                style={{
-                  height: "70vh",           // 👉 igual que la tabla de alumnos
-                  overflowY: "auto",
-                  border: "1px solid #dee2e6",
-                  borderRadius: "0.5rem",
-                  backgroundColor: "#ffffff",
-                  padding: "0.75rem",
-                }}
-              >
-                <table className="table table-striped table-hover mb-0">
+          <div
+            ref={scrollContainerRef}
+            onScroll={handleScroll}
+            className="payments-table-scroll user-payments-table-scroll"
+          >
+            {loadingPayments ? (
+              <div className="payments-message payments-message--muted">
+                Cargando pagos...
+              </div>
+            ) : (
+              <>
+                <table className="payments-table">
                   <thead>
                     <tr>
                       <th>Cuota</th>
@@ -601,11 +635,22 @@ const UserPaymentsView: React.FC = () => {
                         <td>{formatFecha(p.fecha_pago || null)}</td>
                         <td>${p.monto}</td>
                         <td>{p.adelantado ? "Sí" : "No"}</td>
-                        <td>{p.anulado ? "Anulado" : "Activo"}</td>
+                        <td>
+                          <span
+                            className={
+                              p.anulado
+                                ? "payments-status-pill payments-status-pill--canceled"
+                                : "payments-status-pill payments-status-pill--active"
+                            }
+                          >
+                            {p.anulado ? "Anulado" : "Activo"}
+                          </span>
+                        </td>
                         <td>
                           {!p.anulado && (
                             <button
-                              className="btn btn-sm btn-outline-danger"
+                              className="btn user-payments-btn-cancel"
+                              type="button"
                               onClick={() => handleCancelPayment(p.id)}
                             >
                               Anular
@@ -617,32 +662,34 @@ const UserPaymentsView: React.FC = () => {
 
                     {payments.length === 0 && (
                       <tr>
-                        <td colSpan={6} className="text-center">
-                          No hay pagos registrados para esta inscripción.
+                        <td colSpan={6}>
+                          <div className="payments-message payments-message--muted">
+                            No hay pagos registrados para esta inscripción.
+                          </div>
                         </td>
                       </tr>
                     )}
                   </tbody>
                 </table>
-              </div>
 
-              {loadingMore && (
-                <div className="text-center text-muted py-2">
-                  Cargando más pagos...
-                </div>
-              )}
+                {loadingMore && (
+                  <div className="payments-message payments-message--muted">
+                    Cargando más pagos...
+                  </div>
+                )}
 
-              {!hasMore && payments.length > 0 && (
-                <div className="text-center text-muted py-2">
-                  No hay más pagos para cargar.
-                </div>
-              )}
-            </>
-          )}
+                {!hasMore && payments.length > 0 && (
+                  <div className="payments-message payments-message--muted">
+                    No hay más pagos para cargar.
+                  </div>
+                )}
+              </>
+            )}
+          </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 };
 
-export default UserPaymentsView;
+export default UserPaymentsView
