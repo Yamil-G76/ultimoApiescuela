@@ -5,71 +5,72 @@
 .dashboard-page {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  color: var(--text-main);
+  gap: 32px;          /* igual que career-page */
+  color: #333333;     /* igual que career-page */
 }
 
 /* -------------------------------------------
-   ENCABEZADO GENERAL
+   ENCABEZADO GENERAL (similar a .career-page .page-header)
    ------------------------------------------- */
 
 .dashboard-header {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 14px 18px;
-  border-radius: 22px;
-  background: linear-gradient(135deg, #ffffff, var(--primary-50));
-  border: 1px solid var(--primary-100);
-  box-shadow: var(--shadow-soft);
-  position: relative;
+  padding: 24px 24px;
+  border-radius: 16px;
+  background-color: #ffffff;
+  border: 1px solid #d0d4e4;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
-/* Bordecito superior celeste/teal */
+/* Bordecito superior azul primario como Carreras */
 .dashboard-header::before {
   content: "";
   position: absolute;
   inset: 0;
-  border-radius: 22px;
-  border-top: 4px solid #0ea5e9;
+  border-radius: 16px;
+  border-top: 4px solid #1e4dd8;
   pointer-events: none;
 }
 
 .dashboard-header h2 {
   margin: 0;
   font-size: 1.6rem;
-  font-weight: 700;
-  color: var(--primary-800);
+  font-weight: 600;
+  color: #1e4dd8; /* mismo azul que .page-header-title */
 }
 
 .dashboard-header p {
   margin: 0;
-  font-size: 0.9rem;
-  color: var(--text-muted);
+  font-size: 0.95rem;
+  color: #7a8094; /* mismo tono que .page-header-subtitle */
 }
 
 /* -------------------------------------------
-   ESTADOS GENERALES
+   ESTADOS GENERALES (alineados a alert-box)
    ------------------------------------------- */
 
 .dashboard-error {
   padding: 10px 14px;
   border-radius: 12px;
-  background-color: #fee2e2;
-  color: #b91c1c;
+  background-color: #ffe5e5;
+  color: #e53935;
   font-size: 0.9rem;
+  border: 1px solid #e53935;
 }
 
 .dashboard-loading {
   padding: 16px 10px;
   text-align: center;
   font-size: 0.95rem;
-  color: var(--text-muted);
+  color: #7a8094;
 }
 
 .dashboard-empty-text {
   font-size: 0.9rem;
-  color: var(--text-muted);
+  color: #7a8094;
 }
 
 /* -------------------------------------------
@@ -92,13 +93,14 @@
   max-width: 320px;
 }
 
-/* Tarjeta resumen */
+/* Tarjeta resumen (estilo card tipo dashboard, coherente con career-table-card) */
 .dashboard-card {
   position: relative;
-  border-radius: 22px;
-  padding: 14px 18px;
-  background: #ffffff;
-  box-shadow: var(--shadow-soft);
+  border-radius: 16px;
+  padding: 18px 20px;
+  background: radial-gradient(circle at 0% 0%, #e4ecff 0, #ffffff 55%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid #d0d4e4;
 }
 
 /* Tarjetas Alumnos / Carreras centradas */
@@ -113,75 +115,95 @@
   gap: 6px;
 }
 
-/* Barritas de color arriba según card */
+/* Barritas de color arriba según card (usando paleta de azules/violetas) */
 .dashboard-card--alumnos::before,
 .dashboard-card--carreras::before {
   content: "";
   position: absolute;
   inset: 0;
-  border-radius: 22px;
+  border-radius: 16px;
   pointer-events: none;
 }
 
-/* Alumnos → verde/teal */
+/* Alumnos → azul primario */
 .dashboard-card--alumnos::before {
-  border-top: 4px solid #22c55e;
+  border-top: 4px solid #1e4dd8;
 }
 
-/* Carreras → celeste */
+/* Carreras → violeta como career-table-card */
 .dashboard-card--carreras::before {
-  border-top: 4px solid #0ea5e9;
+  border-top: 4px solid #766cf1;
 }
 
 .dashboard-card-title {
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
-  color: var(--primary-800);
+  color: #1e4dd8;
 }
 
 .dashboard-card-value {
   margin: 0;
   font-size: 1.8rem;
   font-weight: 700;
-  color: var(--primary-700);
+  color: #333333;
 }
 
+/* Botón card → equivalente a .btn .btn-primary pero en formato pill */
 .dashboard-card-btn {
   margin-top: 4px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 7px 14px;
+  padding: 7px 16px;
   border-radius: 999px;
   border: none;
   font-size: 0.85rem;
   font-weight: 600;
-  background: linear-gradient(135deg, #0ea5e9, #22c55e);
+  background-color: #1e4dd8;
   color: #ffffff;
   cursor: pointer;
   transition:
-    background 0.15s ease,
+    background-color 0.15s ease,
     box-shadow 0.15s ease,
     transform 0.08s ease;
 }
 
 .dashboard-card-btn:hover:not(:disabled) {
-  box-shadow: 0 10px 22px rgba(14, 148, 136, 0.35);
+  background-color: #1b3ea8;
+  box-shadow: 0 8px 18px rgba(30, 77, 216, 0.35);
   transform: translateY(-1px);
 }
 
+.dashboard-card-btn:disabled {
+  opacity: 0.7;
+  cursor: default;
+  box-shadow: none;
+  transform: none;
+}
+
 /* -------------------------------------------
-   PANEL BASE (MISMA IDEA QUE “PAGOS REGISTRADOS”)
+   PANEL BASE (similar a career-table-card)
    ------------------------------------------- */
 
 .dashboard-panel {
   position: relative;
-  border-radius: 18px;
-  background-color: #ffffff;
-  box-shadow: var(--shadow-soft);
-  padding: 12px 14px;
+  border-radius: 16px;
+  background: radial-gradient(circle at 0% 0%, #e4ecff 0, #ffffff 55%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  padding: 20px 20px 18px;
   flex: 1 1 320px;
+  border: 1px solid #d0d4e4;
+}
+
+/* Borde superior violeta por defecto (mismo criterio que career-table-card) */
+.dashboard-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  border-top: 4px solid #766cf1;
+  pointer-events: none;
 }
 
 /* Header dentro del panel: título + subtítulo + link derecha */
@@ -196,49 +218,49 @@
   margin: 0;
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--primary-800);
+  color: #1e4dd8;
 }
 
 .dashboard-panel-subtitle {
   margin: 2px 0 0 0;
   font-size: 0.85rem;
-  color: var(--text-muted);
+  color: #7a8094;
 }
 
-/* Botón/Link tipo pill a la derecha del header */
+/* Botón/Link tipo pill a la derecha del header (outline azul/verde suave) */
 .dashboard-panel-link {
   border-radius: 999px;
   padding: 6px 12px;
   font-size: 0.8rem;
   font-weight: 600;
-  border: 1px solid #6ee7b7;
-  background: linear-gradient(135deg, #e0f2fe, #ccfbf1);
-  color: #064e3b;
+  border: 1px solid #d0d4e4;
+  background-color: #f3f5fa;
+  color: #1e4dd8;
   cursor: pointer;
   white-space: nowrap;
   transition:
-    background 0.15s ease,
+    background-color 0.15s ease,
     box-shadow 0.15s ease,
     transform 0.08s ease,
     border-color 0.15s ease;
 }
 
 .dashboard-panel-link:hover:not(:disabled) {
-  background: linear-gradient(135deg, #bae6fd, #a7f3d0);
-  border-color: #22c55e;
-  box-shadow: 0 10px 24px rgba(34, 197, 94, 0.35);
+  background-color: #e4ecff;
+  border-color: #1e4dd8;
+  box-shadow: 0 6px 16px rgba(30, 77, 216, 0.25);
   transform: translateY(-1px);
 }
 
-/* Variante violeta para noticias */
+/* Variante violeta para noticias (siguiendo la misma paleta) */
 .dashboard-panel-link--violet {
   border-color: #a5b4fc;
-  background: linear-gradient(135deg, #ede9fe, #e0f2fe);
+  background-color: #ede9fe;
   color: #4338ca;
 }
 
 .dashboard-panel-link--violet:hover:not(:disabled) {
-  background: linear-gradient(135deg, #ddd6fe, #bfdbfe);
+  background-color: #ddd6fe;
   border-color: #6366f1;
   box-shadow: 0 10px 24px rgba(99, 102, 241, 0.35);
 }
@@ -246,6 +268,8 @@
 /* Mensaje dentro del panel cuando no hay datos */
 .dashboard-panel-message {
   margin-top: 8px;
+  font-size: 0.9rem;
+  color: #7a8094;
 }
 
 /* -------------------------------------------
@@ -253,18 +277,13 @@
    ------------------------------------------- */
 
 .dashboard-panel--mini-payments {
-  background: radial-gradient(circle at 0% 0%, #e0f2fe 0, #ffffff 55%);
-  border: 1px solid #e5e7eb;
+  background: radial-gradient(circle at 0% 0%, #e4ecff 0, #ffffff 55%);
+  border: 1px solid #d0d4e4;
 }
 
 /* Bordecito superior azul-violeta */
 .dashboard-panel--mini-payments::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 18px;
-  border-top: 4px solid #6366f1;
-  pointer-events: none;
+  border-top-color: #6366f1;
 }
 
 /* Wrapper scrolleable para la tabla mini */
@@ -284,17 +303,12 @@
 
 .dashboard-panel--news {
   background: radial-gradient(circle at 0% 0%, #f3e8ff 0, #ffffff 55%);
-  border: 1px solid #e5e7eb;
+  border: 1px solid #d0d4e4;
 }
 
 /* Bordecito superior violeta */
 .dashboard-panel--news::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 18px;
-  border-top: 4px solid #8b5cf6;
-  pointer-events: none;
+  border-top-color: #8b5cf6;
 }
 
 /* Wrapper scrolleable para la tabla de noticias */
@@ -306,6 +320,7 @@
 
 /* -------------------------------------------
    TABLAS DENTRO DE LOS PANELS
+   (mismo estilo que .career-table)
    ------------------------------------------- */
 
 .dashboard-table {
@@ -314,13 +329,13 @@
   font-size: 0.88rem;
 }
 
-/* Encabezado base (para pagos) */
+/* Encabezado base (pagos) con degradado azul */
 .dashboard-table thead th {
   text-align: left;
   padding: 9px 8px;
-  background: linear-gradient(90deg, var(--primary-100), #e5f3ff);
-  border-bottom: 1px solid var(--primary-200);
-  color: var(--text-main);
+  background: linear-gradient(90deg, #e4ecff, #f3f5fa);
+  border-bottom: 1px solid #d0d4e4;
+  color: #333333;
   font-weight: 600;
 }
 
@@ -335,21 +350,21 @@
   background-color: #f9fafb;
 }
 
-/* Hover */
+/* Hover azul como career-table */
 .dashboard-table tbody tr:hover td {
-  background-color: #eef3ff;
+  background-color: #e4ecff;
 }
 
-/* Variante encabezado para noticias (más violeta) */
+/* Variante encabezado para noticias (más violeta pero coherente) */
 .dashboard-table--news thead th {
-  background: linear-gradient(90deg, var(--primary-100), #e9d5ff);
+  background: linear-gradient(90deg, #e4ecff, #f3e8ff);
 }
 
 /* Columna detalle recortada */
 .dashboard-news-detail-cell {
   max-width: 340px;
   font-size: 0.84rem;
-  color: var(--text-muted);
+  color: #7a8094;
 }
 
 /* -------------------------------------------

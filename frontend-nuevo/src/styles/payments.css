@@ -5,35 +5,59 @@
 .payments-page {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  color: var(--text-main);
+  gap: 32px;
+  color: #333333; /* igual que .career-page */
   min-height: 0;
 }
 
 /* -------------------------------------------
-   HEADER SUPERIOR (usa .page-header global)
+   HEADER SUPERIOR (card igual que Carreras)
    ------------------------------------------- */
 
-.payments-page .page-header-subtitle {
-  margin-top: 4px;
-  font-size: 0.9rem;
-  color: var(--text-muted);
+.payments-page .page-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 24px;
+  border-radius: 16px;
+  background-color: #ffffff;
+  border: 1px solid #d0d4e4;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
-/* Pill "Vista global" */
+/* Borde/acento superior en azul primario (como Carreras) */
+.payments-page .page-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  border-top: 4px solid #1e4dd8;
+  pointer-events: none;
+}
+
+/* Subtítulo con la misma tipografía/tono que Carreras */
+.payments-page .page-header-subtitle {
+  margin: 4px 0 0 0;
+  font-size: 0.95rem;
+  color: #7a8094;
+}
+
+/* Pill "Vista global" con colores alineados al azul/violeta de Carreras */
 .payments-header-badge {
   border-radius: 999px;
   padding: 6px 14px;
   font-size: 0.8rem;
   font-weight: 600;
   border: 1px solid #a5b4fc;
-  background: linear-gradient(135deg, #eef2ff, #e0f2fe);
-  color: #1e3a8a;
+  background: linear-gradient(135deg, #eef2ff, #e4ecff);
+  color: #1e4dd8;
 }
 
 .payments-header-badge:hover:not(:disabled) {
-  background: linear-gradient(135deg, #e0f2fe, #c7d2fe);
-  box-shadow: 0 6px 14px rgba(59, 130, 246, 0.25);
+  background: linear-gradient(135deg, #e4ecff, #dbeafe);
+  box-shadow: 0 6px 14px rgba(30, 77, 216, 0.25);
   transform: translateY(-1px);
 }
 
@@ -53,78 +77,101 @@
 
 .payments-search-input-wrapper {
   display: flex;
-  gap: 8px;
-  max-width: 700px;
+  gap: 10px;
+  max-width: 560px; /* igual ancho aprox. que .career-search-inline */
 }
 
 .payments-search-input {
   flex: 1;
 }
 
-/* Botón de búsqueda verde/teal como en alumnos */
+/* Botón de búsqueda: estilo outline coherente con .btn-outline de Carreras */
 .payments-search-btn {
-  border-color: #6ee7b7 !important;
-  color: #047857 !important;
-  background-color: #ecfdf5 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  border: 1px solid #d0d4e4 !important;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 16px;
+  background-color: #f3f5fa !important;
+  color: #1e4dd8 !important;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.08s ease;
 }
 
 .payments-search-btn:hover:not(:disabled) {
-  background-color: #d1fae5 !important;
-  box-shadow: 0 6px 16px rgba(4, 120, 87, 0.25);
+  background-color: #e4ecff !important;
+  box-shadow: 0 6px 16px rgba(30, 77, 216, 0.18);
   transform: translateY(-1px);
+}
+
+.payments-search-btn:disabled {
+  opacity: 0.7;
+  cursor: default;
+  box-shadow: none;
+  transform: none;
 }
 
 .payments-search-hint {
   margin: 0;
   font-size: 0.8rem;
-  color: var(--text-muted);
+  color: #7a8094;
 }
 
 /* -------------------------------------------
    CARD CONTENEDORA DE LA TABLA
-   (MISMA LÓGICA QUE EN ALUMNOS/CARRERAS)
+   (Mismo estilo que .career-table-card)
    ------------------------------------------- */
 
 .payments-card {
   position: relative;
-  border-radius: 18px;
-  background-color: #ffffff;
-  box-shadow: var(--shadow-soft);
-  padding: 10px 12px 14px;
+  border-radius: 16px;
+  background: radial-gradient(circle at 0% 0%, #e4ecff 0, #ffffff 55%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  padding: 24px 24px 20px;
+  border: 1px solid #d0d4e4;
 }
 
-/* Bordecito superior de color que también se ve como borde de tabla */
+/* Bordecito superior violeta (igual que .career-table-card::before) */
 .payments-card::before {
   content: "";
   position: absolute;
   inset: 0;
-  border-radius: 18px;
-  border-top: 4px solid #14b8a6; /* teal verdoso, mismo estilo que otras vistas */
+  border-radius: 16px;
+  border-top: 4px solid #766cf1;
   pointer-events: none;
 }
 
 .payments-card-header {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin-bottom: 8px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
 }
 
 .payments-card-title {
   margin: 0;
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--primary-800);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1e4dd8;
 }
 
 .payments-card-subtitle {
-  margin: 0;
-  font-size: 0.9rem;
-  color: var(--text-muted);
+  margin: 4px 0 0 0;
+  font-size: 0.85rem;
+  color: #7a8094;
 }
 
 /* -------------------------------------------
    MENSAJES / ERRORES
+   (alineados a .alert-box y .list-message)
    ------------------------------------------- */
 
 .payments-message {
@@ -134,22 +181,23 @@
 }
 
 .payments-message--muted {
-  color: var(--text-muted);
+  color: #7a8094;
 }
 
 /* -------------------------------------------
    SCROLL SOLO EN LA TABLA
+   (igual que .career-table-wrapper)
    ------------------------------------------- */
 
 .payments-table-scroll {
   position: relative;
-  max-height: 40vh;      /* controla el alto de la tabla */
+  max-height: 40vh;
   overflow-y: auto;
-  margin-top: 4px;
+  margin-top: 8px;
 }
 
 /* -------------------------------------------
-   TABLA
+   TABLA (Mismo estilo que .career-table)
    ------------------------------------------- */
 
 .payments-table {
@@ -158,40 +206,42 @@
   font-size: 0.9rem;
 }
 
-/* Encabezado sticky, fondo sólido (no se rompe al scrollear) */
+/* Encabezado sticky con degradado azul */
 .payments-table thead th {
   position: sticky;
   top: 0;
   z-index: 1;
   text-align: left;
   padding: 10px 10px;
-  background-color: #f3f4f6;
-  border-bottom: 1px solid #e5e7eb;
-  color: var(--text-main);
+  background: linear-gradient(90deg, #e4ecff, #f3f5fa);
+  border-bottom: 1px solid #d0d4e4;
+  color: #333333;
   font-weight: 600;
 }
 
 .payments-table tbody td {
-  padding: 9px 10px;
+  padding: 9px 8px;
   border-bottom: 1px solid #e5e7eb;
   background-color: #ffffff;
 }
 
-/* Zebra suave */
+/* Zebra suave (igual que carreras) */
 .payments-table tbody tr:nth-child(even) td {
   background-color: #f9fafb;
 }
 
-/* Hover suave */
+/* Hover filas azul */
 .payments-table tbody tr:hover td {
-  background-color: #eef3ff;
+  background-color: #e4ecff;
 }
 
 /* -------------------------------------------
-   ESTADO (ACTIVO / ANULADO)
+   ESTADO (ACTIVO / ANULADO) – PILL
    ------------------------------------------- */
 
-.payments-status-pill {
+/* Estilo base (alias: se aplica a payments-status-pill y payments-pill) */
+.payments-status-pill,
+.payments-pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -200,37 +250,58 @@
   border-radius: 999px;
   font-size: 0.78rem;
   font-weight: 600;
+  border: 1px solid transparent;
 }
 
-.payments-status-pill--active {
+/* Verde suave usando lógica similar a botones/alertas de éxito */
+.payments-status-pill--active,
+.payments-pill--active {
   background-color: #dcfce7;
   color: #166534;
-  border: 1px solid #4ade80;
+  border-color: #4ade80;
 }
 
-.payments-status-pill--canceled {
+/* Rojo suave, coherente con .btn-danger */
+.payments-status-pill--canceled,
+.payments-status-pill--cancelled,
+.payments-pill--canceled,
+.payments-pill--cancelled {
   background-color: #fee2e2;
   color: #b91c1c;
-  border: 1px solid #fecaca;
+  border-color: #fecaca;
 }
 
 /* -------------------------------------------
    BOTÓN "VER DETALLE"
+   (outline azul pequeño, similar a acciones de tabla)
    ------------------------------------------- */
 
 .payments-btn-detail {
   padding: 6px 12px;
   font-size: 0.8rem;
   border-radius: 999px;
-  border: 1px solid #93c5fd;
-  background-color: #eff6ff;
-  color: #1d4ed8;
+  border: 1px solid #1e4dd8;
+  background-color: #f3f5fa;
+  color: #1e4dd8;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.08s ease;
 }
 
 .payments-btn-detail:hover:not(:disabled) {
-  background-color: #dbeafe;
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.28);
+  background-color: #e4ecff;
+  box-shadow: 0 6px 16px rgba(30, 77, 216, 0.25);
   transform: translateY(-1px);
+}
+
+.payments-btn-detail:disabled {
+  opacity: 0.7;
+  cursor: default;
+  box-shadow: none;
+  transform: none;
 }
 
 /* -------------------------------------------
@@ -240,12 +311,19 @@
 @media (max-width: 900px) {
   .payments-search-input-wrapper {
     flex-direction: column;
+    max-width: none;
   }
 
   .payments-table-scroll {
     max-height: 50vh;
   }
+
+  .payments-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
+
 /* ===========================================
    DETALLE DE PAGOS POR ALUMNO (UserPaymentsView)
    =========================================== */
@@ -253,15 +331,16 @@
 .user-payments-page {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 32px;
+  color: #333333;
 }
 
-/* Header general para esta vista */
+/* Header general para esta vista (usando estética de .page-header) */
 .user-payments-header {
   align-items: center;
 }
 
-/* Título + subtítulo a la izquierda (usa estilos globales de .page-header) */
+/* Título + subtítulo a la izquierda */
 .user-payments-header-main {
   display: flex;
   flex-direction: column;
@@ -275,10 +354,10 @@
   gap: 12px;
 }
 
-/* Info de alumno/dni/carrera, en una sola línea (o wrap) */
+/* Info de alumno/dni/carrera */
 .user-payments-header-extra {
   font-size: 0.85rem;
-  color: var(--text-muted);
+  color: #7a8094;
   display: flex;
   flex-wrap: wrap;
   gap: 4px 10px;
@@ -287,32 +366,47 @@
 }
 
 .user-payments-header-extra strong {
-  color: var(--primary-800);
+  color: #1e4dd8;
 }
 
-/* Botón VOLVER, con color propio (azul-violeta) */
+/* Botón VOLVER: estilo outline primario tipo pill */
 .user-payments-back-btn {
   padding: 6px 14px;
   font-size: 0.85rem;
   border-radius: 999px;
-  border: 1px solid #a5b4fc;
-  background-color: #eef2ff;
-  color: #1d4ed8;
+  border: 1px solid #d0d4e4;
+  background-color: #f3f5fa;
+  color: #1e4dd8;
+  cursor: pointer;
+  font-weight: 600;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.08s ease;
 }
 
 .user-payments-back-btn:hover:not(:disabled) {
-  background-color: #e0e7ff;
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.28);
+  background-color: #e4ecff;
+  box-shadow: 0 6px 16px rgba(30, 77, 216, 0.25);
   transform: translateY(-1px);
+}
+
+.user-payments-back-btn:disabled {
+  opacity: 0.7;
+  cursor: default;
+  box-shadow: none;
+  transform: none;
 }
 
 .text-error {
   color: #b91c1c;
 }
 
-/* --- PILL ESTADO: que no parezca botón clickeable --- */
+/* --- PILL ESTADO EN DETALLE: que no parezca botón clickeable --- */
 
-.user-payments-page .payments-status-pill {
+.user-payments-page .payments-status-pill,
+.user-payments-page .payments-pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -321,34 +415,39 @@
   border-radius: 999px;
   font-size: 0.78rem;
   font-weight: 500;
-  border: none;
+  border-width: 1px;
   box-shadow: none;
   cursor: default;
 }
 
-.user-payments-page .payments-status-pill--active {
-  background-color: #dcfce7;
-  color: #166534;
-}
-
-.user-payments-page .payments-status-pill--canceled {
-  background-color: #fee2e2;
-  color: #b91c1c;
-}
-
-/* Cambiamos el color solo del formulario, para diferenciarlo del listado */
-.user-payments-form-card::before {
-  border-top-color: #6366f1; /* violeta-azulado, distinto del teal general */
-}
-
-/* -----------------------------
-   CARD FORMULARIO
-   ----------------------------- */
+/* -------------------------------------------
+   CARD FORMULARIO (mismo estilo que .career-form-card)
+   ------------------------------------------- */
 
 .user-payments-form-card {
+  position: relative;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  padding: 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  border: 1px solid #d0d4e4;
   margin-top: 4px;
 }
 
+/* Barrita superior violeta-azulada (similar a .career-form-card) */
+.user-payments-form-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  border-top: 4px solid #766cf1;
+  pointer-events: none;
+}
+
+/* Grilla de campos */
 .user-payments-form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -364,12 +463,12 @@
 
 .user-payments-form-field label {
   font-size: 0.85rem;
-  color: var(--text-muted);
+  color: #7a8094;
 }
 
 .user-payments-hint {
   font-size: 0.78rem;
-  color: var(--text-muted);
+  color: #7a8094;
 }
 
 /* Checkbox "Pago adelantado" */
@@ -378,10 +477,10 @@
   align-items: center;
   gap: 6px;
   font-size: 0.85rem;
-  color: var(--text-main);
+  color: #333333;
 }
 
-/* Alineamos el botón de guardar al fondo y a la derecha dentro de su celda */
+/* Botón de guardar alineado al fondo y derecha */
 .user-payments-form-actions {
   display: flex;
   align-items: flex-end;
@@ -394,36 +493,68 @@
   align-items: flex-end;
   justify-content: flex-start;
   font-size: 0.85rem;
-  color: var(--text-muted);
+  color: #7a8094;
 }
 
-/* -----------------------------
-   CARD LISTA PAGOS
-   ----------------------------- */
+/* -------------------------------------------
+   CARD LISTA PAGOS (detalle por alumno)
+   ------------------------------------------- */
 
 .user-payments-list-card {
+  position: relative;
+  border-radius: 16px;
+  background: radial-gradient(circle at 0% 0%, #e4ecff 0, #ffffff 55%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  padding: 24px 24px 20px;
+  border: 1px solid #d0d4e4;
   margin-top: 4px;
+}
+
+.user-payments-list-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  border-top: 4px solid #766cf1;
+  pointer-events: none;
 }
 
 /* Un poco más alta que la global */
 .user-payments-table-scroll {
+  position: relative;
   max-height: 50vh;
+  overflow-y: auto;
+  margin-top: 8px;
 }
 
-/* Botón "Anular" estilo pill rojo suave */
+/* Botón "Anular" estilo pill rojo coherente con .btn-danger */
 .user-payments-btn-cancel {
   padding: 6px 12px;
   font-size: 0.8rem;
   border-radius: 999px;
-  border: 1px solid #fecaca;
+  border: 1px solid #e53935;
   background-color: #fef2f2;
-  color: #b91c1c;
+  color: #e53935;
+  cursor: pointer;
+  font-weight: 600;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.08s ease;
 }
 
 .user-payments-btn-cancel:hover:not(:disabled) {
-  background-color: #fee2e2;
-  box-shadow: 0 6px 16px rgba(185, 28, 28, 0.32);
+  background-color: #fde0df;
+  box-shadow: 0 6px 16px rgba(198, 40, 40, 0.35);
   transform: translateY(-1px);
+}
+
+.user-payments-btn-cancel:disabled {
+  opacity: 0.7;
+  cursor: default;
+  box-shadow: none;
+  transform: none;
 }
 
 /* Ajuste de alerta dentro de la card */
@@ -431,9 +562,9 @@
   margin-bottom: 8px;
 }
 
-/* -----------------------------
-   RESPONSIVE
-   ----------------------------- */
+/* -------------------------------------------
+   RESPONSIVE DETALLE
+   ------------------------------------------- */
 
 @media (max-width: 900px) {
   .user-payments-header {

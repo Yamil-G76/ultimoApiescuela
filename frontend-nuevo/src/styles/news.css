@@ -5,13 +5,13 @@
 .news-page {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  color: var(--text-main);
+  gap: 32px;
+  color: #333333;
   min-height: 0;
 }
 
 /* -------------------------------------------
-   HEADER PRINCIPAL (MISMO ESTILO QUE CARRERAS)
+   HEADER PRINCIPAL (alineado a Carreras)
    ------------------------------------------- */
 
 .news-page .page-header {
@@ -20,33 +20,33 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 14px 18px;
-  border-radius: 22px;
-  background: linear-gradient(135deg, #ffffff, var(--primary-50));
-  border: 1px solid var(--primary-100);
-  box-shadow: var(--shadow-soft);
+  padding: 24px 24px;
+  border-radius: 16px;
+  background-color: #ffffff;
+  border: 1px solid #d0d4e4;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 .news-page .page-header::before {
   content: "";
   position: absolute;
   inset: 0;
-  border-radius: 22px;
-  border-top: 4px solid #14b8a6; /* teal como en otras vistas */
+  border-radius: 16px;
+  border-top: 4px solid #1e4dd8; /* azul primario */
   pointer-events: none;
 }
 
 .news-page .page-header-title {
   margin: 0;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--primary-800);
+  font-size: 1.6rem; /* ~25–26px */
+  font-weight: 600;
+  color: #1e4dd8;
 }
 
 .news-page .page-header-subtitle {
   margin: 4px 0 0 0;
-  font-size: 0.9rem;
-  color: var(--text-muted);
+  font-size: 0.95rem;
+  color: #7a8094;
 }
 
 /* ===========================================
@@ -59,19 +59,20 @@
 
 .news-list-card {
   position: relative;
-  border-radius: 24px;
-  background-color: #ffffff;
-  box-shadow: var(--shadow-soft);
-  padding: 16px 18px 18px;
+  border-radius: 16px;
+  background: radial-gradient(circle at 0% 0%, #e4ecff 0, #ffffff 55%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  padding: 24px 24px 20px;
+  border: 1px solid #d0d4e4;
 }
 
-/* 🔧 Barrita superior que SIGUE el borde de la card */
+/* Línea superior en violeta desaturado (detalle) */
 .news-list-card::before {
   content: "";
   position: absolute;
-  inset: 0;                       /* ocupa todo el tamaño de la card */
-  border-radius: 24px;            /* mismo radio que la card */
-  border-top: 4px solid #8b5cf6;  /* violeta suave */
+  inset: 0;
+  border-radius: 16px;
+  border-top: 4px solid #766cf1;
   pointer-events: none;
 }
 
@@ -80,38 +81,111 @@
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .news-list-title {
   margin: 0;
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--primary-800);
+  color: #1e4dd8;
 }
 
 .news-list-subtitle {
   margin: 4px 0 0 0;
   font-size: 0.85rem;
-  color: var(--text-muted);
+  color: #7a8094;
 }
 
-/* Botón "Nueva noticia" con degradado suave brillante */
+/* ===========================================
+   BOTONES
+   =========================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  border: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 16px;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.08s ease;
+}
+
+.btn:disabled {
+  opacity: 0.7;
+  cursor: default;
+  box-shadow: none;
+  transform: none;
+}
+
+/* CTA de nueva noticia = primario */
 .news-list-cta-btn {
-  border-radius: 999px;
-  border: 1px solid #14b8a6;
-  background: linear-gradient(
-    135deg,
-    #22c55e, /* verde */
-    #0ea5e9  /* celeste */
-  );
+  background-color: #1e4dd8;
   color: #ffffff;
-  white-space: nowrap;
 }
 
 .news-list-cta-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #16a34a, #0284c7);
-  box-shadow: 0 10px 22px rgba(34, 197, 94, 0.35);
+  background-color: #1b3ea8;
+  box-shadow: 0 8px 18px rgba(30, 77, 216, 0.35);
+  transform: translateY(-1px);
+}
+
+/* Botones de acciones en tabla */
+.news-table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.news-table-actions .btn {
+  padding: 5px 10px;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+/* Ver detalle – secundario azul */
+.news-btn-detail {
+  background-color: #f3f5fa;
+  color: #1e4dd8;
+  border: 1px solid #d0d4e4;
+}
+
+.news-btn-detail:hover:not(:disabled) {
+  background-color: #e4ecff;
+  box-shadow: 0 6px 16px rgba(30, 77, 216, 0.18);
+  transform: translateY(-1px);
+}
+
+/* Editar – neutro gris */
+.news-btn-edit {
+  background-color: #ffffff;
+  color: #7a8094;
+  border: 1px solid #d0d4e4;
+}
+
+.news-btn-edit:hover:not(:disabled) {
+  background-color: #f3f5fa;
+  box-shadow: 0 6px 16px rgba(17, 24, 39, 0.12);
+  transform: translateY(-1px);
+}
+
+/* Eliminar – destructivo */
+.news-btn-delete {
+  background-color: #fef2f2;
+  color: #e53935;
+  border: 1px solid #e53935;
+}
+
+.news-btn-delete:hover:not(:disabled) {
+  background-color: #fde0df;
+  box-shadow: 0 6px 16px rgba(198, 40, 40, 0.35);
   transform: translateY(-1px);
 }
 
@@ -121,7 +195,7 @@
 
 .news-table-wrapper {
   position: relative;
-  margin-top: 4px;
+  margin-top: 8px;
   max-height: 60vh;
   overflow-y: auto;
   border-radius: 16px;
@@ -149,7 +223,7 @@
 }
 
 .news-message--muted {
-  color: var(--text-muted);
+  color: #7a8094;
 }
 
 /* ===========================================
@@ -162,16 +236,16 @@
   font-size: 0.9rem;
 }
 
-/* Encabezado fijo dentro del scroll, estilo pagos */
+/* Encabezado fijo con degradado tipo dashboard */
 .news-table thead th {
   position: sticky;
   top: 0;
   z-index: 1;
   text-align: left;
   padding: 10px 8px;
-  background-color: #f3f4f6; /* fondo sólido */
-  border-bottom: 1px solid #e5e7eb;
-  color: var(--text-main);
+  background: linear-gradient(90deg, #e4ecff, #f3f5fa);
+  border-bottom: 1px solid #d0d4e4;
+  color: #333333;
   font-weight: 600;
 }
 
@@ -188,18 +262,28 @@
 
 /* Hover fila principal */
 .news-row:hover td {
-  background-color: #eef3ff;
+  background-color: #e4ecff;
+}
+
+/* Fila principal de noticia */
+.news-row {
+  transition: background-color 0.15s ease;
+}
+
+/* Fila expandida marcada */
+.news-row--expanded td {
+  background-color: #e4ecff;
 }
 
 /* Título + preview en la columna de título */
 .news-cell-title-main {
   font-weight: 600;
-  color: var(--primary-800);
+  color: #333333;
 }
 
 .news-cell-title-preview {
   font-size: 0.82rem;
-  color: var(--text-muted);
+  color: #7a8094;
   margin-top: 2px;
 }
 
@@ -209,89 +293,38 @@
   height: 64px;
   object-fit: cover;
   border-radius: 10px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #d0d4e4;
 }
 
 .news-table-no-image {
   font-size: 0.78rem;
-  color: var(--text-muted);
+  color: #7a8094;
 }
 
 /* ===========================================
-   ACCIONES
-   =========================================== */
-
-.news-table-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-/* Botones compactos como en otras tablas */
-.news-table-actions .btn {
-  padding: 5px 10px;
-  font-size: 0.78rem;
-  border-radius: 999px;
-}
-
-/* Ver detalle – celeste */
-.news-btn-detail {
-  border: 1px solid var(--primary-200);
-  background-color: #eff6ff;
-  color: #1d4ed8;
-}
-
-.news-btn-detail:hover:not(:disabled) {
-  background-color: #dbeafe;
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.28);
-  transform: translateY(-1px);
-}
-
-/* Editar – violeta */
-.news-btn-edit {
-  border: 1px solid #a5b4fc;
-  background-color: #f5f3ff;
-  color: #4c1d95;
-}
-
-.news-btn-edit:hover:not(:disabled) {
-  background-color: #ede9fe;
-  box-shadow: 0 6px 16px rgba(76, 29, 149, 0.3);
-  transform: translateY(-1px);
-}
-
-/* Eliminar – rojo suave */
-.news-btn-delete {
-  border: 1px solid #fecaca;
-  background-color: #fef2f2;
-  color: #b91c1c;
-}
-
-.news-btn-delete:hover:not(:disabled) {
-  background-color: #fee2e2;
-  box-shadow: 0 6px 16px rgba(185, 28, 28, 0.32);
-}
-
-/* ===========================================
-   FILA DE DETALLE
+   FILA DETALLE
    =========================================== */
 
 .news-row-detail td {
-  background-color: #f9fafb;
+  background-color: #f3f5fa;
 }
 
 .news-row-detail-inner {
   display: flex;
   gap: 14px;
   align-items: flex-start;
+  padding: 16px 12px;
+  border-radius: 12px;
+  background-color: #ffffff;
+  border: 1px solid #d0d4e4;
 }
 
 .news-row-detail-image {
   width: 220px;
   max-height: 220px;
   object-fit: cover;
-  border-radius: 14px;
-  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  border: 1px solid #d0d4e4;
 }
 
 .news-row-detail-text {
@@ -305,53 +338,17 @@
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
-  color: var(--primary-800);
+  color: #1e4dd8;
 }
 
 .news-row-detail-content {
   margin: 0;
   font-size: 0.9rem;
-  color: var(--text-main);
+  color: #333333;
+  line-height: 1.4;
 }
 
 /* ===========================================
-   RESPONSIVE
-   =========================================== */
-
-@media (max-width: 900px) {
-  .news-page .page-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .news-list-card {
-    padding: 12px 12px 14px;
-  }
-
-  .news-list-card-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-
-  .news-list-cta-btn {
-    align-self: stretch;
-    text-align: center;
-  }
-
-  .news-table-wrapper {
-    max-height: 70vh;
-  }
-
-  .news-row-detail-inner {
-    flex-direction: column;
-  }
-
-  .news-row-detail-image {
-    width: 100%;
-    max-height: 260px;
-  }
-}/* ===========================================
    FORMULARIOS CREAR / EDITAR NOTICIA
    =========================================== */
 
@@ -361,26 +358,23 @@
 
 .news-form-card {
   position: relative;
-  background: radial-gradient(
-    circle at 0% 0%,
-    #e0f2fe 0,
-    #f5f3ff 40%,
-    #ffffff 70%
-  );
-  border-radius: 24px;
-  box-shadow: var(--shadow-soft);
-  padding: 18px 22px 20px;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  padding: 24px 24px 20px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 24px;
+  border: 1px solid #d0d4e4;
 }
 
+/* Línea superior violeta como la lista */
 .news-form-card::before {
   content: "";
   position: absolute;
   inset: 0;
-  border-radius: 24px;
-  border-top: 4px solid #8b5cf6; /* violeta como la lista */
+  border-radius: 16px;
+  border-top: 4px solid #766cf1;
   pointer-events: none;
 }
 
@@ -399,13 +393,13 @@
   border-radius: 999px;
   font-size: 0.78rem;
   font-weight: 600;
-  background-color: #eef2ff;
-  color: #3730a3;
+  background-color: #f3f5fa;
+  color: #1e4dd8;
 }
 
 .news-form-caption {
   font-size: 0.8rem;
-  color: var(--text-muted);
+  color: #7a8094;
 }
 
 /* Grilla de campos */
@@ -429,12 +423,12 @@
 
 .news-form-label {
   font-size: 0.85rem;
-  color: var(--text-muted);
+  color: #7a8094;
 }
 
 .news-form-input {
   border-radius: 10px;
-  border: 1px solid var(--input-border);
+  border: 1px solid #d0d4e4;
   padding: 9px 12px;
   font-size: 0.9rem;
   outline: none;
@@ -442,12 +436,12 @@
 }
 
 .news-form-input::placeholder {
-  color: var(--input-placeholder);
+  color: #a3a7b5;
 }
 
 .news-form-input:focus {
-  border-color: var(--primary-600);
-  box-shadow: 0 0 0 2px var(--input-focus-ring);
+  border-color: #1e4dd8;
+  box-shadow: 0 0 0 2px rgba(30, 77, 216, 0.2);
 }
 
 .news-form-textarea {
@@ -457,7 +451,7 @@
 
 .news-form-hint {
   font-size: 0.78rem;
-  color: var(--text-muted);
+  color: #7a8094;
 }
 
 /* Preview de imagen nueva / actual */
@@ -473,9 +467,9 @@
 .news-form-current-image img {
   max-width: 320px;
   max-height: 220px;
-  border-radius: 14px;
+  border-radius: 12px;
   object-fit: cover;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #d0d4e4;
 }
 
 /* Acciones del formulario */
@@ -487,38 +481,71 @@
   justify-content: flex-end;
 }
 
-/* Botón principal con degradado (igual lógica que Nueva noticia) */
+/* Botón principal (guardar) = primario */
 .news-form-btn-primary {
-  border-radius: 999px;
-  border: 1px solid #14b8a6;
-  background: linear-gradient(
-    135deg,
-    #22c55e,
-    #0ea5e9
-  );
+  background-color: #1e4dd8;
   color: #ffffff;
+  border-radius: 12px;
+  border: none;
+  padding: 8px 16px;
 }
 
 .news-form-btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #16a34a, #0284c7);
-  box-shadow: 0 10px 22px rgba(34, 197, 94, 0.35);
+  background-color: #1b3ea8;
+  box-shadow: 0 8px 18px rgba(30, 77, 216, 0.35);
   transform: translateY(-1px);
 }
 
 /* Botón secundario suave */
 .news-form-btn-secondary {
-  background-color: #e5e7eb;
-  color: #111827;
+  background-color: #f3f5fa;
+  color: #333333;
+  border-radius: 12px;
+  border: 1px solid #d0d4e4;
+  padding: 8px 16px;
 }
 
 .news-form-btn-secondary:hover:not(:disabled) {
-  background-color: #d1d5db;
-  box-shadow: 0 6px 16px rgba(17, 24, 39, 0.18);
+  background-color: #e4e7f5;
+  box-shadow: 0 6px 16px rgba(17, 24, 39, 0.12);
   transform: translateY(-1px);
 }
 
 /* Responsive formularios noticia */
 @media (max-width: 900px) {
+  .news-page .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .news-list-card {
+    padding: 16px 16px 18px;
+  }
+
+  .news-list-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .news-list-cta-btn {
+    align-self: stretch;
+    text-align: center;
+  }
+
+  .news-table-wrapper {
+    max-height: none;
+  }
+
+  .news-row-detail-inner {
+    flex-direction: column;
+  }
+
+  .news-row-detail-image {
+    width: 100%;
+    max-height: 260px;
+  }
+
   .news-form-card-header {
     flex-direction: column;
     align-items: flex-start;

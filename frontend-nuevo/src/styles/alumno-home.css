@@ -1,0 +1,206 @@
+/* ===========================================
+   HOME / DASHBOARD ALUMNO
+   =========================================== */
+
+.alumno-home-page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  color: var(--text-main);
+  min-height: 0;
+}
+
+/* -------------------------------------------
+   HEADER TIPO CARD (similar a admin)
+   ------------------------------------------- */
+
+.page-header.page-header--alumno-home {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #ffffff, #e0f2fe);
+  border: 1px solid var(--primary-100);
+  box-shadow: var(--shadow-soft);
+}
+
+/* barrita superior celeste/teal */
+.page-header.page-header--alumno-home::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 22px;
+  border-top: 4px solid #0ea5e9;
+  pointer-events: none;
+}
+
+.page-header--alumno-home .page-header-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-800);
+}
+
+.page-header--alumno-home .page-header-subtitle {
+  margin: 4px 0 0 0;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+/* Pill a la derecha con resumen de inscripciones */
+.alumno-home-header-pill {
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #ecfdf5, #e0f2fe);
+  border: 1px solid rgba(14, 165, 233, 0.35);
+  color: #0369a1;
+  max-width: 320px;
+  text-align: right;
+}
+
+/* -------------------------------------------
+   LOADING
+   ------------------------------------------- */
+
+.alumno-home-loading {
+  margin-top: 8px;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+/* -------------------------------------------
+   GRID DE CARDS
+   ------------------------------------------- */
+
+.alumno-home-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+/* Card base */
+.alumno-home-card {
+  position: relative;
+  border-radius: 18px;
+  background-color: #ffffff;
+  box-shadow: var(--shadow-soft);
+  padding: 16px 18px 18px;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Diferentes acentos por tipo de card */
+.alumno-home-card--careers::before,
+.alumno-home-card--profile::before,
+.alumno-home-card--news::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  border-top: 3px solid transparent;
+  pointer-events: none;
+}
+
+/* Carreras: verde/teal */
+.alumno-home-card--careers::before {
+  border-top-color: #22c55e;
+}
+
+/* Perfil: azul */
+.alumno-home-card--profile::before {
+  border-top-color: #3b82f6;
+}
+
+/* Noticias: violeta */
+.alumno-home-card--news::before {
+  border-top-color: #8b5cf6;
+}
+
+.alumno-home-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.alumno-home-card-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--primary-800);
+}
+
+/* Badge en "Mis carreras" */
+.alumno-home-card-badge {
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+/* Chip suave para perfil/noticias */
+.alumno-home-chip-soft {
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background-color: #eef2ff;
+  color: #3730a3;
+}
+
+.alumno-home-chip-soft--news {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+/* Número grande de carreras */
+.alumno-home-card-number {
+  margin: 4px 0 0 0;
+  font-size: 2.1rem;
+  font-weight: 700;
+  color: #0f766e;
+}
+
+/* Texto principal card */
+.alumno-home-card-text {
+  margin: 4px 0 0 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* Acciones (botón) pegadas abajo a la derecha */
+.alumno-home-card-actions {
+  margin-top: auto;              /* empuja el bloque de acciones al fondo */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;     /* botones alineados a la derecha */
+}
+
+/* Usamos las clases .btn globales:
+   .btn, .btn-primary, .btn-outline ya definidas en el proyecto */
+
+/* -------------------------------------------
+   RESPONSIVE
+   ------------------------------------------- */
+
+@media (max-width: 900px) {
+  .page-header.page-header--alumno-home {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .alumno-home-header-pill {
+    max-width: 100%;
+    text-align: left;
+  }
+}

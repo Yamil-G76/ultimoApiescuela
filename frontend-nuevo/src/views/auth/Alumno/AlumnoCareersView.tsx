@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../../../config/backend";
+import "../../../styles/alumno-careers.css";
 
 interface EnrollmentItem {
   id: number;               // id de usuarioxcarrera
@@ -103,61 +104,99 @@ const AlumnoCareersView: React.FC = () => {
   };
 
   return (
-    <div className="container mt-4">
-      <h2>Mis carreras</h2>
+    <div className="alumno-careers-page">
+      {/* Header tipo card, consistente con el dashboard */}
+      <header className="page-header page-header--alumno-careers">
+        <div>
+          <h2 className="page-header-title">Mis carreras</h2>
+          <p className="page-header-subtitle">
+            Consultá las carreras en las que estás inscripto y accedé a tus pagos.
+          </p>
+        </div>
 
-      {error && <div className="alert alert-danger py-2">{error}</div>}
-
-      {loading ? (
-        <div className="text-muted">Cargando tus carreras...</div>
-      ) : (
-        <div
-          style={{
-            height: "70vh",
-            overflowY: "auto",
-            border: "1px solid #dee2e6",
-            borderRadius: "0.5rem",
-            backgroundColor: "#ffffff",
-            padding: "0.75rem",
-          }}
+        <button
+          type="button"
+          className="btn alumno-careers-back-btn"
+          onClick={() => navigate("/alumno")}
         >
-          <table className="table table-striped table-hover mb-0">
-            <thead>
-              <tr>
-                <th>ID inscripción</th>
-                <th>Carrera</th>
-                <th>Inicio cursado</th>
-                <th style={{ width: "160px" }}>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((e) => (
-                <tr key={e.id}>
-                  <td>{e.id}</td>
-                  <td>{e.career_name}</td>
-                  <td>{formatFecha(e.inicio_cursado || null)}</td>
-                  <td>
-                    <button
-                      className="btn btn-sm btn-outline-primary"
-                      onClick={() => handleGoToPayments(e)}
-                    >
-                      Ver pagos
-                    </button>
-                  </td>
-                </tr>
-              ))}
+          Volver al dashboard
+        </button>
+      </header>
 
-              {items.length === 0 && (
-                <tr>
-                  <td colSpan={4} className="text-center">
-                    Todavía no tenés carreras asignadas.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+      {error && (
+        <div className="alert-box alert-error alumno-careers-alert">
+          {error}
         </div>
       )}
+
+      {/* Card principal con tabla + scroll interno */}
+      <section className="alumno-careers-section">
+        <div className="alumno-careers-card">
+          <div className="alumno-careers-card-header">
+            <div>
+              <h3 className="alumno-careers-card-title">Carreras activas</h3>
+              <p className="alumno-careers-card-subtitle">
+                Listado de inscripciones actuales. Desde acá podés ver los pagos de cada carrera.
+              </p>
+            </div>
+
+            <span className="alumno-careers-pill">
+              {items.length} {items.length === 1 ? "inscripción" : "inscripciones"}
+            </span>
+          </div>
+
+          <div className="alumno-careers-table-wrapper">
+            {loading ? (
+              <div className="alumno-careers-message alumno-careers-message--muted">
+                Cargando tus carreras...
+              </div>
+            ) : (
+              <>
+                <table className="alumno-careers-table">
+                  <thead>
+                    <tr>
+                      <th style={{ width: "140px" }}>ID inscripción</th>
+                      <th>Carrera</th>
+                      <th style={{ width: "160px" }}>Inicio cursado</th>
+                      <th style={{ width: "180px" }}>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {items.map((e) => (
+                      <tr key={e.id}>
+                        <td>{e.id}</td>
+                        <td>{e.career_name}</td>
+                        <td>{formatFecha(e.inicio_cursado || null)}</td>
+                        <td>
+                          <div className="alumno-careers-actions">
+                            <button
+                              className="btn alumno-careers-btn-payments"
+                              type="button"
+                              onClick={() => handleGoToPayments(e)}
+                            >
+                              Ver pagos
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+
+                    {items.length === 0 && (
+                      <tr>
+                        <td colSpan={4}>
+                          <div className="alumno-careers-message alumno-careers-message--muted">
+                            Todavía no tenés carreras asignadas.
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </>
+            )}
+          </div>
+        </div>
+      </section>
     </div>
   );
 };

@@ -1,0 +1,251 @@
+/* ===========================================
+   PÁGINA "MIS CARRERAS" - ALUMNO
+   =========================================== */
+
+.alumno-careers-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: var(--text-main);
+  min-height: 0;
+}
+
+/* -------------------------------------------
+   HEADER PRINCIPAL (CONSISTENTE CON DASHBOARD)
+   ------------------------------------------- */
+
+.page-header.page-header--alumno-careers {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #ffffff, #e0f2fe);
+  border: 1px solid var(--primary-100);
+  box-shadow: var(--shadow-soft);
+}
+
+.page-header.page-header--alumno-careers::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 22px;
+  border-top: 3px solid #8b5cf6; /* violeta suave */
+  pointer-events: none;
+}
+
+.page-header--alumno-careers .page-header-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-800);
+}
+
+.page-header--alumno-careers .page-header-subtitle {
+  margin: 4px 0 0 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* Botón volver al dashboard (celeste/azul suave) */
+.alumno-careers-back-btn {
+  border-radius: 999px;
+  padding: 8px 18px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border: 1px solid #bfdbfe;
+  background: linear-gradient(135deg, #eff6ff, #e0f2fe);
+  color: #1d4ed8;
+}
+
+.alumno-careers-back-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  border-color: #60a5fa;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.22);
+  transform: translateY(-1px);
+}
+
+/* -------------------------------------------
+   ALERTA DE ERROR
+   ------------------------------------------- */
+
+.alumno-careers-alert {
+  font-size: 0.9rem;
+}
+
+/* ===========================================
+   CARD CONTENEDORA + TABLA
+   =========================================== */
+
+.alumno-careers-section {
+  margin-top: 4px;
+}
+
+.alumno-careers-card {
+  position: relative;
+  border-radius: 20px;
+  background-color: #ffffff;
+  box-shadow: var(--shadow-soft);
+  padding: 16px 18px 18px;
+}
+
+/* Barrita superior violeta */
+.alumno-careers-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  border-top: 3px solid #8b5cf6;
+  pointer-events: none;
+}
+
+.alumno-careers-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.alumno-careers-card-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--primary-800);
+}
+
+.alumno-careers-card-subtitle {
+  margin: 4px 0 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Pill con cantidad de inscripciones */
+.alumno-careers-pill {
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid #c4b5fd;
+  background: linear-gradient(135deg, #eef2ff, #f5f3ff);
+  color: #4c1d95;
+}
+
+/* ===========================================
+   TABLA + SCROLL INTERNO
+   =========================================== */
+
+.alumno-careers-table-wrapper {
+  position: relative;
+  margin-top: 4px;
+  max-height: 55vh;
+  overflow-y: auto;
+  border-radius: 16px;
+  background-color: #ffffff;
+  padding: 8px 10px;
+}
+
+/* Scrollbar sutil */
+.alumno-careers-table-wrapper::-webkit-scrollbar {
+  width: 6px;
+}
+.alumno-careers-table-wrapper::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background-color: rgba(148, 163, 184, 0.5);
+}
+
+/* Mensajes dentro del panel */
+.alumno-careers-message {
+  padding: 10px 8px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.alumno-careers-message--muted {
+  color: var(--text-muted);
+}
+
+/* Tabla */
+.alumno-careers-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+/* Encabezado sticky como pagos/noticias */
+.alumno-careers-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  text-align: left;
+  padding: 10px 8px;
+  background-color: #f3f4f6;
+  border-bottom: 1px solid #e5e7eb;
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+.alumno-careers-table tbody td {
+  padding: 9px 8px;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #ffffff;
+}
+
+/* Zebra */
+.alumno-careers-table tbody tr:nth-child(even) td {
+  background-color: #f9fafb;
+}
+
+/* Hover */
+.alumno-careers-table tbody tr:hover td {
+  background-color: #eef3ff;
+}
+
+/* Acciones */
+.alumno-careers-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Botón "Ver pagos" – similar a otros violeta/azul */
+.alumno-careers-btn-payments {
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  border-radius: 999px;
+  border: 1px solid #a5b4fc;
+  background-color: #f5f3ff;
+  color: #4c1d95;
+}
+
+.alumno-careers-btn-payments:hover:not(:disabled) {
+  background-color: #ede9fe;
+  box-shadow: 0 4px 12px rgba(76, 29, 149, 0.2);
+  transform: translateY(-1px);
+}
+
+/* ===========================================
+   RESPONSIVE
+   =========================================== */
+
+@media (max-width: 900px) {
+  .page-header.page-header--alumno-careers {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .alumno-careers-card {
+    padding: 12px 12px 14px;
+  }
+
+  .alumno-careers-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .alumno-careers-table-wrapper {
+    max-height: 65vh;
+  }
+}

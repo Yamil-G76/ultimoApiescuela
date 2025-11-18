@@ -1,148 +1,326 @@
-import React, { useMemo } from "react";
+// src/views/auth/admin/AdminProfileView.tsx
+import React, { useEffect, useState } from "react";
+import { BASE_URL } from "../../../config/backend";
 import "../../../styles/profile.css";
 
-interface StoredUser {
+interface UserProfile {
   id: number;
   username: string;
   first_name?: string;
   last_name?: string;
   email?: string;
   dni?: string;
-  type?: string;
+  type: string;
+  avatar_url?: string | null;
 }
 
 const AdminProfileView: React.FC = () => {
-  const rawUser = localStorage.getItem("user");
+  const [user, setUser] = useState<UserProfile | null>(null);
 
-  let user: StoredUser | null = null;
-  if (rawUser) {
-    try {
-      user = JSON.parse(rawUser) as StoredUser;
-    } catch {
-      user = null;
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // --------------------------------------
+  // Cargar datos del admin
+  // --------------------------------------
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        setError(null);
+
+        // 1) Tomamos el usuario del localStorage
+        const rawUser = localStorage.getItem("user");
+        if (!rawUser) {
+          setError("No se encontró usuario en sesión.");
+          setLoading(false);
+          return;
+        }
+
+        const parsed = JSON.parse(rawUser) as UserProfile;
+        const userId = parsed.id;
+
+        if (!userId) {
+          setError("No se encontró el ID del usuario.");
+          setLoading(false);
+          return;
+        }
+
+        // 2) Pedimos la versión fresca al backend
+        const res = await fetch(`${BASE_URL}/users/${userId}`);
+        if (!res.ok) {
+          throw new Error(`Error HTTP: ${res.status}`);
+        }
+
+        const data = await res.json();
+        const u = data.data as UserProfile;
+
+        setUser(u);
+        setFirstName(u.first_name || "");
+        setLastName(u.last_name || "");
+        setEmail(u.email || "");
+
+        if (u.avatar_url) {
+          setAvatarPreview(`${BASE_URL}${u.avatar_url}`);
+        }
+      } catch (err) {
+        console.error(err);
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("Error desconocido cargando el perfil.");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void loadProfile();
+  }, []);
+
+  // --------------------------------------
+  // Manejo de avatar
+  // --------------------------------------
+  const handleAvatarFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setAvatarFile(file);
+    setAvatarPreview(URL.createObjectURL(file));
+  };
+
+  const uploadImage = async (file: File): Promise<string> => {
+    const form = new FormData();
+    form.append("file", file);
+
+    const res = await fetch(`${BASE_URL}/upload`, {
+      method: "POST",
+      body: form,
+    });
+
+    if (!res.ok) {
+      throw new Error("Error subiendo imagen");
     }
+
+    const data = await res.json();
+    // ej: "/static/avatars/archivo.jpg"
+    return data.url as string;
+  };
+
+  // --------------------------------------
+  // Guardar perfil
+  // --------------------------------------
+  const handleSaveProfile = async () => {
+    if (!user) return;
+
+    setSaving(true);
+    setError(null);
+
+    try {
+      let avatarUrl = user.avatar_url ?? null;
+
+      if (avatarFile) {
+        avatarUrl = await uploadImage(avatarFile);
+      }
+
+      const res = await fetch(`${BASE_URL}/users/${user.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          first_name: firstName,
+          last_name: lastName,
+          email,
+          avatar_url: avatarUrl,
+        }),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        console.error("Error actualizando perfil admin:", errData);
+        setError("No se pudo actualizar el perfil.");
+        return;
+      }
+
+      // Actualizamos estado y localStorage para que el navbar se entere
+      const updated: UserProfile = {
+        ...user,
+        first_name: firstName,
+        last_name: lastName,
+        email,
+        avatar_url: avatarUrl,
+      };
+
+      setUser(updated);
+      localStorage.setItem("user", JSON.stringify(updated));
+
+      alert("Perfil actualizado correctamente");
+    } catch (err) {
+      console.error(err);
+      setError("Error guardando el perfil.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // --------------------------------------
+  // Render
+  // --------------------------------------
+  if (loading) {
+    return (
+      <div className="profile-page">
+        <div className="list-message list-message--muted">
+          Cargando perfil...
+        </div>
+      </div>
+    );
   }
 
-  const fullName = useMemo(() => {
-    if (!user) return "";
-    const name = [user.first_name, user.last_name].filter(Boolean).join(" ");
-    return name || user.username || "";
-  }, [user]);
+  if (!user) {
+    return (
+      <div className="profile-page">
+        <div className="list-message list-message--muted">
+          No se pudo cargar el perfil del administrador.
+        </div>
+      </div>
+    );
+  }
 
-  const initials = useMemo(() => {
-    if (!fullName) return "AD";
-    return fullName
-      .split(" ")
-      .map((p) => p[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase();
-  }, [fullName]);
+  const fullName =
+    [firstName, lastName].filter(Boolean).join(" ") || user.username;
 
   return (
     <div className="profile-page">
-      {/* HEADER */}
       <header className="page-header page-header--profile">
-        <div className="profile-header-main">
-          <h2 className="page-header-title">Mi perfil</h2>
+        <div>
+          <h2 className="page-header-title">Mi perfil (Administrador)</h2>
           <p className="page-header-subtitle">
-            Información de tu cuenta de administrador en ApiEscuela.
+            Visualizá y actualizá tus datos y foto de perfil.
           </p>
-        </div>
-
-        <div className="profile-header-avatar">
-          <div className="profile-avatar-circle">
-            <span>{initials}</span>
-          </div>
-          <div className="profile-avatar-text">
-            <span className="profile-avatar-name">
-              {fullName || "Administrador"}
-            </span>
-            <span className="profile-avatar-role">Administrador</span>
-          </div>
         </div>
       </header>
 
-      {/* GRID DE CARDS */}
-      <section className="profile-grid">
-        {/* DATOS PERSONALES */}
-        <article className="profile-card profile-card--info">
-          <div className="profile-card-header">
-            <h3 className="profile-card-title">Datos personales</h3>
-            <p className="profile-card-subtitle">
-              Información básica que se muestra en el sistema.
+      {error && (
+        <div className="alert-box alert-error" style={{ marginTop: 4 }}>
+          {error}
+        </div>
+      )}
+
+      <section className="profile-card">
+        {/* Bloque avatar */}
+        <div className="profile-avatar-block">
+          <div className="profile-avatar-wrapper">
+            {avatarPreview ? (
+              <img
+                src={avatarPreview}
+                alt={fullName}
+                className="profile-avatar-img"
+              />
+            ) : (
+              <div className="profile-avatar-placeholder">
+                <span>
+                  {fullName
+                    .split(" ")
+                    .map((p) => p[0])
+                    .join("")
+                    .slice(0, 2)
+                    .toUpperCase()}
+                </span>
+              </div>
+            )}
+          </div>
+
+          <div className="profile-avatar-actions">
+            <label className="btn btn-outline profile-avatar-upload-btn">
+              Elegir foto
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarFile}
+                style={{ display: "none" }}
+              />
+            </label>
+            <p className="profile-hint">
+              Opcional. PNG o JPG, tamaño moderado.
             </p>
           </div>
+        </div>
 
-          <div className="profile-card-body profile-fields-grid">
-            <div className="profile-field">
-              <span className="profile-field-label">Nombre y apellido</span>
-              <span className="profile-field-value">
-                {fullName || "-"}
-              </span>
+        {/* Formulario datos */}
+        <div className="profile-form">
+          <div className="profile-form-row">
+            <div className="profile-form-field">
+              <label>Nombre</label>
+              <input
+                className="form-input"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+              />
             </div>
 
-            <div className="profile-field">
-              <span className="profile-field-label">Usuario</span>
-              <span className="profile-field-value">
-                {user?.username || "-"}
-              </span>
-            </div>
-
-            <div className="profile-field">
-              <span className="profile-field-label">Email</span>
-              <span className="profile-field-value">
-                {user?.email || "-"}
-              </span>
-            </div>
-
-            <div className="profile-field">
-              <span className="profile-field-label">DNI</span>
-              <span className="profile-field-value">
-                {user?.dni || "-"}
-              </span>
+            <div className="profile-form-field">
+              <label>Apellido</label>
+              <input
+                className="form-input"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+              />
             </div>
           </div>
-        </article>
 
-        {/* CUENTA / SEGURIDAD */}
-        <article className="profile-card profile-card--account">
-          <div className="profile-card-header">
-            <h3 className="profile-card-title">Cuenta y seguridad</h3>
-            <p className="profile-card-subtitle">
-              Resumen de tu acceso como administrador.
-            </p>
+          <div className="profile-form-row">
+            <div className="profile-form-field">
+              <label>Email</label>
+              <input
+                className="form-input"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+
+            <div className="profile-form-field">
+              <label>Usuario</label>
+              <input className="form-input" value={user.username} disabled />
+            </div>
           </div>
 
-          <div className="profile-card-body">
-            <div className="profile-field">
-              <span className="profile-field-label">Rol</span>
-              <span className="profile-field-pill">Administrador</span>
-            </div>
-
-            <div className="profile-field">
-              <span className="profile-field-label">ID interno</span>
-              <span className="profile-field-value">
-                {user?.id ?? "-"}
-              </span>
-            </div>
-
-            <div className="profile-actions-row">
-              <button
-                type="button"
-                className="btn profile-btn-outline"
+          <div className="profile-form-row">
+            <div className="profile-form-field">
+              <label>Tipo de usuario</label>
+              <input
+                className="form-input"
+                value={user.type.toUpperCase()}
                 disabled
-              >
-                Cambiar contraseña (próximamente)
-              </button>
+              />
             </div>
 
-            <p className="profile-footer-hint">
-              Esta sección se podrá usar más adelante para actualizar tu
-              contraseña u otros datos sensibles.
-            </p>
+            {user.dni && (
+              <div className="profile-form-field">
+                <label>DNI</label>
+                <input className="form-input" value={user.dni} disabled />
+              </div>
+            )}
           </div>
-        </article>
+
+          <div className="profile-form-actions">
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={handleSaveProfile}
+              disabled={saving}
+            >
+              {saving ? "Guardando..." : "Guardar cambios"}
+            </button>
+          </div>
+        </div>
       </section>
     </div>
   );

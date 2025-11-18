@@ -1,24 +1,69 @@
+users css
+
+
+
 /* ===========================================
-   PÁGINA LISTA DE ALUMNOS
+   TARJETA GLOBAL PARA HEADERS (Carreras / Pagos / Noticias / Usuarios)
+   =========================================== */
+
+.page-header {
+  position: relative;
+  background: #ffffff;
+  border: 1px solid #d0d4e4;
+  border-radius: 16px;
+  padding: 20px 24px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* Barrita superior azul */
+.page-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  border-top: 4px solid #1e4dd8;
+  pointer-events: none;
+}
+
+.page-header-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1e4dd8;
+  margin: 0;
+}
+
+.page-header-subtitle {
+  margin: 4px 0 0 0;
+  font-size: 0.95rem;
+  color: #7a8094;
+}
+
+/* ===========================================
+   PÁGINA LISTA DE ALUMNOS / USUARIOS
    =========================================== */
 
 .user-page {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  color: var(--text-main);
+  gap: 32px;
+  color: #333333;
   min-height: 0;
 }
 
-/* Header de esta página: forzamos botón a la derecha */
+/* Ajustes del header específico para usuarios */
 .user-page .page-header {
   margin-bottom: 2px;
-  display: flex;              /* por si otro CSS lo cambia */
+  display: flex;
   align-items: flex-start;
   justify-content: space-between;
 }
 
-/* Botón del header: pegado a la derecha, sin bajar tanto */
+/* Botón del header: pegado a la derecha */
 .page-header-cta {
   margin-top: 0;
   margin-left: auto;
@@ -40,35 +85,55 @@
 
 .user-search-input-wrapper {
   display: flex;
-  gap: 8px;
-  max-width: 620px;
+  gap: 10px;
+  max-width: 560px;
 }
 
 .user-search-input {
   flex: 1;
 }
 
-/* Botón de búsqueda con borde verde suave (igual que carreras) */
+/* Botón outline como Carreras */
 .user-search .btn.btn-outline {
-  border-color: #6ee7b7;
-  color: #047857;
-  background-color: #ecfdf5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  border: 1px solid #d0d4e4;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 16px;
+  background-color: #f3f5fa;
+  color: #1e4dd8;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.08s ease;
 }
 
 .user-search .btn.btn-outline:hover:not(:disabled) {
-  background-color: #d1fae5;
-  box-shadow: 0 6px 16px rgba(4, 120, 87, 0.25);
+  background-color: #e4ecff;
+  box-shadow: 0 6px 16px rgba(30, 77, 216, 0.18);
   transform: translateY(-1px);
+}
+
+.user-search .btn.btn-outline:disabled {
+  opacity: 0.7;
+  cursor: default;
+  box-shadow: none;
+  transform: none;
 }
 
 .user-search-hint {
   margin: 0;
   font-size: 0.8rem;
-  color: var(--text-muted);
+  color: #7a8094;
 }
 
 /* -------------------------------------------
-   CARD CONTENEDORA + LISTA (estilo pagos/carreras)
+   CARD CONTENEDORA + LISTA
    ------------------------------------------- */
 
 .user-list {
@@ -77,56 +142,53 @@
 
 .user-card {
   position: relative;
-  border-radius: 18px;
-  background-color: #ffffff;
-  box-shadow: var(--shadow-soft);
-  padding: 10px 12px 14px;
+  border-radius: 16px;
+  background: radial-gradient(circle at 0% 0%, #e4ecff 0, #ffffff 55%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  padding: 24px 24px 20px;
+  border: 1px solid #d0d4e4;
 }
 
-/* Bordecito superior MORADO para diferenciar de carreras/pagos */
+/* Barrita superior violeta */
 .user-card::before {
   content: "";
   position: absolute;
   inset: 0;
-  border-radius: 18px;
-  border-top: 4px solid #8b5cf6; /* violeta */
+  border-radius: 16px;
+  border-top: 4px solid #766cf1;
   pointer-events: none;
 }
 
 .user-card-header {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  margin-bottom: 8px;
+  gap: 4px;
+  margin-bottom: 12px;
 }
 
 .user-card-title {
   margin: 0;
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--primary-800);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1e4dd8;
 }
 
 .user-card-subtitle {
   margin: 0;
-  font-size: 0.9rem;
-  color: var(--text-muted);
+  font-size: 0.85rem;
+  color: #7a8094;
 }
 
 /* -------------------------------------------
-   SCROLL SOLO EN LA TABLA (como payments-table-scroll)
+   TABLA
    ------------------------------------------- */
 
 .user-table-scroll {
   position: relative;
-  max-height: 40vh;           /* alto fijo → scroll interno */
+  max-height: 40vh;
   overflow-y: auto;
-  margin-top: 4px;
+  margin-top: 8px;
 }
-
-/* -------------------------------------------
-   TABLA (estilo similar a payments-table)
-   ------------------------------------------- */
 
 .user-table {
   width: 100%;
@@ -134,36 +196,31 @@
   font-size: 0.9rem;
 }
 
-/* Encabezado sticky, fondo sólido (no se rompe al scrollear) */
-.user-table-scroll .user-table thead th {
+/* Header sticky con gradiente */
+.user-table thead th {
   position: sticky;
   top: 0;
   z-index: 1;
-}
-
-.user-table thead th {
   text-align: left;
   padding: 10px 10px;
-  background-color: #f3f4f6;
-  border-bottom: 1px solid #e5e7eb;
-  color: var(--text-main);
+  background: linear-gradient(90deg, #e4ecff, #f3f5fa);
+  border-bottom: 1px solid #d0d4e4;
+  color: #333333;
   font-weight: 600;
 }
 
 .user-table tbody td {
-  padding: 9px 10px;
+  padding: 9px 8px;
   border-bottom: 1px solid #e5e7eb;
   background-color: #ffffff;
 }
 
-/* Zebra suave */
 .user-table tbody tr:nth-child(even) td {
   background-color: #f9fafb;
 }
 
-/* Hover filas parecido a otras tablas */
 .user-table tbody tr:hover td {
-  background-color: #eef3ff;
+  background-color: #e4ecff;
 }
 
 /* -------------------------------------------
@@ -172,59 +229,60 @@
 
 .user-table-actions {
   display: flex;
-  flex-wrap: nowrap;          /* en desktop los mantenemos en una fila */
+  flex-wrap: nowrap;
   gap: 6px;
 }
 
-/* Tamaño compacto para los botones dentro de la tabla */
 .user-table-actions .btn {
-  padding: 6px 10px;
-  font-size: 0.78rem;
-  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 0.76rem;
+  min-width: 90px;
+  border-radius: 12px;
+  justify-content: center;
   white-space: nowrap;
 }
 
-/* EDITAR – borde lila, fondo violeta clarito */
+/* EDITAR – azul */
 .user-table-actions .user-btn-edit {
-  border: 1px solid #a5b4fc;
-  background-color: #f5f3ff;
-  color: #4c1d95;
+  border: 1px solid #1e4dd8;
+  background-color: #f3f5fa;
+  color: #1e4dd8;
 }
 
 .user-table-actions .user-btn-edit:hover:not(:disabled) {
-  background-color: #ede9fe;
-  box-shadow: 0 6px 16px rgba(76, 29, 149, 0.3);
+  background-color: #e4ecff;
+  box-shadow: 0 6px 16px rgba(30, 77, 216, 0.25);
   transform: translateY(-1px);
 }
 
-/* CARRERAS – estilo teal/verde como el buscador */
+/* CARRERAS – gris neutro */
 .user-table-actions .user-btn-enroll {
-  border: 1px solid #6ee7b7;
-  background-color: #ecfdf5;
-  color: #047857;
+  border: 1px solid #d0d4e4;
+  background-color: #ffffff;
+  color: #7a8094;
 }
 
 .user-table-actions .user-btn-enroll:hover:not(:disabled) {
-  background-color: #d1fae5;
-  box-shadow: 0 6px 16px rgba(4, 120, 87, 0.28);
+  background-color: #f3f5fa;
+  box-shadow: 0 6px 16px rgba(17, 24, 39, 0.12);
   transform: translateY(-1px);
 }
 
-/* ELIMINAR – rojo suave coherente con el resto del sistema */
+/* ELIMINAR – rojo */
 .user-table-actions .user-btn-delete {
-  border: 1px solid #fecaca;
+  border: 1px solid #e53935;
   background-color: #fef2f2;
-  color: #b91c1c;
+  color: #e53935;
 }
 
 .user-table-actions .user-btn-delete:hover:not(:disabled) {
-  background-color: #fee2e2;
-  box-shadow: 0 6px 16px rgba(185, 28, 28, 0.32);
+  background-color: #fde0df;
+  box-shadow: 0 6px 16px rgba(198, 40, 40, 0.35);
   transform: translateY(-1px);
 }
 
 /* -------------------------------------------
-   MENSAJES DENTRO DEL PANEL
+   MENSAJES
    ------------------------------------------- */
 
 .user-list-message {
@@ -234,41 +292,34 @@
 }
 
 .user-list-message--muted {
-  color: var(--text-muted);
+  color: #7a8094;
 }
 
-/* -------------------------------------------
-   FORMULARIO CREAR / EDITAR ALUMNO / USUARIO
-   (igual que ya tenías)
-   ------------------------------------------- */
+/* ===========================================
+   FORMULARIO CREAR / EDITAR
+   =========================================== */
 
 .user-form-card {
   position: relative;
-  background: radial-gradient(
-      circle at 0% 0%,
-      #d1fae5 0,   /* verde muy clarito */
-      #e0f2fe 35%, /* celeste suave */
-      #ffffff 60%
-  );
-  border-radius: 24px;
-  box-shadow: var(--shadow-soft);
-  padding: 18px 22px 20px;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  padding: 24px 24px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 24px;
+  border: 1px solid #d0d4e4;
 }
 
-/* Barrita superior ahora en tono verde/teal */
 .user-form-card::before {
   content: "";
   position: absolute;
   inset: 0;
-  border-radius: 24px;
-  border-top: 4px solid #14b8a6; /* teal verdoso */
+  border-radius: 16px;
+  border-top: 4px solid #766cf1;
   pointer-events: none;
 }
 
-/* Cabecera de la card */
 .user-form-card-header {
   display: flex;
   align-items: center;
@@ -277,23 +328,19 @@
 }
 
 .user-form-chip {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   padding: 4px 10px;
   border-radius: 999px;
   font-size: 0.78rem;
+  background-color: #e4ecff;
+  color: #1e4dd8;
   font-weight: 600;
-  background-color: #dcfce7; /* verde pastel */
-  color: #065f46;            /* verde oscuro */
 }
 
 .user-form-caption {
   font-size: 0.8rem;
-  color: var(--text-muted);
+  color: #7a8094;
 }
 
-/* Grilla de campos */
 .user-form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -304,7 +351,7 @@
 .user-form-column {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
 .user-form-field {
@@ -315,77 +362,30 @@
 
 .user-form-label {
   font-size: 0.85rem;
-  color: var(--text-muted);
+  color: #7a8094;
 }
 
 .user-form-input {
   border-radius: 10px;
-  border: 1px solid var(--input-border);
+  border: 1px solid #d0d4e4;
   padding: 9px 12px;
   font-size: 0.9rem;
-  outline: none;
   background-color: #ffffff;
 }
 
-.user-form-input::placeholder {
-  color: var(--input-placeholder);
-}
-
 .user-form-input:focus {
-  border-color: #14b8a6; /* teal */
-  box-shadow: 0 0 0 2px rgba(45, 212, 191, 0.35);
+  border-color: #1e4dd8;
+  box-shadow: 0 0 0 2px rgba(30, 77, 216, 0.2);
 }
 
-.user-form-select {
-  appearance: none;
-}
-
-/* Hint bajo algunos campos */
-.user-form-hint {
-  font-size: 0.78rem;
-  color: var(--text-muted);
-}
-
-/* Acciones del formulario */
-.user-form-actions {
-  margin-top: 8px;
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
-
-/* Botón GUARDAR: celeste + verde */
-.user-form-actions .btn.btn-primary {
-  border-radius: 999px;
-  border: 1px solid #14b8a6;
-  background: linear-gradient(
-    135deg,
-    #22c55e,  /* verde */
-    #0ea5e9   /* celeste */
-  );
-  color: #ffffff;
-}
-
-.user-form-actions .btn.btn-primary:hover:not(:disabled) {
-  background: linear-gradient(
-    135deg,
-    #16a34a,
-    #0284c7
-  );
-  box-shadow: 0 10px 22px rgba(34, 197, 94, 0.35);
-  transform: translateY(-1px);
-}
-
-/* El botón Cancelar sigue usando .btn-secondary global */
-
-/* -------------------------------------------
+/* ===========================================
    RESPONSIVE
-   ------------------------------------------- */
+   =========================================== */
 
 @media (max-width: 900px) {
   .user-search-input-wrapper {
     flex-direction: column;
+    max-width: none;
   }
 
   .user-card-header {
@@ -398,7 +398,7 @@
   }
 
   .user-table-actions {
-    flex-wrap: wrap; /* en móvil permitimos que bajen de renglón */
+    flex-wrap: wrap;
   }
 
   .user-form-card-header {
@@ -407,6 +407,7 @@
   }
 
   .user-form-grid {
+    grid-template-columns: 1fr;
     gap: 14px 18px;
   }
 }

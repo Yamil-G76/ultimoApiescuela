@@ -33,7 +33,7 @@ import NewsEditView from "../views/auth/admin/NewsEditView";
 import NewsFeedView from "../views/auth/Alumno/NewsFedd";
 
 // Alumno - vistas nuevas
-import AlumnoHomeView from "../views/auth/Alumno/AlumnoHomeView";
+import AlumnoDashboardView from "../views/auth/Alumno/AlumnoDashboardView";
 import AlumnoProfileView from "../views/auth/Alumno/AlumnoProfileView";
 import AlumnoCareersView from "../views/auth/Alumno/AlumnoCareersView";
 import AlumnoPaymentsView from "../views/auth/Alumno/AlumnoPaymentsView";
@@ -96,7 +96,7 @@ const AppRouter: React.FC = () => {
 
           {/* ALUMNO */}
           <Route path="/alumno">
-            <Route index element={<AlumnoHomeView />} />
+            <Route index element={<AlumnoDashboardView />} />
             <Route path="profile" element={<AlumnoProfileView />} />
             <Route path="careers" element={<AlumnoCareersView />} />
             <Route path="payments" element={<AlumnoPaymentsView />} />

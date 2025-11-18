@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { BASE_URL } from "../../../config/backend";
+import "../../../styles/alumno-payments.css";
 
 interface PaymentItem {
   id: number;
@@ -170,101 +171,119 @@ const AlumnoPaymentsView: React.FC = () => {
   }, [enrollmentId]);
 
   // -----------------------------
-  // Render
+  // Sin enrollmentId (error de navegación)
   // -----------------------------
   if (!enrollmentId) {
     return (
-      <div className="container mt-4">
-        <div className="alert alert-warning">
-          No se encontró información de la inscripción.
-        </div>
-        <button
-          className="btn btn-secondary"
-          onClick={() => navigate("/alumno/careers")}
-        >
-          Volver a mis carreras
-        </button>
+      <div className="alumno-payments-page">
+        <header className="page-header page-header--alumno-payments">
+          <div>
+            <h2 className="page-header-title">Mis pagos</h2>
+            <p className="page-header-subtitle">
+              No se encontró la inscripción seleccionada. Volvé a tus carreras
+              para elegir una nuevamente.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            className="btn alumno-payments-back-btn"
+            onClick={() => navigate("/alumno/careers")}
+          >
+            Volver a mis carreras
+          </button>
+        </header>
+
+        <section className="alumno-payments-section">
+          <div className="alumno-payments-card">
+            <div className="alumno-payments-message alumno-payments-message--muted">
+              No se encontró información de la inscripción.
+            </div>
+          </div>
+        </section>
       </div>
     );
   }
 
+  // -----------------------------
+  // Render normal
+  // -----------------------------
   return (
-    <div className="container mt-4">
-      {/* Encabezado */}
-      <div className="d-flex justify-content-between align-items-center mb-3">
+    <div className="alumno-payments-page">
+      {/* Header principal tipo card */}
+      <header className="page-header page-header--alumno-payments">
         <div>
-          <h2 className="mb-0">Mis pagos</h2>
+          <h2 className="page-header-title">Mis pagos</h2>
+          <p className="page-header-subtitle">
+            Consultá el historial de pagos de tu carrera seleccionada.
+          </p>
           {careerName && (
-            <small className="text-muted">
-              Carrera: {careerName}
-            </small>
+            <p className="page-header-subtitle page-header-subtitle--secondary">
+              Carrera: <span className="alumno-payments-career">{careerName}</span>
+            </p>
           )}
         </div>
 
         <button
-          className="btn btn-secondary"
+          type="button"
+          className="btn alumno-payments-back-btn"
           onClick={() => navigate("/alumno/careers")}
         >
           Volver a mis carreras
         </button>
-      </div>
+      </header>
 
-      {/* Filtro anulados */}
-      <div className="card mb-3">
-        <div className="card-body d-flex justify-content-between align-items-center">
-          <div>
-            <h5 className="card-title mb-0">Historial de pagos</h5>
-            <small className="text-muted">
-              Los más recientes aparecen primero.
-            </small>
+      {/* Card principal: filtro + tabla */}
+      <section className="alumno-payments-section">
+        <div className="alumno-payments-card">
+          <div className="alumno-payments-card-header">
+            <div>
+              <h3 className="alumno-payments-card-title">Historial de pagos</h3>
+              <p className="alumno-payments-card-subtitle">
+                Los pagos más recientes aparecen primero. Podés elegir si ver o
+                no los pagos anulados.
+              </p>
+            </div>
+
+            <div className="alumno-payments-toggle">
+              <div className="form-check form-switch">
+                <input
+                  id="switchAnuladosAlumno"
+                  className="form-check-input"
+                  type="checkbox"
+                  checked={includeAnulados}
+                  onChange={handleToggleAnulados}
+                />
+                <label
+                  className="form-check-label"
+                  htmlFor="switchAnuladosAlumno"
+                >
+                  {includeAnulados
+                    ? "Mostrando pagos anulados"
+                    : "Ocultando pagos anulados"}
+                </label>
+              </div>
+            </div>
           </div>
 
-          <div className="form-check form-switch">
-            <input
-              id="switchAnuladosAlumno"
-              className="form-check-input"
-              type="checkbox"
-              checked={includeAnulados}
-              onChange={handleToggleAnulados}
-            />
-            <label
-              className="form-check-label"
-              htmlFor="switchAnuladosAlumno"
-            >
-              {includeAnulados
-                ? "Mostrando pagos anulados"
-                : "Ocultando pagos anulados"}
-            </label>
-          </div>
-        </div>
-      </div>
-
-      {/* Lista de pagos */}
-      <div className="card">
-        <div className="card-body">
           {paymentsError && (
-            <div className="alert alert-danger py-2 mb-2">
+            <div className="alert-box alert-error alumno-payments-alert">
               {paymentsError}
             </div>
           )}
 
-          {loadingPayments ? (
-            <div className="text-muted">Cargando pagos...</div>
-          ) : (
-            <>
-              <div
-                ref={scrollContainerRef}
-                onScroll={handleScroll}
-                style={{
-                  height: "70vh",
-                  overflowY: "auto",
-                  border: "1px solid #dee2e6",
-                  borderRadius: "0.5rem",
-                  backgroundColor: "#ffffff",
-                  padding: "0.75rem",
-                }}
-              >
-                <table className="table table-striped table-hover mb-0">
+          <div
+            ref={scrollContainerRef}
+            onScroll={handleScroll}
+            className="alumno-payments-table-wrapper"
+          >
+            {loadingPayments ? (
+              <div className="alumno-payments-message alumno-payments-message--muted">
+                Cargando pagos...
+              </div>
+            ) : (
+              <>
+                <table className="alumno-payments-table">
                   <thead>
                     <tr>
                       <th>Cuota</th>
@@ -281,36 +300,48 @@ const AlumnoPaymentsView: React.FC = () => {
                         <td>{formatFecha(p.fecha_pago || null)}</td>
                         <td>${p.monto}</td>
                         <td>{p.adelantado ? "Sí" : "No"}</td>
-                        <td>{p.anulado ? "Anulado" : "Activo"}</td>
+                        <td>
+                          <span
+                            className={
+                              p.anulado
+                                ? "payments-status-pill payments-status-pill--canceled"
+                                : "payments-status-pill payments-status-pill--active"
+                            }
+                          >
+                            {p.anulado ? "Anulado" : "Activo"}
+                          </span>
+                        </td>
                       </tr>
                     ))}
 
                     {payments.length === 0 && (
                       <tr>
-                        <td colSpan={5} className="text-center">
-                          No hay pagos registrados para esta carrera.
+                        <td colSpan={5}>
+                          <div className="alumno-payments-message alumno-payments-message--muted">
+                            No hay pagos registrados para esta carrera.
+                          </div>
                         </td>
                       </tr>
                     )}
                   </tbody>
                 </table>
-              </div>
+              </>
+            )}
+          </div>
 
-              {loadingMore && (
-                <div className="text-center text-muted py-2">
-                  Cargando más pagos...
-                </div>
-              )}
+          {loadingMore && (
+            <div className="alumno-payments-message alumno-payments-message--muted">
+              Cargando más pagos...
+            </div>
+          )}
 
-              {!hasMore && payments.length > 0 && (
-                <div className="text-center text-muted py-2">
-                  No hay más pagos para cargar.
-                </div>
-              )}
-            </>
+          {!loadingPayments && !loadingMore && !hasMore && payments.length > 0 && (
+            <div className="alumno-payments-message alumno-payments-message--muted">
+              No hay más pagos para cargar.
+            </div>
           )}
         </div>
-      </div>
+      </section>
     </div>
   );
 };

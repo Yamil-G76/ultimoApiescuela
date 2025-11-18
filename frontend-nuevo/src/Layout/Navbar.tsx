@@ -1,3 +1,4 @@
+// src/Layout/Navbar.tsx
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
@@ -116,7 +117,7 @@ const Navbar: React.FC = () => {
       label: "Usuarios",
       icon: <FiUsers />,
     },
-    // 👇 "Crear noticia" ya no va acá, se hace desde el botón en la vista de noticias
+    // 👇 Mi perfil ya NO va en el menú, se maneja desde el footer
   ];
 
   const alumnoMenu: MenuItem[] = [
@@ -126,7 +127,7 @@ const Navbar: React.FC = () => {
       icon: <FiHome />,
       exact: true,
     },
-    // Mi perfil del alumno también se maneja desde el footer
+    // "Mi perfil" va en el footer
     {
       to: "/alumno/careers",
       label: "Mis carreras",

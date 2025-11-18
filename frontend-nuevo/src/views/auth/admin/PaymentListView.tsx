@@ -182,9 +182,7 @@ const PaymentsListView: React.FC = () => {
             Historial de pagos registrados, del más reciente al más antiguo.
           </p>
         </div>
-        <div className="page-header-badge payments-header-badge">
-          Vista global
-        </div>
+
       </header>
 
       {/* Buscador */}

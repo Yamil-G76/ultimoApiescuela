@@ -1,0 +1,242 @@
+/* ===========================================
+   PÁGINA "MIS PAGOS" - ALUMNO
+   =========================================== */
+
+.alumno-payments-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: var(--text-main);
+  min-height: 0;
+}
+
+/* -------------------------------------------
+   HEADER PRINCIPAL
+   ------------------------------------------- */
+
+.page-header.page-header--alumno-payments {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #ffffff, #e0f2fe);
+  border: 1px solid var(--primary-100);
+  box-shadow: var(--shadow-soft);
+}
+
+.page-header.page-header--alumno-payments::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 22px;
+  border-top: 3px solid #14b8a6; /* teal suave */
+  pointer-events: none;
+}
+
+.page-header--alumno-payments .page-header-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-800);
+}
+
+.page-header--alumno-payments .page-header-subtitle {
+  margin: 4px 0 0 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.page-header-subtitle--secondary {
+  margin-top: 2px;
+  font-size: 0.85rem;
+}
+
+.alumno-payments-career {
+  font-weight: 600;
+  color: var(--primary-800);
+}
+
+/* Botón volver */
+.alumno-payments-back-btn {
+  border-radius: 999px;
+  padding: 8px 18px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border: 1px solid #bfdbfe;
+  background: linear-gradient(135deg, #eff6ff, #e0f2fe);
+  color: #1d4ed8;
+}
+
+.alumno-payments-back-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  border-color: #60a5fa;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.22);
+  transform: translateY(-1px);
+}
+
+/* ===========================================
+   CARD PRINCIPAL
+   =========================================== */
+
+.alumno-payments-section {
+  margin-top: 4px;
+}
+
+.alumno-payments-card {
+  position: relative;
+  border-radius: 20px;
+  background-color: #ffffff;
+  box-shadow: var(--shadow-soft);
+  padding: 16px 18px 18px;
+}
+
+/* Barrita superior teal */
+.alumno-payments-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  border-top: 3px solid #14b8a6;
+  pointer-events: none;
+}
+
+.alumno-payments-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.alumno-payments-card-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--primary-800);
+}
+
+.alumno-payments-card-subtitle {
+  margin: 4px 0 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Toggle anulados */
+.alumno-payments-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 220px;
+  font-size: 0.85rem;
+}
+
+/* ===========================================
+   MENSAJES / ERRORES
+   =========================================== */
+
+.alumno-payments-alert {
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+.alumno-payments-message {
+  padding: 10px 8px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.alumno-payments-message--muted {
+  color: var(--text-muted);
+}
+
+/* ===========================================
+   TABLA + SCROLL
+   =========================================== */
+
+.alumno-payments-table-wrapper {
+  position: relative;
+  margin-top: 4px;
+  max-height: 55vh;
+  overflow-y: auto;
+  border-radius: 16px;
+  background-color: #ffffff;
+  padding: 8px 10px;
+}
+
+/* Scrollbar sutil */
+.alumno-payments-table-wrapper::-webkit-scrollbar {
+  width: 6px;
+}
+.alumno-payments-table-wrapper::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background-color: rgba(148, 163, 184, 0.5);
+}
+
+.alumno-payments-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+/* Encabezado sticky */
+.alumno-payments-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  text-align: left;
+  padding: 10px 8px;
+  background-color: #f3f4f6;
+  border-bottom: 1px solid #e5e7eb;
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+.alumno-payments-table tbody td {
+  padding: 9px 8px;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #ffffff;
+}
+
+/* Zebra */
+.alumno-payments-table tbody tr:nth-child(even) td {
+  background-color: #f9fafb;
+}
+
+/* Hover */
+.alumno-payments-table tbody tr:hover td {
+  background-color: #eef3ff;
+}
+
+/* Nota: el estado usa .payments-status-pill del módulo de pagos admin */
+
+/* ===========================================
+   RESPONSIVE
+   =========================================== */
+
+@media (max-width: 900px) {
+  .page-header.page-header--alumno-payments {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .alumno-payments-card {
+    padding: 12px 12px 14px;
+  }
+
+  .alumno-payments-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .alumno-payments-toggle {
+    justify-content: flex-start;
+    min-width: auto;
+  }
+
+  .alumno-payments-table-wrapper {
+    max-height: 65vh;
+  }
+}
